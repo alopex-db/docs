@@ -1,0 +1,94 @@
+# ===========================================
+# Security - Sensitive Files
+# ===========================================
+
+# Environment files
+.env
+.env.*
+.env.local
+.env.*.local
+
+# Credentials and secrets
+credentials.*
+secrets.*
+*.credentials
+*.secret
+
+# Private keys
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+*.ppk
+
+# SSH
+.ssh/
+
+# Git credentials
+.git-credentials
+.netrc
+
+# Local configuration
+config.local.*
+local.settings.json
+*.local.yml
+*.local.yaml
+*.local.json
+
+# Database files
+*.sqlite
+*.sqlite3
+*.db
+
+# Authentication
+htpasswd
+.htpasswd
+
+# Certificates (private)
+*.crt.key
+*-key.pem
+
+# AWS
+.aws/credentials
+.aws/config
+
+# Azure
+.azure/
+
+# GCP
+*.json.key
+*-credentials.json
+
+# ===========================================
+# Development - Local Files
+# ===========================================
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary
+tmp/
+temp/
+*.tmp
+
+# Build artifacts
+dist/
+build/
+target/

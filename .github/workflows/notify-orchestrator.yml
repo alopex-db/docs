@@ -1,0 +1,33 @@
+name: Notify Orchestrator
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'concepts/**'
+      - 'design/**'
+      - 'specs/**'
+      - 'README.md'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Orchestrator
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.ORCHESTRATOR_TOKEN }}
+          repository: asopitech-labs/sponsors-orchestrator
+          event-type: source-updated
+          client-payload: |
+            {
+              "source": "alopex-db/docs",
+              "source_type": "public-docs",
+              "project": "alopex-db",
+              "ref": "${{ github.ref }}",
+              "sha": "${{ github.sha }}",
+              "actor": "${{ github.actor }}",
+              "timestamp": "${{ github.event.head_commit.timestamp }}"
+            }
