@@ -1290,6 +1290,14 @@ pub struct ColumnStatistics {
 }
 ```
 
+#### 6.1.1 RowID 取り扱いポリシー
+
+- 64bit RowID を **直接格納** する。フォーマットは `row_id = (segment_id << 44) | local_offset`（上位20bit=segment_id、下位44bit=RowGroupを跨いだセグメント内オフセット）。
+- segment_id はテーブル単位で単調増加（最大約 1,048,576 セグメント）、local_offset は最大約 17.5 兆行/segment まで対応。
+- RowID は SegmentV2 に永続化し、RowGroup 統計に `row_id_min/max` を保持する。統計欠損時は従来どおり全スキャンフォールバック。
+- ColumnarScan は RowID 列がなくても格納済み RowID を優先復元し、Row.row_id に設定する。
+- KNN/HNSW など Top-K 再フェッチは RowID から segment_id/local_offset を復元して O(K) で行再取得できる構造とする（現状は ColumnarScan 経由の復元パスを提供）。
+
 ### 6.2 エンコーディング
 
 既存の`alopex-core::columnar::encoding`を大幅拡張：
