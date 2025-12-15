@@ -63,6 +63,35 @@
 
 ---
 
+## Chirps マイルストーン
+
+| Version | Milestone | 依存 | 状態 |
+|---------|-----------|------|------|
+| v0.1-v0.3 | Node Identity、QUIC、Gossip | - | ✅ 完了 |
+| v0.4 | Raft-ready Transport | Chirps v0.3 | ✅ 完了 |
+| v0.5 | Raft Consensus API | Chirps v0.4 | ✅ 完了 |
+| v0.6 | Multi-Raft + TSO + Observability | Chirps v0.5 | ⏳ 予定 |
+| v0.7 | Pluggable Backend + Durable | Chirps v0.6 | ⏳ 予定 |
+| **v0.7.1** | **File Transfer API** | Chirps v0.7 | ⏳ 予定 |
+| v0.8 | Federation Profile | Chirps v0.7 | ⏳ 予定 |
+| v0.9 | Multi-Cluster + HLC | Chirps v0.8 | ⏳ 予定 |
+| v1.0 | Advanced Federation | Chirps v0.9 | ⏳ 予定 |
+
+### Chirps File Transfer API (v0.7.1)
+
+クラスタ間ファイル転送専用 API。SSTable/セグメントファイルの転送、フェデレーション同期に使用。
+
+| 機能 | 説明 |
+|------|------|
+| send_file / broadcast_file | 1対1/1対N ファイル転送 |
+| sync_file | Push/Pull/双方向ファイル同期 |
+| Chunked Transfer | 並列チャンク転送（デフォルト 4並列、1MB/chunk）|
+| Integrity Verification | XXHash64（チャンク）+ SHA-256（ファイル全体）|
+| Resume | セッション永続化によるレジューム対応 |
+| Bandwidth Throttling | トークンバケット方式の帯域制御 |
+
+---
+
 ## DB × Chirps 連動チェックリスト
 
 ### Raft Consensus API統合
@@ -79,6 +108,7 @@
 
 ### フェデレーション連携
 - v1.0 (DB): Chirps v0.8 の Federation profile で 2 クラスタ間フェデレーション
+  - Chirps v0.7.1 の File Transfer API で SSTable/セグメントファイル同期
 - v1.1 (DB): Chirps v0.9 のマルチクラスタ + HLC で Mesh
 - v1.2 (DB): Chirps v1.0 のフェイルオーバー通知で自動フェイルオーバー
 
