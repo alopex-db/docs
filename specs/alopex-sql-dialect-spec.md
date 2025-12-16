@@ -1,7 +1,7 @@
 # Alopex SQL 方言仕様書
 
-**バージョン**: 0.3.1-draft
-**最終更新**: 2025-12-02
+**バージョン**: 0.3.3-draft
+**最終更新**: 2025-12-16
 **ステータス**: ドラフト
 
 ---
@@ -38,6 +38,7 @@ Alopex SQL は **SQLite をベースとし、PostgreSQL の一部構文を参考
 | **トリガー / ビュー** | DDL 拡張 | v0.7+ |
 | **外部キー制約** | 参照整合性チェック | v0.4 |
 | **トランザクション分離レベル指定** | 現状は Snapshot Isolation 固定 | v0.5+ |
+| **TS 拡張** (MATCH, TIME_BUCKET, RATE) | skulk 型を `alopex-query-common` 経由で使用 | v0.2.x |
 
 ### 1.3 Vector 拡張構文の設計根拠
 
@@ -1194,6 +1195,76 @@ SELECT * FROM docs
 
 ---
 
+## 8.5 将来拡張: TS (Time Series) 構文
+
+v0.2.x 以降で、`alopex-query-common` 経由で skulk の型を使用して以下の TS 拡張構文を実装予定。
+
+### MATCH 構文（PromQL スタイルラベルマッチング）
+
+```sql
+-- 構文
+SELECT * FROM metrics
+  WHERE MATCH(labels, '{job="api", instance=~"prod.*"}')
+
+-- マッチ演算子
+=   : 完全一致
+!=  : 不一致
+=~  : 正規表現マッチ
+!~  : 正規表現非マッチ
+```
+
+**使用する型**: `skulk::query::{LabelMatcher, MatchOp}` (alopex-query-common 経由)
+
+### TIME_BUCKET 関数
+
+```sql
+-- 構文
+SELECT TIME_BUCKET(timestamp_col, '1h') AS bucket,
+       SUM(value) AS total
+  FROM metrics
+  GROUP BY bucket
+
+-- インターバル指定
+'1m'  : 1分
+'5m'  : 5分
+'1h'  : 1時間
+'1d'  : 1日
+```
+
+**使用する型**: `skulk::query::TSFunction::TimeBucket` (alopex-query-common 経由)
+
+### 時系列関数 (RATE, DELTA, DERIVATIVE)
+
+```sql
+-- カウンタの秒間変化率
+SELECT RATE(value, '5m') FROM metrics
+
+-- ゲージの絶対差分
+SELECT DELTA(value, '5m') FROM metrics
+
+-- ゲージの秒間変化率
+SELECT DERIVATIVE(value, '5m') FROM metrics
+```
+
+**使用する型**: `skulk::query::TSFunction` (alopex-query-common 経由)
+
+**実装時の依存関係** (v0.2.x):
+
+注意: alopex-sql は型の定義元であり、`alopex-query-common` には依存しない。
+TS 拡張機能を使用する場合は UQM (`alopex-unified`) 経由でアクセスする。
+
+```rust
+// alopex-unified/Cargo.toml
+[dependencies]
+alopex-query-common = { path = "../alopex-query-common" }
+
+// 使用例 (alopex-unified 内)
+use alopex_query_common::{TSFunction, LabelMatcher, MatchOp};
+// これらは実際には skulk::query から再エクスポートされた型
+```
+
+---
+
 ## 9. 組み込み関数一覧
 
 ### 9.1 数値関数
@@ -1418,6 +1489,44 @@ BEGIN, COMMIT, ROLLBACK, TRANSACTION, SAVEPOINT
 
 ### v0.2.0+ 後続バージョン
 
+#### 依存関係の方向性（TS 拡張）
+
+**重要**: alopex-sql と skulk が型の**定義元 (Source of Truth)** である。`alopex-query-common` は薄いファサードとして型を再エクスポートする。
+
+```
+    ┌─────────────┐  ┌─────────────────┐
+    │   skulk     │  │   alopex-sql    │   ← SOURCE OF TRUTH
+    │  (TSDB)     │  │  (本クレート)    │     型の定義元
+    └──────┬──────┘  └────────┬────────┘
+           │                  │
+           └────────┬─────────┘
+                    │ 再エクスポート
+                    ▼
+           ┌─────────────────────┐
+           │ alopex-query-common │   ← FACADE
+           │  (型の再エクスポート) │     薄いラッパー
+           └─────────┬───────────┘
+                     │
+                     ▼
+           ┌──────────────────┐
+           │  alopex-unified  │
+           │     (UQM)        │
+           └──────────────────┘
+```
+
+**TS 拡張で使用する型** (`alopex-query-common` 経由で skulk の型を利用):
+- `skulk::query::TSFunction`: 時系列関数 (rate, delta, time_bucket など)
+- `skulk::query::LabelMatcher`, `MatchOp`: MATCH 構文用ラベルマッチャー
+- `alopex_query_common::TimeRange`, `QueryContext`: 補助型 (独自定義)
+
+**禁止事項**:
+- ❌ `skulk` クレートへの直接依存（`alopex-query-common` 経由で利用）
+- ❌ `alopex-query-common` への依存（循環依存回避、alopex-sql は型の定義元）
+
+**参照ドキュメント**:
+- [alopex-query-common 設計書](../../docs-internal/design/alopex-query-common-design.md) - 型の再エクスポート層
+- [Skulk v0.4 Query Engine 要件](../../.spec-workflow/specs/skulk-v0.4-query-engine/requirements.md) - 時系列型の定義元
+
 | バージョン | 内容 | 対応 DB |
 |------------|------|---------|
 | v0.2.0 | GROUP BY / Aggregation | v0.4 |
@@ -1441,6 +1550,8 @@ BEGIN, COMMIT, ROLLBACK, TRANSACTION, SAVEPOINT
 | 0.3.0-draft | 2025-11-29 | 初版作成 |
 | 0.3.0-draft | 2025-11-30 | 実装マイルストーンセクション追加 |
 | 0.3.1-draft | 2025-12-02 | sqlparser-rs 調査に基づくパーサー実装アーキテクチャ追加（Pratt Parser、Dialect システム、Visitor パターン） |
+| 0.3.2-draft | 2025-12-15 | TS 拡張構文セクション追加、alopex-query-common 依存関係の方向性を明記 |
+| 0.3.3-draft | 2025-12-16 | 依存関係の方向性修正（skulk/alopex-sql が SOURCE OF TRUTH、alopex-query-common が再エクスポート） |
 
 ---
 
