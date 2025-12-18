@@ -2,24 +2,40 @@
 
 > 詳細仕様は `.spec-workflow/specs/` 配下の各 spec ドキュメントを参照。
 
+> **Note (2025-12-18)**: CD ワークフロー修正により v0.3.0 が crates.io に公開済み（旧 v0.1.3 Vector SQL 相当）。
+> 旧 v0.1.0~v0.1.3 は v0.3.0 に統合、v0.1.4 以降は v0.4.0 以降に再番号付け。
+
 ## Overview
 
 alopex-sql クエリエンジンの実装マイルストーンと、各バージョンで実装する具体的な関数・型の一覧。
 
+### v0.3.0 SQL Frontend ✅ crates.io 公開済
+
+| コンポーネント | 内容 | 状態 |
+|----------------|------|------|
+| Parser | Lexer + AST + DDL/DML Parser | ✅ 完了 |
+| Planner | Catalog + LogicalPlan + 名前解決・型チェック | ✅ 完了 |
+| Storage Engine | RowCodec + KeyEncoder + TableStorage/IndexStorage + TxnBridge | ✅ 完了 |
+| Executor | DDL/DML Executor + Iterator ベース実行 | ✅ 完了 |
+| Vector SQL | `vector_similarity` 関数 + Top-K 最適化 | ✅ 完了 |
+
+### 後続バージョン
+
 | Version | Milestone | Status | Spec Location |
 |---------|-----------|--------|---------------|
-| v0.1.0 | Parser | ✅ Complete | - |
-| v0.1.1 | Planner | ✅ Complete | - |
-| v0.1.1-storage | Storage Engine | ✅ Complete | `.spec-workflow/specs/alopex-sql-storage/` |
-| **v0.1.2** | **Executor** | 🔄 In Progress | `.spec-workflow/specs/alopex-sql-executor-v0.1.2/` |
-| v0.1.3 | Vector SQL | ⏳ Planned | - |
-| v0.1.4 | Embedded Integration | ⏳ Planned | - |
+| **v0.4.0** | **Embedded Integration** | ⏳ Planned | `.spec-workflow/specs/alopex-sql-v0.4.0/` |
+| v0.5.0 | GROUP BY / Aggregation | ⏳ Planned | - |
+| v0.5.1 | 次世代検索インデックス基盤 | ⏳ Planned | - |
+| v0.5.2 | キャッシュ・メモリ管理 | ⏳ Planned | - |
+| v0.6.0 | JOIN Support | ⏳ Planned | - |
+| v0.7.0 | WASM Parser | ⏳ Planned | - |
+| v0.8.0 | Subquery | ⏳ Planned | - |
 
 ---
 
-## v0.1.2 Executor
+## Executor 詳細仕様 (v0.3.0 に統合済み)
 
-> Spec: `.spec-workflow/specs/alopex-sql-executor-v0.1.2/`
+> 以下は旧 v0.1.2 Executor の詳細仕様。v0.3.0 として crates.io に公開済み。
 
 ### Module Structure
 
@@ -498,9 +514,9 @@ impl<'txn, 'store, T: KVTransaction> TableStorage<'txn, 'store, T> {
 
 ---
 
-## v0.1.3 Vector SQL
+## Vector SQL 詳細仕様 (v0.3.0 に統合済み)
 
-> 予定仕様（v0.1.2 完了後に詳細化）
+> 以下は旧 v0.1.3 Vector SQL の仕様。v0.3.0 として crates.io に公開済み。
 
 ### Planned Functions
 
@@ -534,14 +550,14 @@ pub fn execute_vector_topk<S: KVStore>(
 
 ---
 
-## v0.1.4 Embedded Integration
+## v0.4.0 Embedded Integration ⏳ 予定
 
-> 予定仕様（v0.1.3 完了後に詳細化）
+> 旧 v0.1.4。詳細仕様は `.spec-workflow/specs/alopex-sql-v0.4.0/requirements.md` を参照。
 
 ### Planned APIs
 
 ```rust
-// alopex-embedded/src/database.rs (v0.1.4)
+// alopex-embedded/src/database.rs (v0.4.0)
 
 impl Database {
     /// Execute a SQL statement and return the result.
@@ -561,7 +577,7 @@ impl Database {
     pub fn execute_sql(&self, sql: &str) -> Result<ExecutionResult, Error>;
 }
 
-// alopex-embedded/src/transaction.rs (v0.1.4)
+// alopex-embedded/src/transaction.rs (v0.4.0)
 
 impl Transaction<'_> {
     /// Execute a SQL statement within this transaction.
@@ -573,9 +589,9 @@ impl Transaction<'_> {
 
 ---
 
-## v0.2.0 GROUP BY / Aggregation
+## v0.5.0 GROUP BY / Aggregation ⏳ 予定
 
-> 対応 Alopex DB: v0.4
+> 旧 v0.2.0。対応 Alopex DB: v0.5
 
 ### New Keywords (Reserved)
 
@@ -598,7 +614,7 @@ SELECT [aggregate_function | column], ...
 ### Aggregate Functions
 
 ```rust
-// executor/evaluator/aggregate.rs (v0.2.0)
+// executor/evaluator/aggregate.rs (v0.5.0)
 
 /// Aggregate function types
 pub enum AggregateFunction {
@@ -631,7 +647,7 @@ pub struct MaxAccumulator { max: Option<SqlValue> }
 ### New LogicalPlan Variant
 
 ```rust
-// planner/logical_plan.rs (v0.2.0 extension)
+// planner/logical_plan.rs (v0.5.0 extension)
 
 pub enum LogicalPlan {
     // ... existing variants ...
@@ -660,7 +676,7 @@ pub struct AggregateExpr {
 ### Query Executor Extension
 
 ```rust
-// executor/query/aggregate.rs (v0.2.0)
+// executor/query/aggregate.rs (v0.5.0)
 
 /// Execute GROUP BY aggregation.
 ///
@@ -679,9 +695,9 @@ pub fn execute_aggregate<S: KVStore>(
 
 ---
 
-## v0.2.1 次世代検索インデックス基盤
+## v0.5.1 次世代検索インデックス基盤 ⏳ 予定
 
-> 対応 Alopex DB: v0.4
+> 旧 v0.2.1。対応 Alopex DB: v0.5
 
 ### New Index Types
 
@@ -699,7 +715,7 @@ CREATE INDEX idx_uuid ON events (id) USING UUIDV7;
 ### New Functions
 
 ```rust
-// executor/evaluator/functions/hash.rs (v0.2.1)
+// executor/evaluator/functions/hash.rs (v0.5.1)
 
 /// SHA-256 hash function
 pub fn eval_sha256(value: &SqlValue) -> Result<SqlValue, EvaluationError>;
@@ -716,14 +732,14 @@ pub fn eval_hamming_distance(a: &SqlValue, b: &SqlValue) -> Result<SqlValue, Eva
 
 ---
 
-## v0.2.2 キャッシュ・メモリ管理
+## v0.5.2 キャッシュ・メモリ管理 ⏳ 予定
 
-> 対応 Alopex DB: v0.4
+> 旧 v0.2.2。対応 Alopex DB: v0.5
 
 ### New System Functions
 
 ```rust
-// executor/evaluator/functions/system.rs (v0.2.2)
+// executor/evaluator/functions/system.rs (v0.5.2)
 
 /// Get current memory usage statistics
 pub fn eval_memory_stats() -> Result<SqlValue, EvaluationError>;
@@ -745,9 +761,9 @@ PRAGMA io_stats;                 -- Show I/O statistics
 
 ---
 
-## v0.3.0 JOIN Support
+## v0.6.0 JOIN Support ⏳ 予定
 
-> 対応 Alopex DB: v0.5
+> 旧 v0.3.0。対応 Alopex DB: v0.6
 
 ### New Keywords (Reserved)
 
@@ -773,7 +789,7 @@ SELECT ... FROM t1 JOIN t2 USING (common_col);   -- join on specific common colu
 ### New LogicalPlan Variant
 
 ```rust
-// planner/logical_plan.rs (v0.3.0 extension)
+// planner/logical_plan.rs (v0.6.0 extension)
 
 pub enum LogicalPlan {
     // ... existing variants ...
@@ -805,7 +821,7 @@ pub enum JoinType {
 ### Join Executor
 
 ```rust
-// executor/query/join.rs (v0.3.0)
+// executor/query/join.rs (v0.6.0)
 
 /// Execute JOIN operation.
 ///
@@ -839,9 +855,9 @@ pub fn hash_join(
 
 ---
 
-## v0.4.0 WASM Parser
+## v0.7.0 WASM Parser ⏳ 予定
 
-> 対応 Alopex DB: v0.6
+> 旧 v0.4.0。対応 Alopex DB: v0.7
 
 ### Target
 
@@ -852,7 +868,7 @@ wasm32-unknown-unknown
 ### Scope (Read-Only SQL)
 
 ```rust
-// alopex-sql-wasm/src/lib.rs (v0.4.0)
+// alopex-sql-wasm/src/lib.rs (v0.7.0)
 
 /// WASM-compatible SQL parser and executor
 /// Supports read-only operations only
@@ -889,9 +905,9 @@ impl WasmSqlEngine {
 
 ---
 
-## v0.5.0 Subquery
+## v0.8.0 Subquery ⏳ 予定
 
-> 対応 Alopex DB: v0.6
+> 旧 v0.5.0。対応 Alopex DB: v0.7
 
 ### New Keywords (Reserved)
 
@@ -919,7 +935,7 @@ SELECT * FROM (SELECT id, name FROM users WHERE active) AS active_users;
 ### New TypedExprKind Variants
 
 ```rust
-// planner/typed_expr.rs (v0.5.0 extension)
+// planner/typed_expr.rs (v0.8.0 extension)
 
 pub enum TypedExprKind {
     // ... existing variants ...
@@ -958,7 +974,7 @@ pub enum Quantifier {
 ### Subquery Executor
 
 ```rust
-// executor/query/subquery.rs (v0.5.0)
+// executor/query/subquery.rs (v0.8.0)
 
 /// Execute scalar subquery
 pub fn execute_scalar_subquery<S: KVStore>(
@@ -986,24 +1002,24 @@ pub fn execute_exists<S: KVStore>(
 
 ---
 
-## v0.6.0+ Distributed Query (Chirps 依存)
+## v0.9.0+ Distributed Query (Chirps 依存) ⏳ 予定
 
-> 対応 Alopex DB: v0.7+
+> 旧 v0.6.0+。対応 Alopex DB: v0.8+
 
 ### Version Roadmap
 
 | Version | Feature | Chirps Dependency |
 |---------|---------|-------------------|
-| v0.6.0 | Distributed Query Planner | Chirps v0.3 |
-| v0.7.0 | Raft-aware Executor | Chirps v0.6 |
-| v0.8.0 | Multi-Raft Query | Chirps v0.7 |
-| v0.9.0 | Federation Query | Chirps v0.8 |
+| v0.9.0 | Distributed Query Planner | Chirps v0.3 |
+| v0.10.0 | Raft-aware Executor | Chirps v0.6 |
+| v0.11.0 | Multi-Raft Query | Chirps v0.7 |
+| v0.12.0 | Federation Query | Chirps v0.8 |
 | v1.0.0 | Query Optimizer | - |
 
-### New Concepts (v0.6.0+)
+### New Concepts (v0.9.0+)
 
 ```rust
-// planner/distributed.rs (v0.6.0+)
+// planner/distributed.rs (v0.9.0+)
 
 /// Distributed query plan
 pub enum DistributedPlan {
@@ -1035,7 +1051,7 @@ pub enum GatherType {
 
 ## Reserved Keywords Summary
 
-### Currently Implemented (v0.1.x)
+### Currently Implemented (v0.3.0 - crates.io 公開済み)
 
 ```
 -- DDL
@@ -1063,16 +1079,16 @@ CAST, NOW
 ### Reserved for Future (Not Yet Implemented)
 
 ```
--- v0.2.0 Aggregation
+-- v0.5.0 Aggregation
 GROUP, HAVING, COUNT, SUM, AVG, MIN, MAX
 
--- v0.3.0 JOIN
+-- v0.6.0 JOIN
 JOIN, LEFT, RIGHT, OUTER, FULL, CROSS, ON, NATURAL
 
--- v0.5.0 Subquery
+-- v0.8.0 Subquery
 EXISTS, ANY, SOME, ALL, WITH, RECURSIVE
 
--- v0.6.0+ Advanced
+-- v0.9.0+ Advanced
 UNION, INTERSECT, EXCEPT,
 OVER, PARTITION, WINDOW,
 BEGIN, COMMIT, ROLLBACK, TRANSACTION, SAVEPOINT,
@@ -1088,7 +1104,7 @@ RETURNING, CONFLICT
 > SQLite/PostgreSQL互換を目指し、両DBで共通する関数を優先実装。
 > 詳細は `reference/sqlite-sql-reference.md`, `reference/postgresql-functions-reference.md` を参照。
 
-### v0.1.2 (Executor - Current)
+### v0.3.0 (Executor - crates.io 公開済み)
 
 ```
 -- 実装済み
@@ -1096,7 +1112,7 @@ CAST(expr AS type)
 NOW()
 ```
 
-### v0.1.3 (Vector SQL)
+### v0.3.0 (Vector SQL - crates.io 公開済み)
 
 ```
 -- ベクトル演算
@@ -1106,7 +1122,7 @@ vector_dims(vec)                         -- 次元数取得
 vector_norm(vec)                         -- ノルム計算
 ```
 
-### v0.2.0 (Aggregation)
+### v0.5.0 (Aggregation)
 
 ```
 -- 基本集約関数 (SQLite/PostgreSQL共通)
@@ -1124,7 +1140,7 @@ GROUP_CONCAT(expr)          -- 文字列連結 (SQLite)
 STRING_AGG(expr, delim)     -- 文字列連結 (PostgreSQL)
 ```
 
-### v0.2.1 (Hash/UUID Index)
+### v0.5.1 (Hash/UUID Index)
 
 ```
 -- ハッシュ関数
@@ -1144,7 +1160,7 @@ ENCODE(bytea, format)       -- エンコード (PostgreSQL互換: base64/hex)
 DECODE(text, format)        -- デコード (PostgreSQL互換)
 ```
 
-### v0.2.3 (Core Scalar Functions)
+### v0.5.3 (Core Scalar Functions)
 
 ```
 -- 数値関数 (SQLite/PostgreSQL共通)
@@ -1226,7 +1242,7 @@ PG_TYPEOF(x)                -- 型名 (PostgreSQL)
 QUOTE(x)                    -- SQLリテラル形式 (SQLite)
 ```
 
-### v0.2.4 (Date/Time Functions)
+### v0.5.4 (Date/Time Functions)
 
 ```
 -- 現在日時 (SQLite/PostgreSQL共通)
@@ -1263,10 +1279,10 @@ JULIANDAY(ts)               -- ユリウス日 (SQLite)
 UNIXEPOCH(ts)               -- Unix時刻 (SQLite 3.38+)
 ```
 
-### v0.3.0+ (Advanced Functions)
+### v0.6.0+ (Advanced Functions)
 
 ```
--- ウィンドウ関数 (PostgreSQL互換, v0.3.0)
+-- ウィンドウ関数 (PostgreSQL互換, v0.6.0)
 ROW_NUMBER() OVER (...)     -- 連番
 RANK() OVER (...)           -- 順位 (同値で同順位、次は飛ぶ)
 DENSE_RANK() OVER (...)     -- 密順位 (同値で同順位、次は連続)
@@ -1280,7 +1296,7 @@ SUM(...) OVER (...)         -- ウィンドウ集約
 AVG(...) OVER (...)
 COUNT(...) OVER (...)
 
--- JSON関数 (v0.3.1)
+-- JSON関数 (v0.6.1)
 -- SQLite互換
 JSON(text)                  -- JSON検証・正規化
 JSON_VALID(text)            -- JSON有効性チェック
@@ -1310,7 +1326,7 @@ JSONB_BUILD_ARRAY(...)
 JSONB_AGG(expr)
 JSONB_OBJECT_AGG(key, val)
 
--- 配列関数 (PostgreSQL, v0.3.2)
+-- 配列関数 (PostgreSQL, v0.6.2)
 ARRAY[...]                  -- 配列リテラル
 ARRAY_AGG(expr)             -- 配列集約
 ARRAY_APPEND(arr, elem)     -- 末尾追加
@@ -1325,12 +1341,12 @@ UNNEST(arr)                 -- 行展開
 STRING_TO_ARRAY(s, delim)   -- 文字列→配列
 ARRAY_TO_STRING(arr, delim) -- 配列→文字列
 
--- 集合生成関数 (PostgreSQL, v0.3.2)
+-- 集合生成関数 (PostgreSQL, v0.6.2)
 GENERATE_SERIES(start, stop)         -- 数列生成
 GENERATE_SERIES(start, stop, step)   -- ステップ付き
 GENERATE_SERIES(start, stop, interval) -- 日時系列
 
--- 統計集約関数 (PostgreSQL, v0.4.0)
+-- 統計集約関数 (PostgreSQL, v0.7.0)
 VARIANCE(expr) / VAR_SAMP(expr)   -- 標本分散
 VAR_POP(expr)                      -- 母分散
 STDDEV(expr) / STDDEV_SAMP(expr)  -- 標本標準偏差
@@ -1342,7 +1358,7 @@ PERCENTILE_CONT(fraction) WITHIN GROUP (ORDER BY expr)  -- 連続パーセンタ
 PERCENTILE_DISC(fraction) WITHIN GROUP (ORDER BY expr)  -- 離散パーセンタイル
 MODE() WITHIN GROUP (ORDER BY expr)  -- 最頻値
 
--- 全文検索関数 (PostgreSQL, v0.5.0+)
+-- 全文検索関数 (PostgreSQL, v0.8.0+)
 TO_TSVECTOR(config, document)   -- 文書→tsvector
 TO_TSQUERY(config, query)       -- クエリ→tsquery
 PLAINTO_TSQUERY(config, query)  -- プレーンテキスト→tsquery
@@ -1350,7 +1366,7 @@ WEBSEARCH_TO_TSQUERY(config, query)  -- Web検索形式
 TS_RANK(tsvector, tsquery)      -- 関連度スコア
 TS_HEADLINE(config, document, query)  -- ハイライト
 
--- ネットワークアドレス関数 (PostgreSQL, v0.6.0+)
+-- ネットワークアドレス関数 (PostgreSQL, v0.9.0+)
 HOST(inet)                  -- ホスト部分
 NETWORK(inet)               -- ネットワーク部
 NETMASK(inet)               -- ネットマスク
@@ -1362,58 +1378,60 @@ BROADCAST(inet)             -- ブロードキャスト
 
 | カテゴリ | SQLite | PostgreSQL | alopex-sql Target |
 |---------|--------|------------|-------------------|
-| 算術 | ✅ | ✅ | v0.2.3 |
-| 三角関数 | ✅ (3.35+) | ✅ | v0.2.3 |
-| 文字列 | ✅ | ✅ | v0.2.3 |
-| 正規表現 | ❌ | ✅ | v0.2.3 (PostgreSQL互換) |
-| 日付・時刻 | ✅ | ✅ | v0.2.4 |
-| 条件 | ✅ | ✅ | v0.2.3 |
-| 集約 | ✅ | ✅ | v0.2.0 |
-| ウィンドウ | ✅ | ✅ | v0.3.0 |
-| JSON | ✅ | ✅ | v0.3.1 |
-| 配列 | ❌ | ✅ | v0.3.2 (PostgreSQL互換) |
-| 集合生成 | ❌ | ✅ | v0.3.2 (PostgreSQL互換) |
-| 全文検索 | FTS5拡張 | ✅ | v0.5.0+ (PostgreSQL互換) |
-| UUID | 拡張 | ✅ | v0.2.1 |
-| ハッシュ | ❌ | ✅ | v0.2.1 |
-| ベクトル | ❌ | 拡張 | v0.1.3 (独自) |
+| 算術 | ✅ | ✅ | v0.5.3 |
+| 三角関数 | ✅ (3.35+) | ✅ | v0.5.3 |
+| 文字列 | ✅ | ✅ | v0.5.3 |
+| 正規表現 | ❌ | ✅ | v0.5.3 (PostgreSQL互換) |
+| 日付・時刻 | ✅ | ✅ | v0.5.4 |
+| 条件 | ✅ | ✅ | v0.5.3 |
+| 集約 | ✅ | ✅ | v0.5.0 |
+| ウィンドウ | ✅ | ✅ | v0.6.0 |
+| JSON | ✅ | ✅ | v0.6.1 |
+| 配列 | ❌ | ✅ | v0.6.2 (PostgreSQL互換) |
+| 集合生成 | ❌ | ✅ | v0.6.2 (PostgreSQL互換) |
+| 全文検索 | FTS5拡張 | ✅ | v0.8.0+ (PostgreSQL互換) |
+| UUID | 拡張 | ✅ | v0.5.1 |
+| ハッシュ | ❌ | ✅ | v0.5.1 |
+| ベクトル | ❌ | 拡張 | v0.3.0 (独自・crates.io 公開済み) |
 
 ---
 
 ## Version Dependencies
 
+> **Note (2025-12-18)**: CD ワークフロー修正により v0.3.0 が crates.io に公開済み（旧 v0.1.3 Vector SQL 相当）。
+> 旧 v0.1.x は v0.3.0 に統合、旧 v0.1.4 以降は v0.4.0 以降に再番号付け。
+
 ```
-v0.1.0 Parser
+┌─────────────────────────────────────────────────────────────┐
+│ v0.3.0 ✅ crates.io 公開済み (旧 v0.1.0~v0.1.3 統合)        │
+│   ├── Parser (Lexer + AST + DDL/DML)                        │
+│   ├── Planner (Catalog + LogicalPlan)                       │
+│   ├── Storage Engine (RowCodec + KeyEncoder + TxnBridge)    │
+│   ├── Executor (DDL/DML)                                    │
+│   └── Vector SQL (vector_similarity, Top-K)                 │
+└─────────────────────────────────────────────────────────────┘
     ↓
-v0.1.1 Planner ←──┐
-    ↓             │
-v0.1.1-storage ───┤ (parallel development)
-    ↓             │
-v0.1.2 Executor ←─┘
+v0.4.0 Embedded Integration (execute_sql API) ──→ Alopex DB v0.4
     ↓
-v0.1.3 Vector SQL
+v0.5.0 GROUP BY / Aggregation ──────────────────→ Alopex DB v0.5
     ↓
-v0.1.4 Embedded Integration
+v0.5.1 Hash/UUID Index (SHA-256/SimHash/UUIDv7)
     ↓
-v0.2.0 GROUP BY / Aggregation ──→ Alopex DB v0.4
+v0.5.2 Cache/Memory Management
     ↓
-v0.2.1 Hash/UUID Index
+v0.6.0 JOIN Support ────────────────────────────→ Alopex DB v0.6
     ↓
-v0.2.2 Cache/Memory Management
+v0.7.0 WASM Parser (Read-Only)
     ↓
-v0.3.0 JOIN Support ─────────────→ Alopex DB v0.5
+v0.8.0 Subquery ────────────────────────────────→ Alopex DB v0.7
     ↓
-v0.4.0 WASM Parser ──────────────→ Alopex DB v0.6
+v0.9.0 Distributed Query Planner ───────────────→ Alopex DB v0.8 (Chirps v0.3)
     ↓
-v0.5.0 Subquery
+v0.10.0 Raft-aware Executor ────────────────────→ Alopex DB v0.9 (Chirps v0.6)
     ↓
-v0.6.0 Distributed Query ────────→ Alopex DB v0.7 (Chirps v0.3)
+v0.11.0 Multi-Raft Query ───────────────────────→ Alopex DB v0.10 (Chirps v0.7)
     ↓
-v0.7.0 Raft-aware Executor ──────→ Alopex DB v0.8 (Chirps v0.6)
-    ↓
-v0.8.0 Multi-Raft Query ─────────→ Alopex DB v0.9 (Chirps v0.7)
-    ↓
-v0.9.0 Federation Query ─────────→ Alopex DB v1.0 (Chirps v0.8)
+v0.12.0 Federation Query ───────────────────────→ Alopex DB v1.0 (Chirps v0.8)
     ↓
 v1.0.0 Query Optimizer (Cost-based)
 ```
@@ -1427,3 +1445,4 @@ v1.0.0 Query Optimizer (Cost-based)
 | 2025-12-09 | 0.1.0 | Initial creation with v0.1.2 Executor detailed spec |
 | 2025-12-09 | 0.2.0 | Added v0.2.0+ roadmap with detailed function signatures and reserved keywords |
 | 2025-12-09 | 0.3.0 | Comprehensive update to Built-in Functions Roadmap based on SQLite/PostgreSQL reference documents |
+| 2025-12-18 | 0.4.0 | **バージョン再番号付け**: CD ワークフロー修正により v0.3.0 が crates.io に公開済み（旧 v0.1.3 Vector SQL 相当）。旧 v0.1.0~v0.1.3 は v0.3.0 に統合、旧 v0.1.4 以降は v0.4.0 以降に再番号付け。全セクションのバージョン番号を更新。 |

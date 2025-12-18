@@ -1,7 +1,7 @@
 # Alopex SQL 方言仕様書
 
-**バージョン**: 0.3.3-draft
-**最終更新**: 2025-12-16
+**バージョン**: 0.3.4-draft
+**最終更新**: 2025-12-18
 **ステータス**: ドラフト
 
 ---
@@ -29,16 +29,16 @@ Alopex SQL は **SQLite をベースとし、PostgreSQL の一部構文を参考
 
 | 機能 | 理由 | 将来検討 |
 |------|------|----------|
-| **JOIN** | 複雑なプランナー/オプティマイザが必要 | v0.5+ |
-| **サブクエリ** | AST/プランナーの複雑化、Box 再帰が必要 | v0.5+ |
-| **CTE (WITH句)** | サブクエリ依存 | v0.6+ |
-| **GROUP BY / HAVING** | 集約プランナーが必要 | v0.4 |
-| **UNION / INTERSECT** | 複数結果セットのマージ | v0.5+ |
-| **ウィンドウ関数** | 高度な集約処理 | v0.6+ |
-| **トリガー / ビュー** | DDL 拡張 | v0.7+ |
-| **外部キー制約** | 参照整合性チェック | v0.4 |
-| **トランザクション分離レベル指定** | 現状は Snapshot Isolation 固定 | v0.5+ |
-| **TS 拡張** (MATCH, TIME_BUCKET, RATE) | skulk 型を `alopex-query-common` 経由で使用 | v0.2.x |
+| **JOIN** | 複雑なプランナー/オプティマイザが必要 | v0.6+ |
+| **サブクエリ** | AST/プランナーの複雑化、Box 再帰が必要 | v0.8+ |
+| **CTE (WITH句)** | サブクエリ依存 | v0.9+ |
+| **GROUP BY / HAVING** | 集約プランナーが必要 | v0.5 |
+| **UNION / INTERSECT** | 複数結果セットのマージ | v0.6+ |
+| **ウィンドウ関数** | 高度な集約処理 | v0.9+ |
+| **トリガー / ビュー** | DDL 拡張 | v0.10+ |
+| **外部キー制約** | 参照整合性チェック | v0.5 |
+| **トランザクション分離レベル指定** | 現状は Snapshot Isolation 固定 | v0.6+ |
+| **TS 拡張** (MATCH, TIME_BUCKET, RATE) | skulk 型を `alopex-query-common` 経由で使用 | v0.5.x |
 
 ### 1.3 Vector 拡張構文の設計根拠
 
@@ -1449,45 +1449,28 @@ BEGIN, COMMIT, ROLLBACK, TRANSACTION, SAVEPOINT
 
 ## 13. 実装マイルストーン
 
-### v0.1.0 Parser
+> **Note (2025-12-18)**: CD ワークフロー修正により v0.3.0 が crates.io に公開済み（旧 v0.1.3 Vector SQL 相当）。
+> 旧 v0.1.0~v0.1.3 は v0.3.0 に統合、v0.1.4 以降は v0.4.0 以降に再番号付け。
 
-| サブバージョン | 内容 | 状態 |
+### v0.3.0 SQL Frontend ✅ crates.io 公開済
+
+以下の機能が v0.3.0 として crates.io に公開済み（旧 v0.1.0~v0.1.3 相当）:
+
+| コンポーネント | 内容 | 状態 |
 |----------------|------|------|
-| v0.1.0-alpha | Lexer/AST 基盤 | 未着手 |
-| v0.1.0-beta | DDL Parser（CREATE/DROP TABLE/INDEX） | 未着手 |
-| v0.1.0-rc | DML Parser（SELECT） | 未着手 |
-| v0.1.0 | DML Parser（INSERT/UPDATE/DELETE） | 未着手 |
+| Parser | Lexer/AST + DDL/DML Parser | ✅ 完了 |
+| Planner | Catalog + LogicalPlan + 名前解決・型チェック | ✅ 完了 |
+| Storage Engine | RowCodec + KeyEncoder + TableStorage/IndexStorage + TxnBridge | ✅ 完了 |
+| Executor | DDL/DML Executor + Iterator ベース実行 | ✅ 完了 |
+| Vector SQL | `vector_similarity` 関数 + Top-K 最適化 | ✅ 完了 |
 
-### v0.1.1 Planner
-
-- Catalog 実装（テーブル/カラム/インデックスメタデータ）
-- LogicalPlan enum
-- 名前解決・型チェック
-
-### v0.1.1-storage Storage Engine
-
-- RowCodec（行のシリアライズ/デシリアライズ）
-- KeyEncoder（テーブルID + RowID → KV キー）
-- TableStorage/IndexStorage（alopex-core KV 上のテーブル/インデックス抽象）
-- TxnBridge（alopex-core トランザクション連携）
-
-### v0.1.2 Executor
-
-- DDL Executor（CreateTable/DropTable）
-- DML Executor（Insert/Update/Delete/Select）
-- Iterator ベース実行
-
-### v0.1.3 Vector SQL
-
-- `vector_similarity` 関数実装
-- `ORDER BY vector_similarity LIMIT K` 最適化
-
-### v0.1.4 Embedded Integration
+### v0.4.0 Embedded Integration ⏳ 予定
 
 - `Database::execute_sql` API
 - `Transaction::execute_sql` API
+- Catalog の永続化
 
-### v0.2.0+ 後続バージョン
+### v0.5.0+ 後続バージョン
 
 #### 依存関係の方向性（TS 拡張）
 
@@ -1529,16 +1512,16 @@ BEGIN, COMMIT, ROLLBACK, TRANSACTION, SAVEPOINT
 
 | バージョン | 内容 | 対応 DB |
 |------------|------|---------|
-| v0.2.0 | GROUP BY / Aggregation | v0.4 |
-| v0.2.1 | 次世代検索インデックス基盤（SHA-256/SimHash/UUIDv7） | v0.4 |
-| v0.2.2 | キャッシュ・メモリ管理（I/O計測、アダプティブキャッシュ） | v0.4 |
-| v0.3.0 | JOIN Support（INNER/LEFT/RIGHT） | v0.5 |
-| v0.4.0 | WASM Parser（Read-Only SQL） | v0.6 |
-| v0.5.0 | Subquery（WHERE/FROM 句） | v0.6 |
-| v0.6.0 | Distributed Query Planner（Chirps v0.3 依存） | v0.7 |
-| v0.7.0 | Raft-aware Executor（Chirps v0.6 依存） | v0.8 |
-| v0.8.0 | Multi-Raft Query（Chirps v0.7 依存） | v0.9 |
-| v0.9.0 | Federation Query（Chirps v0.8 依存） | v1.0 |
+| v0.5.0 | GROUP BY / Aggregation | v0.5 |
+| v0.5.1 | 次世代検索インデックス基盤（SHA-256/SimHash/UUIDv7） | v0.5 |
+| v0.5.2 | キャッシュ・メモリ管理（I/O計測、アダプティブキャッシュ） | v0.5 |
+| v0.6.0 | JOIN Support（INNER/LEFT/RIGHT） | v0.6 |
+| v0.7.0 | WASM Parser（Read-Only SQL） | v0.7 |
+| v0.8.0 | Subquery（WHERE/FROM 句） | v0.7 |
+| v0.9.0 | Distributed Query Planner（Chirps v0.3 依存） | v0.8 |
+| v0.10.0 | Raft-aware Executor（Chirps v0.6 依存） | v0.9 |
+| v0.11.0 | Multi-Raft Query（Chirps v0.7 依存） | v0.10 |
+| v0.12.0 | Federation Query（Chirps v0.8 依存） | v1.0 |
 | v1.0.0 | Query Optimizer（コストベース最適化） | v1.0 |
 
 ---
@@ -1552,6 +1535,7 @@ BEGIN, COMMIT, ROLLBACK, TRANSACTION, SAVEPOINT
 | 0.3.1-draft | 2025-12-02 | sqlparser-rs 調査に基づくパーサー実装アーキテクチャ追加（Pratt Parser、Dialect システム、Visitor パターン） |
 | 0.3.2-draft | 2025-12-15 | TS 拡張構文セクション追加、alopex-query-common 依存関係の方向性を明記 |
 | 0.3.3-draft | 2025-12-16 | 依存関係の方向性修正（skulk/alopex-sql が SOURCE OF TRUTH、alopex-query-common が再エクスポート） |
+| 0.3.4-draft | 2025-12-18 | CD ワークフローによる v0.3.0 公開を反映しバージョン番号を再調整（v0.1.x→v0.3.0統合、v0.1.4→v0.4.0、後続バージョン繰り上げ） |
 
 ---
 
