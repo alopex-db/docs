@@ -70,16 +70,21 @@
 | v0.1-v0.3 | Node Identity、QUIC、Gossip | - | ✅ 完了 |
 | v0.4 | Raft-ready Transport | Chirps v0.3 | ✅ 完了 |
 | v0.5 | Raft Consensus API | Chirps v0.4 | ✅ 完了 |
-| v0.6 | Multi-Raft + TSO + Observability | Chirps v0.5 | ⏳ 予定 |
+| **v0.5.1** | **File Transfer API** | Chirps v0.5 | ⏳ 予定 |
+| v0.6 | Multi-Raft + TSO + Observability | Chirps v0.5.1 | ⏳ 予定 |
 | v0.7 | Pluggable Backend + Durable | Chirps v0.6 | ⏳ 予定 |
-| **v0.7.1** | **File Transfer API** | Chirps v0.7 | ⏳ 予定 |
 | v0.8 | Federation Profile | Chirps v0.7 | ⏳ 予定 |
 | v0.9 | Multi-Cluster + HLC | Chirps v0.8 | ⏳ 予定 |
 | v1.0 | Advanced Federation | Chirps v0.9 | ⏳ 予定 |
 
-### Chirps File Transfer API (v0.7.1)
+### Chirps File Transfer API (v0.5.1)
 
-クラスタ間ファイル転送専用 API。SSTable/セグメントファイルの転送、フェデレーション同期に使用。
+クラスタ間ファイル転送専用 API。**Multi-Raft のスナップショット転送**、SSTable/セグメントファイルの転送、フェデレーション同期に使用。
+
+**依存関係修正 (2025-12-18)**:
+- 旧: v0.7.1 (Chirps v0.7 依存)
+- 新: v0.5.1 (Chirps v0.5 依存)
+- 理由: Multi-Raft (v0.6) がスナップショット転送に File Transfer を必要とするため
 
 | 機能 | 説明 |
 |------|------|
@@ -96,7 +101,8 @@
 
 ### Raft Consensus API統合
 - Chirps v0.5: `StateMachine`/`RaftStorage` trait、`RaftNode` 基本実装
-- Chirps v0.6: `MultiRaftManager`、`WalRaftStorage`、スナップショット転送
+- Chirps v0.5.1: File Transfer API（スナップショット転送の基盤）
+- Chirps v0.6: `MultiRaftManager`、`WalRaftStorage`、スナップショット転送（File Transfer 使用）
 - DB v0.8: `RangeStateMachine` が Chirps Raft API でメタデータ合意
 - Skulk v0.9: `ShardStateMachine` が Chirps Raft API でシャードレプリケーション
 
@@ -108,7 +114,7 @@
 
 ### フェデレーション連携
 - v1.0 (DB): Chirps v0.8 の Federation profile で 2 クラスタ間フェデレーション
-  - Chirps v0.7.1 の File Transfer API で SSTable/セグメントファイル同期
+  - Chirps v0.5.1 の File Transfer API で SSTable/セグメントファイル同期
 - v1.1 (DB): Chirps v0.9 のマルチクラスタ + HLC で Mesh
 - v1.2 (DB): Chirps v1.0 のフェイルオーバー通知で自動フェイルオーバー
 
