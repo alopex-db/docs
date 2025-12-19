@@ -13,7 +13,7 @@
 | v0.2 | v0.1.1 | - | v0.2 | - | Vector (Flat) |
 | v0.2.1 | v0.1.1 | - | v0.2.1 | - | **インメモリモード** |
 | **v0.3** | **v0.3.0** | **v0.3.0** | **v0.3.0** | - | **SQL Frontend (Vector SQL)** ✅ crates.io 公開済 |
-| v0.4 | v0.4 | v0.4 | v0.4 | - | **Embedded Integration** + HNSW |
+| v0.4 | v0.4 | v0.4 | v0.4 | - | **Embedded Integration** + HNSW ✅ 完了 |
 | v0.5 | v0.5 | v0.5 | v0.5 | - | Server + GROUP BY |
 | v0.6 | v0.6 | v0.6 | v0.6 | - | Durability + JOIN |
 | v0.7 | v0.7 | v0.7-v0.8 | v0.7 | - | WASM Viewer + Subquery |
@@ -37,7 +37,7 @@
 | ~~v0.1.2~~ | Executor | alopex-core v0.1 | DDL/DML 実行 | v0.3 | ✅ v0.3.0 に統合 |
 | ~~v0.1.3~~ | Vector SQL | alopex-core v0.1 | vector_similarity, Top-K | v0.3 | ✅ v0.3.0 に統合 |
 | **v0.3.0** | **SQL Frontend (Vector SQL)** | alopex-core v0.3.0 | Parser + Planner + Executor + Vector SQL | v0.3 | ✅ **crates.io 公開済** |
-| v0.4.0 | Embedded Integration | alopex-embedded v0.4 | execute_sql API | v0.4 | ⏳ 予定 |
+| ~~v0.4.0~~ | Embedded Integration | alopex-embedded v0.4 | execute_sql API | v0.4 | ✅ 完了 |
 | v0.5.0 | GROUP BY / Aggregation | alopex-sql v0.4 | 集約クエリ、HNSW INDEX 構文 | v0.5 | ⏳ 予定 |
 | v0.5.1 | 次世代検索インデックス基盤 | alopex-sql v0.5 | SHA-256/SimHash/UUIDv7 | v0.5 | ⏳ 予定 |
 | v0.5.2 | キャッシュ・メモリ管理 | alopex-sql v0.5.1 | I/O計測、アダプティブキャッシュ | v0.5 | ⏳ 予定 |
@@ -59,7 +59,7 @@
 | DB バージョン | 必要な alopex-sql 機能 | alopex-sql バージョン |
 |---------------|------------------------|----------------------|
 | v0.3 | DDL/DML パース＆実行, Storage Engine, Vector SQL | **v0.3.0** (crates.io 公開済) |
-| v0.4 | Embedded Integration, HNSW INDEX 構文 | v0.4.0 |
+| v0.4 | Embedded Integration, HNSW INDEX 構文 | **v0.4.0** (完了) |
 | v0.5 | GROUP BY, 次世代インデックス, キャッシュ | v0.5.0 - v0.5.2 |
 | v0.6 | JOIN (単一ノード) | v0.6.0 |
 | v0.7 | WASM Read-Only パーサー, Subquery | v0.7.0 - v0.8.0 |

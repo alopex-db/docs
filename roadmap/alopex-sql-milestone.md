@@ -23,7 +23,7 @@ alopex-sql クエリエンジンの実装マイルストーンと、各バージ
 
 | Version | Milestone | Status | Spec Location |
 |---------|-----------|--------|---------------|
-| **v0.4.0** | **Embedded Integration** | ⏳ Planned | `.spec-workflow/specs/alopex-sql-v0.4.0/` |
+| ~~v0.4.0~~ | Embedded Integration | ✅ 完了 | `.spec-workflow/specs/alopex-sql-v0.4.0/` |
 | v0.5.0 | GROUP BY / Aggregation | ⏳ Planned | - |
 | v0.5.1 | 次世代検索インデックス基盤 | ⏳ Planned | - |
 | v0.5.2 | キャッシュ・メモリ管理 | ⏳ Planned | - |
