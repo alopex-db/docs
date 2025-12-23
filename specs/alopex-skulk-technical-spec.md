@@ -887,16 +887,31 @@ impl SectionAwareCompactionScheduler {
 Offset      Size      Description
 ────────────────────────────────────────────────────────────
 0x0000      4         Magic: "ATSM" (0x4154534D)
-0x0004      2         Version: 2 (セクション分離対応)
+0x0004      2         Version: 3 (max_lsn 対応)
 0x0006      8         Min Timestamp (i64, little-endian)
 0x000E      8         Max Timestamp (i64, little-endian)
 0x0016      4         Series Count (u32)
-0x001A      1         Compression Type (0=None, 1=Gorilla, 2=LZ4)
+0x001A      1         Compression Type (0=None, 1=Gorilla, 2=LZ4=予約)
 0x001B      1         Section Flags (bit0=Hot, bit1=Cold, bit2=Meta)
 0x001C      2         Level (u16, Compaction レベル)
 0x001E      2         Reserved (zeroed)
 ────────────────────────────────────────────────────────────
-0x0020      var       Series Index Section
+0x0020      var       Data Blocks Section
+                      Data Block (per series)
+                        8   Series ID
+                        4   Point Count
+                        8   Min Timestamp
+                        8   Max Timestamp
+                        8   Max LSN
+                        1   Timestamp Encoding (0=Raw, 1=DoD)
+                        1   Value Encoding (0=Raw, 1=Gorilla)
+                        4   Timestamps Size
+                        var Timestamps Data (compressed)
+                        4   Values Size
+                        var Values Data (compressed)
+                        4   Block CRC32
+────────────────────────────────────────────────────────────
+var         var       Series Index Section
             4         Index Entry Count
             var       Index Entries[]
                         8   Series ID
@@ -913,20 +928,6 @@ Offset      Size      Description
                         4   Point Count
             4         Bloom Filter Size
             var       Bloom Filter Data (xxhash64-based)
-────────────────────────────────────────────────────────────
-var         var       Data Blocks Section
-                      Data Block (per series)
-                        8   Series ID
-                        4   Point Count
-                        8   Min Timestamp
-                        8   Max Timestamp
-                        1   Timestamp Encoding (0=Raw, 1=DoD)
-                        1   Value Encoding (0=Raw, 1=Gorilla)
-                        4   Timestamps Size
-                        var Timestamps Data (compressed)
-                        4   Values Size
-                        var Values Data (compressed)
-                        4   Block CRC32
 ────────────────────────────────────────────────────────────
 EOF-48      48        Footer
             8         Series Index Offset
