@@ -2,6 +2,7 @@
 
 > 詳細仕様は `.spec-workflow/specs/` 配下の各 spec ドキュメントを参照。
 
+> **Note (2026-01-13)**: v0.4.0 Async/Stream 基盤実装完了（runtime-agnostic async facade, tokio adapter, streaming SELECT）。
 > **Note (2025-12-18)**: CD ワークフロー修正により v0.3.0 が crates.io に公開済み（旧 v0.1.3 Vector SQL 相当）。
 > 旧 v0.1.0~v0.1.3 は v0.3.0 に統合、v0.1.4 以降は v0.4.0 以降に再番号付け。
 
@@ -23,7 +24,8 @@ alopex-sql クエリエンジンの実装マイルストーンと、各バージ
 
 | Version | Milestone | Status | Spec Location |
 |---------|-----------|--------|---------------|
-| ~~v0.4.0~~ | Embedded Integration | ✅ 完了 | `.spec-workflow/specs/alopex-sql-v0.4.0/` |
+| ~~v0.4.0~~ | Embedded Integration | ✅ 完了 | `.spec-workflow/archive/specs/alopex-sql-v0-4-0/` |
+| **v0.4.0** | **Async/Stream 基盤** | ✅ **完了** | `.spec-workflow/archive/specs/alopex-sql-v0-4-0/` |
 | v0.5.0 | GROUP BY / Aggregation | ⏳ Planned | - |
 | v0.5.1 | 次世代検索インデックス基盤 | ⏳ Planned | - |
 | v0.5.2 | キャッシュ・メモリ管理 | ⏳ Planned | - |

@@ -4,6 +4,7 @@
 
 ## クレート間バージョン対応
 
+> **Note (2026-01-13)**: alopex-sql v0.4.0 Async/Stream 基盤、alopex-server v0.4 実装完了。
 > **Note (2025-12-18)**: CD ワークフロー修正により alopex-sql v0.3.0 が crates.io に公開済み（旧 v0.1.3 Vector SQL 相当）。
 
 | Alopex DB | alopex-core | alopex-sql | alopex-embedded | Chirps | 主な機能 |
@@ -13,8 +14,8 @@
 | v0.2 | v0.1.1 | - | v0.2 | - | Vector (Flat) |
 | v0.2.1 | v0.1.1 | - | v0.2.1 | - | **インメモリモード** |
 | **v0.3** | **v0.3.0** | **v0.3.0** | **v0.3.0** | - | **SQL Frontend (Vector SQL)** ✅ crates.io 公開済 |
-| v0.4 | v0.4 | v0.4 | v0.4 | - | **Embedded Integration** + HNSW ✅ 完了 |
-| v0.5 | v0.5 | v0.5 | v0.5 | - | Server + GROUP BY |
+| **v0.4** | **v0.4** | **v0.4** | **v0.4** | - | **Embedded Integration + HNSW + Async/Stream + Server** ✅ 完了 |
+| v0.5 | v0.5 | v0.5 | v0.5 | - | GROUP BY + JOIN |
 | v0.6 | v0.6 | v0.6 | v0.6 | - | Durability + JOIN |
 | v0.7 | v0.7 | v0.7-v0.8 | v0.7 | - | WASM Viewer + Subquery |
 | v0.8 | v0.8 | v0.9 | v0.8 | v0.3 | Cluster-aware + 分散クエリ |
@@ -38,6 +39,7 @@
 | ~~v0.1.3~~ | Vector SQL | alopex-core v0.1 | vector_similarity, Top-K | v0.3 | ✅ v0.3.0 に統合 |
 | **v0.3.0** | **SQL Frontend (Vector SQL)** | alopex-core v0.3.0 | Parser + Planner + Executor + Vector SQL | v0.3 | ✅ **crates.io 公開済** |
 | ~~v0.4.0~~ | Embedded Integration | alopex-embedded v0.4 | execute_sql API | v0.4 | ✅ 完了 |
+| **v0.4.0** | **Async/Stream 基盤** | alopex-sql v0.3 | runtime-agnostic async facade, tokio adapter, streaming SELECT | v0.4 | ✅ **完了** |
 | v0.5.0 | GROUP BY / Aggregation | alopex-sql v0.4 | 集約クエリ、HNSW INDEX 構文 | v0.5 | ⏳ 予定 |
 | v0.5.1 | 次世代検索インデックス基盤 | alopex-sql v0.5 | SHA-256/SimHash/UUIDv7 | v0.5 | ⏳ 予定 |
 | v0.5.2 | キャッシュ・メモリ管理 | alopex-sql v0.5.1 | I/O計測、アダプティブキャッシュ | v0.5 | ⏳ 予定 |
