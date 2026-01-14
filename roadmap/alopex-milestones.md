@@ -4,6 +4,7 @@
 
 ## クレート間バージョン対応
 
+> **Note (2026-01-14)**: **Alopex DB v0.4.0 リリース完了**。GitHub Release + crates.io 公開済み。
 > **Note (2026-01-13)**: alopex-sql v0.4.0 Async/Stream 基盤、alopex-server v0.4 実装完了。
 > **Note (2025-12-18)**: CD ワークフロー修正により alopex-sql v0.3.0 が crates.io に公開済み（旧 v0.1.3 Vector SQL 相当）。
 
@@ -14,7 +15,7 @@
 | v0.2 | v0.1.1 | - | v0.2 | - | Vector (Flat) |
 | v0.2.1 | v0.1.1 | - | v0.2.1 | - | **インメモリモード** |
 | **v0.3** | **v0.3.0** | **v0.3.0** | **v0.3.0** | - | **SQL Frontend (Vector SQL)** ✅ crates.io 公開済 |
-| **v0.4** | **v0.4** | **v0.4** | **v0.4** | - | **Embedded Integration + HNSW + Async/Stream + Server** ✅ 完了 |
+| **v0.4.0** | **v0.4.0** | **v0.4.0** | **v0.4.0** | - | **Embedded Integration + HNSW + Async/Stream + Server** ✅ **リリース済** |
 | v0.5 | v0.5 | v0.5 | v0.5 | - | GROUP BY + JOIN |
 | v0.6 | v0.6 | v0.6 | v0.6 | - | Durability + JOIN |
 | v0.7 | v0.7 | v0.7-v0.8 | v0.7 | - | WASM Viewer + Subquery |
