@@ -16,8 +16,8 @@
 | v0.2.1 | v0.1.1 | - | v0.2.1 | - | **インメモリモード** |
 | **v0.3** | **v0.3.0** | **v0.3.0** | **v0.3.0** | - | **SQL Frontend (Vector SQL)** ✅ crates.io 公開済 |
 | **v0.4.0** | **v0.4.0** | **v0.4.0** | **v0.4.0** | - | **Embedded Integration + HNSW + Async/Stream + Server** ✅ **リリース済** |
-| v0.5 | v0.5 | v0.5 | v0.5 | - | GROUP BY + JOIN |
-| v0.6 | v0.6 | v0.6 | v0.6 | - | Durability + JOIN |
+| v0.5 | v0.5 | v0.5 | v0.5 | - | Durability + GROUP BY |
+| v0.6 | v0.6 | v0.6 | v0.6 | - | JOIN Support |
 | v0.7 | v0.7 | v0.7-v0.8 | v0.7 | - | WASM Viewer + Subquery |
 | v0.8 | v0.8 | v0.9 | v0.8 | v0.3 | Cluster-aware + 分散クエリ |
 | v0.9 | v0.9 | v0.10 | v0.9 | v0.6 | Raft Metadata + Raft DDL |
