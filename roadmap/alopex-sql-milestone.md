@@ -30,8 +30,8 @@ alopex-sql クエリエンジンの実装マイルストーンと、各バージ
 | v0.5.1 | 次世代検索インデックス基盤 | ⏳ Planned | - |
 | v0.5.2 | キャッシュ・メモリ管理 | ⏳ Planned | - |
 | v0.6.0 | JOIN Support | ⏳ Planned | - |
-| v0.7.0 | WASM Parser | ⏳ Planned | - |
-| v0.8.0 | Subquery | ⏳ Planned | - |
+| v0.6.0-subquery | Subquery | ⏳ Planned | - |
+| v1.0+-wasm | WASM Parser (Re-evaluation) | ⏳ Re-evaluation | - |
 
 ---
 
@@ -857,7 +857,7 @@ pub fn hash_join(
 
 ---
 
-## v0.7.0 WASM Parser ⏳ 予定
+## v1.0+ WASM Parser (Re-evaluation) ⏳ 再評価
 
 > 旧 v0.4.0。対応 Alopex DB: v0.7
 
@@ -870,7 +870,7 @@ wasm32-unknown-unknown
 ### Scope (Read-Only SQL)
 
 ```rust
-// alopex-sql-wasm/src/lib.rs (v0.7.0)
+// alopex-sql-wasm/src/lib.rs (v1.0+ re-evaluation)
 
 /// WASM-compatible SQL parser and executor
 /// Supports read-only operations only
@@ -907,7 +907,7 @@ impl WasmSqlEngine {
 
 ---
 
-## v0.8.0 Subquery ⏳ 予定
+## v0.6.0 Subquery ⏳ 予定
 
 > 旧 v0.5.0。対応 Alopex DB: v0.7
 
@@ -1087,7 +1087,7 @@ GROUP, HAVING, COUNT, SUM, AVG, MIN, MAX
 -- v0.6.0 JOIN
 JOIN, LEFT, RIGHT, OUTER, FULL, CROSS, ON, NATURAL
 
--- v0.8.0 Subquery
+-- v0.6.0 Subquery
 EXISTS, ANY, SOME, ALL, WITH, RECURSIVE
 
 -- v0.9.0+ Advanced
@@ -1423,9 +1423,9 @@ v0.5.2 Cache/Memory Management
     ↓
 v0.6.0 JOIN Support ────────────────────────────→ Alopex DB v0.6
     ↓
-v0.7.0 WASM Parser (Read-Only)
+v1.0+ WASM Parser (Read-Only, Re-evaluation)
     ↓
-v0.8.0 Subquery ────────────────────────────────→ Alopex DB v0.7
+v0.6.0 Subquery ────────────────────────────────→ Alopex DB v0.6
     ↓
 v0.9.0 Distributed Query Planner ───────────────→ Alopex DB v0.8 (Chirps v0.3)
     ↓

@@ -17,9 +17,9 @@
 | **v0.3** | **v0.3.0** | **v0.3.0** | **v0.3.0** | - | **SQL Frontend (Vector SQL)** ✅ crates.io 公開済 |
 | **v0.4.0** | **v0.4.0** | **v0.4.0** | **v0.4.0** | - | **Embedded Integration + HNSW + Async/Stream + Server** ✅ **リリース済** |
 | v0.5 | v0.5 | v0.5 | v0.5 | - | Durability + GROUP BY |
-| v0.6 | v0.6 | v0.6 | v0.6 | - | JOIN Support |
-| v0.7 | v0.7 | v0.7-v0.8 | v0.7 | - | WASM Viewer + Subquery |
-| v0.8 | v0.8 | v0.9 | v0.8 | v0.3 | Cluster-aware + 分散クエリ |
+| v0.6 | v0.6 | v0.6 | v0.6 | - | Embedded/Server 実用化 + JOIN/Subquery + DataFrame/Python 強化 |
+| v0.7 | v0.7 | v0.7-v0.8 | v0.7 | - | Cluster-aware + 分散クエリ |
+| v0.8 | v0.8 | v0.9 | v0.8 | v0.3 | Metadata Raft + 分散クエリ |
 | v0.9 | v0.9 | v0.10 | v0.9 | v0.6 | Raft Metadata + Raft DDL |
 | v0.10 | v0.10 | v0.11 | v0.10 | v0.7 | Multi-Raft + 分散 Txn |
 | v1.0 | v1.0 | v0.12-v1.0 | v1.0 | v0.8 | Federation + Optimizer |
@@ -45,8 +45,8 @@
 | v0.5.1 | 次世代検索インデックス基盤 | alopex-sql v0.5 | SHA-256/SimHash/UUIDv7 | v0.5 | ⏳ 予定 |
 | v0.5.2 | キャッシュ・メモリ管理 | alopex-sql v0.5.1 | I/O計測、アダプティブキャッシュ | v0.5 | ⏳ 予定 |
 | v0.6.0 | JOIN Support | alopex-sql v0.5.2 | INNER/LEFT/RIGHT JOIN | v0.6 | ⏳ 予定 |
-| v0.7.0 | WASM Parser | alopex-sql v0.6 | Read-Only SQL (wasm32) | v0.7 | ⏳ 予定 |
-| v0.8.0 | Subquery | alopex-sql v0.7 | WHERE/FROM 句サブクエリ | v0.7 | ⏳ 予定 |
+| v0.6.0-subquery | Subquery | alopex-sql v0.6 | WHERE/FROM 句サブクエリ | v0.6 | ⏳ 予定 |
+| v1.0+-wasm | WASM Parser (再評価) | alopex-sql v1.0+ | Read-Only SQL (wasm32) | v1.0+ | ⏳ 再評価 |
 | v0.9.0 | Distributed Query Planner | Chirps v0.3 | シャード対応クエリ計画 | v0.8 | ⏳ 予定 |
 | v0.9.0-index | TSO 統合分散インデックス | Chirps v0.6 (TSO) | Point-in-Time/整合性チェック | v0.8 | ⏳ 予定 |
 | v0.10.0 | Raft-aware Executor | Chirps v0.6 | Raft 合意付き DDL/DML | v0.9 | ⏳ 予定 |
@@ -65,10 +65,10 @@
 | v0.4 | Embedded Integration, HNSW INDEX 構文 | **v0.4.0** (完了) |
 | v0.5 | GROUP BY, 次世代インデックス, キャッシュ | v0.5.0 - v0.5.2 |
 | v0.6 | JOIN (単一ノード) | v0.6.0 |
-| v0.7 | WASM Read-Only パーサー, Subquery | v0.7.0 - v0.8.0 |
-| v0.8 | 分散クエリ計画 (Scatter-Gather) | v0.9.0 |
-| v0.9 | Raft 合意付き DDL | v0.10.0 |
-| v0.10 | Multi-Raft クエリ | v0.11.0 |
+| v0.7 | 分散クエリ計画 (Scatter-Gather) | v0.9.0 |
+| v0.8 | Raft 合意付き DDL | v0.10.0 |
+| v0.9 | Multi-Raft クエリ | v0.11.0 |
+| v0.10 | Hardening/安定化 | v0.11.0+ |
 | v1.0 | Federation クエリ、オプティマイザ | v0.12.0 - v1.0.0 |
 
 ---
