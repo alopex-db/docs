@@ -559,6 +559,7 @@ reference/foundationdb/
 | 2025-11-29 | 参考 OSS プロジェクト ソースパス（セクション 6）追加 |
 | 2025-11-29 | 分散DBにおける検索インデックス設計（セクション 8）追加 |
 | 2025-12-02 | sqlparser-rs コード調査結果（セクション 9）追加 |
+| 2026-06-26 | Rust 以外の軽量言語によるパーサー実装調査（セクション 10）追加 |
 
 ---
 
@@ -1506,3 +1507,256 @@ reference/datafusion-sqlparser-rs/
 ├── src/dialect/mod.rs:1210-1235  # Precedence enum
 └── derive/src/lib.rs             # Visit derive マクロ
 ```
+
+---
+
+## 10. Rust 以外の軽量言語によるパーサー実装調査
+
+Alopex SQL パーサーは現在 Rust で手書き実装されているが、将来的な代替言語の可能性を評価するため、パーサー実装に適した開発途上の軽量言語 3 つを調査した。
+
+### 10.1 対象言語の概要
+
+| 項目 | **Zig** | **Nim** | **Roc** |
+|---|---|---|---|
+| パラダイム | 手続き型・システム言語 | マルチパラダイム（手続き+メタ） | 純粋関数型 |
+| 型システム | 静的型付け、ジェネリクス | 静的型付け、ジェネリクス、ADT | Hindley-Milner 型推論、ADT |
+| メタプログラミング | `comptime`（コンパイル時実行） | マクロ・テンプレート（AST 操作） | なし（シンプルさ優先） |
+| コンパイル先 | LLVM → ネイティブ | C/C++/JS にトランスパイル | LLVM → ネイティブ |
+| C 互換 | `@cImport` で直接呼出し | FFI で C/ObjC/JS と連携 | プラットフォーム抽象化 |
+| GC | なし（手動アロケータ） | あり（選択可能、ARC 含む） | Perceus 参照カウント（将来） |
+| 安定性 | **1.0 予定（2026）** | **2.x 安定版あり** | **pre-1.0 alpha** |
+| ビルド速度 | 極めて高速 | 高速（C 経由） | 高速を目標（Zig でコンパイラ書き直し中） |
+| WASM 対応 | ◎ | ○（JS バックエンド） | △（未成熟） |
+
+### 10.2 パーサー実装エコシステム
+
+| | **Zig** | **Nim** | **Roc** |
+|---|---|---|---|
+| 主要ライブラリ | [cZPeg](https://github.com/spadix0/cZPeg), [parzig](https://github.com/DeSc1998/parzig), Mecha | [npeg](https://github.com/zevv/npeg) (PEG), nimly (lex/yacc) | [roc-parser](https://github.com/lukewilliamboswell/roc-parser) (コンビネータ) |
+| アプローチ | comptime PEG / コンビネータ | マクロで PEG → Nim 関数に展開 | 関数型パーサーコンビネータ |
+| コンパイル時生成 | ◎（comptime で再帰下降を生成） | ◎（マクロで PEG をコンパイル時展開） | ×（ランタイムのみ） |
+| SQL パーサー実例 | [SQL-Parser (SQLite in Zig)](https://github.com/Enriquefft/SQL-Parser), [zigrocks-sql](https://notes.eatonphil.com/zigrocks-sql.html) | npeg で DSL 定義可能 | なし |
+
+### 10.3 パーサー実装例
+
+#### 10.3.1 Zig — comptime PEG パーサー（cZPeg）
+
+[cZPeg](https://github.com/spadix0/cZPeg) は PEG 文法からコンパイル時に再帰下降パーサーを生成する。ランタイムオーバーヘッドがゼロ。
+
+```zig
+const peg = @import("czpeg");
+
+// コンパイル時に PEG 文法から再帰下降パーサーを生成
+const grammar = peg.Grammar(
+    struct {
+        // 四則演算の文法定義
+        pub const expr = product.seq(.{
+            peg.oneOf(.{ .lit("+"), .lit("-") }),
+            product,
+        }).repeat();
+        pub const product = atom.seq(.{
+            peg.oneOf(.{ .lit("*"), .lit("/") }),
+            atom,
+        }).repeat();
+        pub const atom = peg.oneOf(.{
+            number,
+            .lit("(").seq(.{expr}).seq(.{.lit(")")}),
+        });
+        pub const number = peg.range('0', '9').repeat1();
+    },
+);
+
+// comptime で生成されたパーサーをランタイムで使用
+const result = grammar.parse("3+4*5");
+```
+
+**特徴**:
+- 文法定義が struct のフィールドとして表現され、`comptime` で評価される
+- 生成されるパーサーはネイティブコードに直接コンパイルされ、ランタイムオーバーヘッドなし
+- C ABI 互換のため、Rust から FFI 経由で呼び出し可能
+
+**SQL パーサー実例**: [Enriquefft/SQL-Parser](https://github.com/Enriquefft/SQL-Parser) が SQLite 互換パーサーを Zig で実装。[zigrocks-sql](https://notes.eatonphil.com/zigrocks-sql.html) は Zig + RocksDB で SQL データベースを構築した実例。
+
+#### 10.3.2 Nim — npeg マクロ PEG パーサー
+
+[npeg](https://github.com/zevv/npeg) はマクロで PEG 文法を Nim 関数にコンパイル時展開する。文法定義と Nim コードを自由に混在できる。
+
+```nim
+import npeg
+
+# PEG 文法をマクロで定義 → コンパイル時に Nim 関数に展開
+let parser = peg("input"):
+  # SQL-like な SELECT 文の簡易パーサー
+  input      <- select_stmt * !1
+  select_stmt <- i"SELECT" * ws * columns * ws * i"FROM" * ws * >table_name
+  columns    <- column * *(',' * ws * column)
+  column     <- >+Alpha
+  table_name <- +Alpha
+  ws         <- +' '
+
+# パース実行（Nim コード内でキャプチャを自由に操作可能）
+let r = parser.match("SELECT name, age FROM users")
+echo r.captures  # @["name", "age", "users"]
+```
+
+**特徴**:
+- PEG 文法が Nim の DSL としてそのまま記述できる
+- `>` プレフィックスでキャプチャ、`:` でコードブロック埋め込み
+- コンパイル時にマクロ展開されるため実行時のパース文法解釈コストなし
+- Python に近い構文で学習コストが低い
+
+**参考**: Nim 自身のコンパイラパーサーも手書き実装 ([nim-lang/Nim/compiler/parser.nim](https://github.com/nim-lang/Nim/blob/devel/compiler/parser.nim))。EBNF に忠実な設計。
+
+#### 10.3.3 Roc — 関数型パーサーコンビネータ
+
+[roc-parser](https://github.com/lukewilliamboswell/roc-parser) は ADT + パターンマッチを活かした純関数型コンビネータ。
+
+```roc
+# ADT でトークンを定義
+Token : [Select, From, Ident Str, Comma, Star]
+
+# コンビネータでパーサーを組み立て
+keyword : Str, Token -> Parser Utf8 Token
+keyword = |text, tag|
+    const(tag) |> skip(string(text))
+
+token : Parser Utf8 Token
+token = one_of([
+    keyword("SELECT", Select),
+    keyword("FROM", From),
+    string("*") |> map(|_| Star),
+    string(",") |> map(|_| Comma),
+    many1(alpha) |> map(|chars| Ident(Str.from_utf8(chars))),
+])
+
+# パース結果は型安全な ADT
+expect parse_str(many(token), "SELECT name FROM users")
+    == Ok([Select, Ident("name"), From, Ident("users")])
+```
+
+**特徴**:
+- すべてが不変値の関数合成。副作用なし
+- ADT + パターンマッチで構文木の定義が自然
+- HM 型推論により型注釈なしでも型安全
+- pre-1.0 alpha 段階のため、API が未確定
+
+### 10.4 言語パーサー実装の適性評価
+
+| 観点 | **Zig** | **Nim** | **Roc** | **Rust（現行）** |
+|---|---|---|---|---|
+| AST 定義の表現力 | △ struct/union で手動 | ○ object variant | ◎ ADT + パターンマッチ | ○ enum + Box |
+| 文法定義の簡潔さ | ○ comptime DSL | ◎ npeg マクロ (PEG 直書き) | ○ コンビネータ合成 | ○ 手書き |
+| パフォーマンス | ◎ ゼロオーバーヘッド | ○ C 出力で高速 | ○ LLVM 最適化 | ◎ ゼロコスト抽象 |
+| エラー処理 | ○ error union | ○ exceptions/Result | ◎ Result 型（例外なし） | ◎ Result + ? |
+| Rust FFI / 統合 | ◎ C ABI 互換 | ○ C 経由で可能 | ○ Platform/Host モデルで C ABI export | - (ネイティブ) |
+| エコシステム成熟度 | ○ 1.0 間近 | ◎ 安定版あり | △ alpha、API 未確定 | ◎ 最も充実 |
+| 学習コスト | 中 | 低 | 中（関数型の素養要） | 高 |
+
+### 10.5 Alopex SQL パーサーへの適用可能性
+
+現行の Rust 手書き実装を補完・代替する候補として **Nim** と **Roc** を評価する。
+
+#### 候補 A: Nim — 文法 DSL ファーストのパーサー実装
+
+```
+Nim (npeg PEG 文法 → C コンパイル)
+  ↓ C ライブラリとして出力 (.a / .so)
+Rust Host (alopex-sql)
+  ↓ extern "C" FFI で呼び出し
+alopex-core / alopex-embedded
+```
+
+| 項目 | 評価 |
+|---|---|
+| **文法記述** | ◎ — npeg で PEG 文法を DSL として直書き。最も簡潔 |
+| **Rust 連携** | ○ — C にトランスパイルされるため `extern "C"` FFI で統合可能 |
+| **AST 表現** | ○ — object variant で ADT を表現可能 |
+| **成熟度** | ◎ — Nim 2.x 安定版。npeg も十分な実績あり |
+| **学習コスト** | 低 — Python 風構文。文法定義に集中できる |
+| **リスク** | エコシステム規模が小さい。ビルドパイプラインに Nim ツールチェーンが必要 |
+
+**適用場面**:
+- SQL 文法のプロトタイピングと検証（PEG 文法を素早く試行錯誤）
+- 文法定義を Nim で記述し、生成された C コードを Rust から利用するハイブリッド構成
+- Alopex SQL 方言の文法仕様を npeg DSL として executable specification 化
+
+#### 候補 B: Roc — 型安全な純関数パーサー + Rust Host
+
+Roc は「Platform / Host」モデルにより、**Rust をホストとして Roc 関数を C ABI 経由で呼び出す**設計を持つ。[basic-webserver](https://github.com/roc-lang/basic-webserver) が Rust (hyper + tokio) → Roc の実例。
+
+```
+Roc Application (パーサーロジック: 純粋関数)
+  ↓ C ABI 互換オブジェクトとして export (roc_app_main 等)
+Rust Platform Host (alopex-sql)
+  ↓ extern "C" リンク
+alopex-core / alopex-embedded
+```
+
+| 項目 | 評価 |
+|---|---|
+| **AST 表現** | ◎ — ADT + パターンマッチが第一級。AST 定義が最も自然 |
+| **型安全性** | ◎ — HM 型推論、例外なし、純粋関数。パーサーのテスタビリティが極めて高い |
+| **Rust 連携** | ○ — Platform/Host モデルで C ABI export。Rust から `extern "C"` で呼び出し可能 |
+| **パフォーマンス** | ○ — LLVM 最適化。Perceus 参照カウントで GC なし |
+| **成熟度** | △ — pre-1.0 alpha。ABI 未安定。コンパイラを Zig で書き直し中 |
+| **学習コスト** | 中 — 関数型プログラミングの素養が必要 |
+| **リスク** | alpha 段階で API 変更の可能性大。Roc コンパイラ自体の安定性 |
+
+**適用場面**:
+- パーサーロジックを純粋関数として Roc で記述し、Rust Host から呼び出すクリーンな分離
+- AST 定義・パターンマッチ・型推論を活かした型駆動パーサー開発
+- 将来的な Roc 1.0 安定版リリース後の本格採用を見据えた先行評価
+
+#### 候補比較
+
+| 観点 | **Nim** | **Roc** |
+|---|---|---|
+| 即座に使えるか | ◎ 安定版あり | △ alpha 段階 |
+| 文法記述の簡潔さ | ◎ PEG 直書き | ○ コンビネータ合成 |
+| 型安全性 | ○ | ◎ HM 型推論 + ADT |
+| テスタビリティ | ○ | ◎ 純粋関数（副作用なし） |
+| Rust 統合の容易さ | ○ C 出力 → FFI | ○ C ABI export → FFI |
+| 将来性 | ○ 安定だが成長は緩やか | ◎ 設計思想が先進的、成長が早い |
+
+#### 推奨ロードマップ
+
+| フェーズ | アクション | 言語 |
+|---|---|---|
+| **短期（現在）** | 現行 Rust 手書きパーサーの継続開発 | Rust |
+| **中期（実験）** | Nim npeg で Alopex SQL 方言の PEG 文法を executable specification として記述。文法の正確性検証に活用 | Nim |
+| **中期（評価）** | Roc で小規模パーサー（式パーサー等）を PoC 実装し、Rust Host からの呼び出しを検証 | Roc |
+| **長期（判断）** | Roc 1.0 安定版リリース後、Nim PEG / Roc パーサーコンビネータ / Rust 手書きの 3 方式を性能・保守性で比較評価し、本採用を判断 | — |
+
+### 10.6 参考資料
+
+#### ライブラリ・ツール
+
+- [cZPeg - Compile-Time PEG for Zig](https://github.com/spadix0/cZPeg)
+- [parzig - Compile time parser generator for Zig](https://github.com/DeSc1998/parzig)
+- [npeg - PEGs for Nim](https://github.com/zevv/npeg)
+- [nimly - Lexer/Parser generator for Nim](https://nimble.directory/pkg/nimly)
+- [roc-parser - Parser Combinator for Roc](https://github.com/lukewilliamboswell/roc-parser)
+
+#### 記事・ブログ
+
+- [Zig, Parser Combinators, and Why They're Awesome (Hexops)](https://devlog.hexops.org/2021/zig-parser-combinators-and-why-theyre-awesome/)
+- [Zig Parser - Mitchell Hashimoto](https://mitchellh.com/zig/parser)
+- [Writing a SQL database in Zig and RocksDB (Phil Eaton)](https://notes.eatonphil.com/zigrocks-sql.html)
+- [Parsing inputs in Nim (Miran)](https://narimiran.github.io/2021/01/11/nim-parsing.html)
+- [Nim Metaprogramming - Macro Tutorial](https://dlesnoff.github.io/nimProgramming-blog/blogPosts/macroTutorial.html)
+- [Roc Parser Example](https://www.roc-lang.org/examples/Parser/README)
+- [Roc Pattern Matching](https://www.roc-lang.org/examples/PatternMatching/README)
+
+#### Roc / Rust 連携
+
+- [Roc Platforms and Apps](https://www.roc-lang.org/platforms) — Platform/Host モデルの公式解説
+- [basic-webserver (Rust Host 実例)](https://github.com/roc-lang/basic-webserver) — Rust (hyper + tokio) から Roc 関数を呼び出す実装
+- [Roc with Richard Feldman - Rust in Production Podcast](https://corrode.dev/podcast/s05e04-roc/) — Roc と Rust の関係性についてのインタビュー
+- [Why Roc Is Moving Away From Rust to Zig](https://medium.com/rustaceans/why-roc-is-moving-away-from-rust-to-zig-8b2259ff1c13) — コンパイラ実装言語の移行理由（Host は引き続き Rust 可）
+- [Roc FAQ](https://www.roc-lang.org/faq) — FFI ポリシー、Platform による FFI 制御の設計思想
+
+#### 言語比較
+
+- [Zig vs Nim Benchmarks](https://programming-language-benchmarks.vercel.app/zig-vs-nim)
+- [Slant - Nim vs Zig (2025)](https://www.slant.co/versus/395/35558/~nim_vs_zig)
+- [Roc Language - Fast](https://www.roc-lang.org/fast)
