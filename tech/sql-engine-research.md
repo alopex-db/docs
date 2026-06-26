@@ -1512,7 +1512,27 @@ reference/datafusion-sqlparser-rs/
 
 ## 10. Rust 以外の軽量言語によるパーサー実装調査
 
-Alopex SQL パーサーは現在 Rust で手書き実装されているが、将来的な代替言語の可能性を評価するため、パーサー実装に適した開発途上の軽量言語 3 つを調査した。
+### 10.0 背景: Rust による SQL パーサー実装の限界
+
+Alopex SQL パーサーは Rust で手書き実装されているが、**開発が事実上停滞している**。根本原因は Rust の型システムにある。
+
+**Rust でのパーサー実装が困難な理由**:
+
+1. **コンパイル時型解決の壁**: Rust はすべての型をコンパイル時に解決する。再帰的な AST 型は `Box<T>` で間接参照を強制され、ネストが深まるほど型定義が爆発的に複雑化する
+2. **現在の alopex-sql の状況**: ExprKind 10 variants / StatementKind 8 variants / Token 24 variants / Keyword 69 variants（合計約 180 variants）の簡易 SQL で既にビルドが困難
+3. **スケーラビリティの限界**: SQLite 相当の構文（JOIN, サブクエリ, Window 関数, CTE 等）ですら Rust での実装は極めて困難。PostgreSQL / MySQL 相当の完全な SQL 方言は、現時点の Rust ではコンパイル自体が現実的でない
+4. **sqlparser-rs の実態**: デファクトである sqlparser-rs は parser/mod.rs だけで約 18,000 行に膨張しており、コンパイル時間・保守性の両面で限界に達しつつある
+
+**具体的な技術的制約**:
+- 再帰的 enum に対する `Box<T>` の必須化（12 箇所で使用中、今後加速的に増加）
+- `#[allow(clippy::large_enum_variant)]` による lint 抑制の常態化
+- 再帰深度制限（RecursionCounter、デフォルト 50）によるスタックオーバーフロー回避
+- ライフタイム注釈の伝播（`Parser<'a>` → すべてのメソッドに `'a` が波及）
+- match 式の網羅性チェックにより、variant 追加のたびに全 match を修正する必要
+
+これらの制約は SQL のサブセットでは管理可能だが、**文法規模が線形に増加すると型の複雑度が指数的に増加する**。Rust は SQL パーサーのような大規模再帰型データ構造を扱う用途に構造的に不向きである。
+
+この問題を解決するため、**Nim** と **Roc** を代替言語の候補として調査した。
 
 ### 10.1 対象言語の概要
 
@@ -1642,15 +1662,19 @@ expect parse_str(many(token), "SELECT name FROM users")
 
 ### 10.4 言語パーサー実装の適性評価
 
-| 観点 | **Zig** | **Nim** | **Roc** | **Rust（現行）** |
+| 観点 | **Nim** | **Roc** | **Zig** | **Rust（現行）** |
 |---|---|---|---|---|
-| AST 定義の表現力 | △ struct/union で手動 | ○ object variant | ◎ ADT + パターンマッチ | ○ enum + Box |
-| 文法定義の簡潔さ | ○ comptime DSL | ◎ npeg マクロ (PEG 直書き) | ○ コンビネータ合成 | ○ 手書き |
-| パフォーマンス | ◎ ゼロオーバーヘッド | ○ C 出力で高速 | ○ LLVM 最適化 | ◎ ゼロコスト抽象 |
-| エラー処理 | ○ error union | ○ exceptions/Result | ◎ Result 型（例外なし） | ◎ Result + ? |
-| Rust FFI / 統合 | ◎ C ABI 互換 | ○ C 経由で可能 | ○ Platform/Host モデルで C ABI export | - (ネイティブ) |
-| エコシステム成熟度 | ○ 1.0 間近 | ◎ 安定版あり | △ alpha、API 未確定 | ◎ 最も充実 |
-| 学習コスト | 中 | 低 | 中（関数型の素養要） | 高 |
+| AST 定義の表現力 | ○ object variant | ◎ ADT + パターンマッチ | △ struct/union で手動 | **△ enum + Box 必須、スケールしない** |
+| 文法定義の簡潔さ | ◎ npeg マクロ (PEG 直書き) | ○ コンビネータ合成 | ○ comptime DSL | **× 手書きで冗長、variant 追加コスト大** |
+| 文法規模のスケーラビリティ | ◎ PEG 文法は規模に依存しない | ◎ 関数合成で線形に拡張 | ○ | **× 型の複雑度が指数的に増加** |
+| パフォーマンス | ○ C 出力で高速 | ○ LLVM 最適化 | ◎ ゼロオーバーヘッド | ◎ ゼロコスト抽象 |
+| エラー処理 | ○ exceptions/Result | ◎ Result 型（例外なし） | ○ error union | ○ Result + ? |
+| Rust FFI / 統合 | ○ C 経由で可能 | ○ Platform/Host モデルで C ABI export | ◎ C ABI 互換 | - (ネイティブ) |
+| エコシステム成熟度 | ◎ 安定版あり | △ alpha、API 未確定 | ○ 1.0 間近 | ◎ 最も充実（ただしパーサーには不向き） |
+| ビルド時間 | ◎ 高速 | ○ | ◎ 極めて高速 | **× 大規模 AST でコンパイル時間爆発** |
+| 学習コスト | 低 | 中（関数型の素養要） | 中 | 高 |
+
+> **注記**: Rust の評価は「言語全般」ではなく「大規模 SQL パーサー実装」に限定した評価である。Rust はストレージエンジン、ネットワーク層、並行処理など他の領域では引き続き最適解であり、Alopex プロジェクト全体の基盤言語としての位置づけは変わらない。パーサー層のみを別言語で実装し、C ABI / FFI で統合する戦略を検討する。
 
 ### 10.5 Alopex SQL パーサーへの適用可能性
 
@@ -1720,12 +1744,33 @@ alopex-core / alopex-embedded
 
 #### 推奨ロードマップ
 
-| フェーズ | アクション | 言語 |
-|---|---|---|
-| **短期（現在）** | 現行 Rust 手書きパーサーの継続開発 | Rust |
-| **中期（実験）** | Nim npeg で Alopex SQL 方言の PEG 文法を executable specification として記述。文法の正確性検証に活用 | Nim |
-| **中期（評価）** | Roc で小規模パーサー（式パーサー等）を PoC 実装し、Rust Host からの呼び出しを検証 | Roc |
-| **長期（判断）** | Roc 1.0 安定版リリース後、Nim PEG / Roc パーサーコンビネータ / Rust 手書きの 3 方式を性能・保守性で比較評価し、本採用を判断 | — |
+Rust での SQL パーサー開発は停滞しており、**言語移行は「検討事項」ではなく「必要条件」**である。
+
+| フェーズ | アクション | 言語 | 目標 |
+|---|---|---|---|
+| **Phase 1: 文法仕様化** | Nim npeg で Alopex SQL 方言の完全な PEG 文法を記述。executable specification として動作検証 | Nim | 文法の正確性を言語非依存に確立 |
+| **Phase 2: PoC 実装** | Nim パーサーを C ライブラリとして出力し、Rust (alopex-sql) から FFI 呼び出しする PoC を構築 | Nim + Rust | Nim → Rust 統合パスの検証 |
+| **Phase 2b: Roc 評価** | Roc で式パーサーを PoC 実装し、Rust Host からの C ABI 呼び出しを検証。Nim との比較材料とする | Roc + Rust | Roc の実用性評価 |
+| **Phase 3: 本格移行** | Phase 2 の結果に基づき Nim または Roc でパーサー全体を再実装。Rust 側は FFI ブリッジ + Planner/Executor に専念 | Nim or Roc | SQLite 相当以上の SQL 文法サポート |
+| **Phase 4: 拡張** | JOIN, サブクエリ, Window 関数, CTE など高度な SQL 構文を追加。Rust では不可能だった文法拡張を実現 | Nim or Roc | PostgreSQL 互換を視野に入れた拡張 |
+
+#### アーキテクチャ目標
+
+```
+┌──────────────────────────────────────┐
+│  SQL Parser (Nim or Roc)             │  ← 文法定義・字句解析・構文解析
+│  出力: AST (C ABI 互換構造体)         │
+└────────────┬─────────────────────────┘
+             │ extern "C" FFI
+             ▼
+┌──────────────────────────────────────┐
+│  alopex-sql (Rust)                   │  ← Planner / Executor / Catalog
+│  AST を受け取り LogicalPlan に変換    │
+│  ストレージ層 (alopex-core) と統合    │
+└──────────────────────────────────────┘
+```
+
+この分離により、**パーサー層は文法の複雑度に対してスケール可能**になり、**Rust 層はストレージ・実行エンジンの強みを活かす**構成となる。
 
 ### 10.6 参考資料
 
