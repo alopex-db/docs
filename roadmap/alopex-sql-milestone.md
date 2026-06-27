@@ -2,6 +2,7 @@
 
 > 詳細仕様は `.spec-workflow/specs/` 配下の各 spec ドキュメントを参照。
 
+> **Note (2026-06-27)**: SQL パーサーを **Nim 実装に置き換える方針を決定**（C ABI FFI で統合、Rust 手書きパーサーは廃止）。あわせて JOIN/Subquery を Planner/Executor まで実装する。技術選定は steering `tech.md` / `technical-decisions.md` を参照。実装 spec: `.spec-workflow/specs/nim-sql-parser-migration/`。
 > **Note (2026-01-13)**: v0.4.0 Async/Stream 基盤実装完了（runtime-agnostic async facade, tokio adapter, streaming SELECT）。
 > **Note (2025-12-18)**: CD ワークフロー修正により v0.3.0 が crates.io に公開済み（旧 v0.1.3 Vector SQL 相当）。
 > 旧 v0.1.0~v0.1.3 は v0.3.0 に統合、v0.1.4 以降は v0.4.0 以降に再番号付け。
@@ -29,9 +30,12 @@ alopex-sql クエリエンジンの実装マイルストーンと、各バージ
 | v0.5.0 | GROUP BY / Aggregation | ⏳ Planned | - |
 | v0.5.1 | 次世代検索インデックス基盤 | ⏳ Planned | - |
 | v0.5.2 | キャッシュ・メモリ管理 | ⏳ Planned | - |
-| v0.6.0 | JOIN Support | ⏳ Planned | - |
-| v0.6.0-subquery | Subquery | ⏳ Planned | - |
+| v0.6.0 | JOIN Support | ⏳ Planned | `.spec-workflow/specs/nim-sql-parser-migration/` |
+| v0.6.0-subquery | Subquery | ⏳ Planned | `.spec-workflow/specs/nim-sql-parser-migration/` |
+| nim-parser | **Nim SQL Parser 移行（Rust パーサー廃止）+ JOIN/Subquery 実行** | ⏳ Planned | `.spec-workflow/specs/nim-sql-parser-migration/` |
 | v1.0+-wasm | WASM Parser (Re-evaluation) | ⏳ Re-evaluation | - |
+
+> **パーサー実装方針 (2026-06-27 改訂)**: Parser コンポーネントは **Nim 実装**（`nim-sql-parser/`）に置き換え、C ABI FFI で alopex-sql に統合する。上記 v0.6.0 JOIN / v0.6.0-subquery のパース〜実行は nim-sql-parser-migration spec が担う。下記の `LogicalPlan::Join` / `TypedExprKind` 等の Rust 型定義は実行層（Planner/Executor）の目標形状として有効。
 
 ---
 
