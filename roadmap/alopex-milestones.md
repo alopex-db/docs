@@ -4,6 +4,7 @@
 
 ## クレート間バージョン対応
 
+> **Note (2026-06-27)**: alopex-sql の SQL パーサーを **Nim 実装に置き換える方針を決定**（C ABI FFI で統合、Rust 手書きパーサーは廃止）。あわせて JOIN/Subquery を Planner/Executor まで実装する（対応 DB v0.6）。技術選定は steering `tech.md` / `technical-decisions.md`、実装 spec は `.spec-workflow/specs/nim-sql-parser-migration/` を参照。詳細な機能対応は `alopex-sql-milestone.md` を参照。
 > **Note (2026-01-14)**: **Alopex DB v0.4.0 リリース完了**。GitHub Release + crates.io 公開済み。
 > **Note (2026-01-13)**: alopex-sql v0.4.0 Async/Stream 基盤、alopex-server v0.4 実装完了。
 > **Note (2025-12-18)**: CD ワークフロー修正により alopex-sql v0.3.0 が crates.io に公開済み（旧 v0.1.3 Vector SQL 相当）。
@@ -17,7 +18,7 @@
 | **v0.3** | **v0.3.0** | **v0.3.0** | **v0.3.0** | - | **SQL Frontend (Vector SQL)** ✅ crates.io 公開済 |
 | **v0.4.0** | **v0.4.0** | **v0.4.0** | **v0.4.0** | - | **Embedded Integration + HNSW + Async/Stream + Server** ✅ **リリース済** |
 | v0.5 | v0.5 | v0.5 | v0.5 | - | Durability + GROUP BY |
-| v0.6 | v0.6 | v0.6 | v0.6 | - | Embedded/Server 実用化 + JOIN/Subquery + DataFrame/Python 強化 |
+| v0.6 | v0.6 | v0.6 | v0.6 | - | Embedded/Server 実用化 + Nim SQL パーサー移行 + JOIN/Subquery + DataFrame/Python 強化 |
 | v0.7 | v0.7 | v0.7-v0.8 | v0.7 | - | Cluster-aware + 分散クエリ |
 | v0.8 | v0.8 | v0.9 | v0.8 | v0.3 | Metadata Raft + 分散クエリ |
 | v0.9 | v0.9 | v0.10 | v0.9 | v0.6 | Raft Metadata + Raft DDL |
@@ -44,8 +45,8 @@
 | v0.5.0 | GROUP BY / Aggregation | alopex-sql v0.4 | 集約クエリ、HNSW INDEX 構文 | v0.5 | ⏳ 予定 |
 | v0.5.1 | 次世代検索インデックス基盤 | alopex-sql v0.5 | SHA-256/SimHash/UUIDv7 | v0.5 | ⏳ 予定 |
 | v0.5.2 | キャッシュ・メモリ管理 | alopex-sql v0.5.1 | I/O計測、アダプティブキャッシュ | v0.5 | ⏳ 予定 |
-| v0.6.0 | JOIN Support | alopex-sql v0.5.2 | INNER/LEFT/RIGHT JOIN | v0.6 | ⏳ 予定 |
-| v0.6.0-subquery | Subquery | alopex-sql v0.6 | WHERE/FROM 句サブクエリ | v0.6 | ⏳ 予定 |
+| v0.6.0 | Nim パーサー移行 + JOIN Support | alopex-sql v0.5.2 | Nim 製パーサー(FFI) + INNER/LEFT/RIGHT/FULL/CROSS JOIN | v0.6 | ⏳ 予定 |
+| v0.6.0-subquery | Subquery | alopex-sql v0.6 | スカラー/IN/EXISTS/FROM 派生/ANY,ALL サブクエリ | v0.6 | ⏳ 予定 |
 | v1.0+-wasm | WASM Parser (再評価) | alopex-sql v1.0+ | Read-Only SQL (wasm32) | v1.0+ | ⏳ 再評価 |
 | v0.9.0 | Distributed Query Planner | Chirps v0.3 | シャード対応クエリ計画 | v0.8 | ⏳ 予定 |
 | v0.9.0-index | TSO 統合分散インデックス | Chirps v0.6 (TSO) | Point-in-Time/整合性チェック | v0.8 | ⏳ 予定 |
