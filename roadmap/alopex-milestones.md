@@ -19,9 +19,9 @@
 | **v0.4.0** | **v0.4.0** | **v0.4.0** | **v0.4.0** | - | **Embedded Integration + HNSW + Async/Stream + Server** ✅ **リリース済** |
 | v0.5 | v0.5 | v0.5 | v0.5 | - | Durability + GROUP BY |
 | v0.6 | v0.6 | v0.6 | v0.6 | - | Embedded/Server 実用化 + Nim SQL パーサー移行 + JOIN/Subquery + DataFrame/Python 強化 |
-| v0.7 | v0.7 | v0.7-v0.8 | v0.7 | - | Cluster-aware + 分散クエリ |
-| v0.8 | v0.8 | v0.9 | v0.8 | v0.3 | Metadata Raft + 分散クエリ |
-| v0.9 | v0.9 | v0.10 | v0.9 | v0.6 | Raft Metadata + Raft DDL |
+| v0.7 | v0.7 | v0.7-v0.8 | v0.7 | v0.3 | Cluster-aware + 分散クエリ計画 (Scatter-Gather simulation) |
+| v0.8 | v0.8 | v0.9 | v0.8 | v0.6 | Metadata Raft + 分散クエリ本実装 (Distributed Query Planner) |
+| v0.9 | v0.9 | v0.10 | v0.9 | v0.7 | Raft Metadata + Raft DDL |
 | v0.10 | v0.10 | v0.11 | v0.10 | v0.7 | Multi-Raft + 分散 Txn |
 | v1.0 | v1.0 | v0.12-v1.0 | v1.0 | v0.8 | Federation + Optimizer |
 
