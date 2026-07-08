@@ -1427,8 +1427,6 @@ v0.5.2 Cache/Memory Management
     ↓
 v0.6.0 JOIN Support ────────────────────────────→ Alopex DB v0.6
     ↓
-v1.0+ WASM Parser (Read-Only, Re-evaluation)
-    ↓
 v0.6.0 Subquery ────────────────────────────────→ Alopex DB v0.6
     ↓
 v0.9.0 Distributed Query Planner ───────────────→ Alopex DB v0.8 (Chirps v0.3)
@@ -1440,6 +1438,8 @@ v0.11.0 Multi-Raft Query ──────────────────�
 v0.12.0 Federation Query ───────────────────────→ Alopex DB v1.0 (Chirps v0.8)
     ↓
 v1.0.0 Query Optimizer (Cost-based)
+    ↓
+v1.0+ WASM Parser (Read-Only, Re-evaluation)
 ```
 
 ---
