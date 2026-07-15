@@ -65,7 +65,7 @@ Cargo.toml の description に基づく公式責務。
 |---|---|---|---|---|---|
 | 3 | 集約器 `state()`/`merge()` 追加 | alopex-sql (trait), alopex-core (マージ演算) | **ws v0.7.2** | あり(trait) | 全8集約器が state/merge 実装、AVG=(sum,count)化、単一プロセス内 partial→final が単一パスと同結果 |
 | 4 | DISTINCT 集約 (SUM/AVG/MIN/MAX/GROUP_CONCAT) | alopex-sql | **ws v0.7.2** | なし | 各集約の DISTINCT が型受理され正しい値を返す。#3 と同時 |
-| 5 | 汎用スカラー関数 + 関数レジストリ基盤 (#6a/#6b を内包) | alopex-sql, alopex-core (#6b 計測) | **ws v0.7.3** | なし(追加のみ) | レジストリ導入、v0.5.3 カタログの数値/三角/文字列/正規表現/条件/型関数が動作。**公開は v0.7.3 の1回**だが、範囲が広いため**実装 spec は3分割**: (A) `registry-scalars`=レジストリ基盤+v0.5.3、(B) `hash-encode`=v0.5.1 ハッシュ/UUID/エンコード、(C) `system-pragma`=v0.5.2 システム関数+PRAGMA。A→B/C の順 (A が基盤)。**C 完了時に v0.7.3 を1回公開**する |
+| 5 | 汎用スカラー関数 + 関数レジストリ基盤 (#6a/#6b を内包) | alopex-sql, alopex-core (#6b 計測) | **ws v0.7.3** | なし(追加のみ) | レジストリ導入、v0.5.3 カタログの数値/三角/文字列/正規表現/条件/型関数が動作。**公開は v0.7.3 の1回**だが、範囲が広いため**実装 spec は3分割**: (A) `registry-scalars`=レジストリ基盤+v0.5.3、(B) `hash-encode`=v0.5.1 ハッシュ/UUID/エンコード、(C) `system-pragma`=v0.5.2 システム関数+PRAGMA。A→B/C の順 (A が基盤)。**C 完了時に v0.7.3 を1回公開**する。C は公開担当として、**issue #45 (alopex-tools 比較ベンチ) 完了を前提に新関数を SQL 比較ベンチ (Phase 1 埋め込み型) へ反映・検証**し、**デモ/検証スクリプト・チュートリアル等の公開情報を更新**する工程まで含む (#45 の publish 方針が確定したら v0.7.3 リリースの publish 対象がそれに追随) |
 | 9 | 分散プラン (Exchange/Repartition/ScatterGather) | alopex-sql | **ws v0.9.0** | あり(LogicalPlan) | DistributedPlanner が論理→ScatterGather 変換。#3 完了が前提 |
 | 10a | cluster metadata contracts + ルーティング simulation | alopex-cluster | **ws v0.7.0** | — | ✅ **リリース済**（3151行、`simulated_harness.rs`） |
 | 10b | cluster 本実装 (remote execution / Raft / 分散 txn) | alopex-cluster | **DB v0.8 (本来予定・B-4)** | なし(未公開) | Chirps Mesh 越しのリモート実行。**v0.8.0 の元計画** |
