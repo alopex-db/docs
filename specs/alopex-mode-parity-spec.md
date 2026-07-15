@@ -1,6 +1,6 @@
 # モードパリティ検証・デモ仕様書
 
-> **対象バージョン**: Alopex DB v0.6 以降（v0.7.1 で SF-CLUSTER を有効化）
+> **対象バージョン**: Alopex DB v0.6 以降（v0.7.1 で SF-CLUSTER を有効化。ただし v0.7.1 の配布物には rpath 伝播バグ + Nim ツールチェーン依存の欠陥があり、crates.io/PyPI からの公開版インストールでは再現できない。**v0.7.2 で修正済み**、公開版で再現するには v0.7.2 以降を使うこと）
 > **ステータス**: ドラフト
 
 ## 概要
@@ -156,9 +156,10 @@ alopex/scripts/parity/
 - `alopex-core` の互換フィクスチャ生成器（`generate_compat_v0_1.rs` 系）で生成した旧バージョンのデータディレクトリを、現行バージョンの全 reader サーフェスで開けることを検証する。
 - 互換フィクスチャは対象バージョンの追加に合わせて拡充する。
 
-## クラスタサーフェスの有効化（v0.7.1）
+## クラスタサーフェスの有効化（v0.7.1、公開版での再現には v0.7.2 以降が必要）
 
 - SF-CLUSTER は v0.7 の cluster-aware foundation により有効化する。定義は「`alopex-server` を `[cluster]` セクションで `mode=cluster_aware`・`node_id`・`cluster_id`・`advertised_endpoint` を明示設定（単一メンバー）して起動した HTTP 経路」である。
+- **v0.7.1 の crates.io/PyPI 公開版には rpath 伝播バグがあり、`LD_LIBRARY_PATH` を手動設定しない限り `alopex-server`/`alopex` バイナリが起動できない。** ソースビルド (`make nim-parser` 経由) では問題が隠れて再現しなかった。v0.7.2 で修正済みのため、公開版のみで本節を再現する場合は v0.7.2 以降を用いること。
 - 有効化要件は予約条項のとおり「クラスタノードが既存データディレクトリを取り込み、同一コーパス・同一検証クエリが一致すること」であり、コーパス・期待値・正規化規則は変更なく用いる。
 - ライブ実行のルーティング判定は `local_only` である。v0.7 は分散実行を行わず、複数ノードに跨る判定は `future_distributed_execution_required` としてクエリを拒否する。
 - マルチノード（実分散実行）のセルは v0.8 以降の予約である。v0.7.0 機能そのもの（cluster status / join・leave / routing 診断 / DataFrame P3）の実証は `alopex-v07-feature-demo-spec.md` が規定する。

@@ -1,6 +1,6 @@
 # v0.7 機能デモ・検証仕様書（cluster-aware foundation / DataFrame P3）
 
-> **対象バージョン**: Alopex DB v0.7.1
+> **対象バージョン**: Alopex DB v0.7.1（crates.io/PyPI 公開版には rpath 伝播バグ + Nim ツールチェーン依存の欠陥があり、公開版インストールでは本デモを再現できない。**v0.7.2 で修正済み**、公開版で再現するには v0.7.2 以降を使うこと）
 > **ステータス**: ドラフト
 > **前提仕様**: `alopex-mode-parity-spec.md`（SF-CLUSTER の定義・有効化条件はそちらが規定する）
 
