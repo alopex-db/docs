@@ -1316,8 +1316,15 @@ use alopex_query_common::{TSFunction, LabelMatcher, MatchOp};
 | `AVG(col)` | 平均 | NULL を無視 |
 | `MIN(col)` | 最小値 | NULL を無視 |
 | `MAX(col)` | 最大値 | NULL を無視 |
+| `GROUP_CONCAT(col[, sep])` | 文字列連結 | NULL を無視 |
+| `STRING_AGG(col, sep)` | 文字列連結 | NULL を無視 |
 
-**注意**: v0.3 では集約関数はあるが、GROUP BY はサポートしない（テーブル全体の集約のみ）。
+`COUNT/SUM/AVG/MIN/MAX/GROUP_CONCAT/STRING_AGG` は `DISTINCT` 修飾をサポートする。
+DISTINCT の重複判定は GROUP BY と同一のキー等価性に従い、NULL は集約対象外。
+`TOTAL(DISTINCT ...)` は未対応。
+
+**注意**: v0.7.3 以降、非 DISTINCT 集約は単一プロセス内 partial→final 実行に対応する。
+DISTINCT 集約は2段 partial→final では重複排除が保証できないため Single 実行に固定する。
 
 ---
 
