@@ -65,7 +65,7 @@ Cargo.toml の description に基づく公式責務。
 |---|---|---|---|---|---|
 | 3 | 集約器 `state()`/`merge()` 追加 | alopex-sql (trait), alopex-core (マージ演算) | **ws v0.7.3** | あり(trait) | 全8集約器が state/merge 実装、AVG=(sum,count)化、単一プロセス内 partial→final が単一パスと同結果 |
 | 4 | DISTINCT 集約 (SUM/AVG/MIN/MAX/GROUP_CONCAT) | alopex-sql | **ws v0.7.3** | なし | 各集約の DISTINCT が型受理され正しい値を返す。#3 と同時 |
-| 5 | 汎用スカラー関数 + 関数レジストリ基盤 (#6a/#6b を内包) | alopex-sql, alopex-core (#6b 計測) | **ws v0.7.4** | なし(追加のみ) | レジストリ導入、v0.5.3 カタログの数値/三角/文字列/正規表現/条件/型関数が動作。**公開は v0.7.4 の1回**だが、範囲が広いため**実装 spec は3分割**: (A) `registry-scalars`=レジストリ基盤+v0.5.3、(B) `hash-encode`=v0.5.1 ハッシュ/UUID/エンコード、(C) `system-pragma`=v0.5.2 システム関数+PRAGMA。A→B/C の順 (A が基盤)。**C 完了時に v0.7.4 を1回公開**する。C は公開担当として、**issue #45 (alopex-tools 比較ベンチ) 完了を前提に新関数を SQL 比較ベンチ (Phase 1 埋め込み型) へ反映・検証**し、**デモ/検証スクリプト・チュートリアル等の公開情報を更新**する工程まで含む (#45 の publish 方針が確定したら v0.7.4 リリースの publish 対象がそれに追随) |
+| 5 | 汎用スカラー関数 + 関数レジストリ基盤 (#6a/#6b を内包) | alopex-sql, alopex-core (#6b 計測) | **ws v0.7.4** | なし(追加のみ) | ✅ **完済・公開済**。レジストリ導入、v0.5.3 カタログの数値/三角/文字列/正規表現/条件/型関数、v0.5.1 ハッシュ/UUID/エンコード、v0.5.2 システム関数/PRAGMA を実装。**公開は v0.7.4 の1回**、実装 spec は3分割 (A) `registry-scalars` → (B) `hash-encode` / (C) `system-pragma`。比較ベンチは **#45とは独立に**既存 `alopex-sql` Criterion ベンチを拡張して実施し、デモ/検証スクリプトと公開情報を更新した。 |
 | 9 | 分散プラン (Exchange/Repartition/ScatterGather) | alopex-sql | **ws v0.9.0** | あり(LogicalPlan) | DistributedPlanner が論理→ScatterGather 変換。#3 完了が前提 |
 | 10a | cluster metadata contracts + ルーティング simulation | alopex-cluster | **ws v0.7.0** | — | ✅ **リリース済**（3151行、`simulated_harness.rs`） |
 | 10b | cluster 本実装 (remote execution / Raft / 分散 txn) | alopex-cluster | **DB v0.8 (本来予定・B-4)** | なし(未公開) | Chirps Mesh 越しのリモート実行。**v0.8.0 の元計画** |
@@ -76,7 +76,7 @@ Cargo.toml の description に基づく公式責務。
 - **v0.7.0 でやるべきだった機能（#3/#4/#5）は、すべて v0.7.x パッチ系列で完済する。** これらは「v0.7 の実装漏れ」であり、新バージョンの予定を消費させない。
 - **2つの軸を分ける: 「公開バージョン」と「実装 spec」は別物。**
   - **公開バージョン軸**: #5 と旧 #6a/#6b は**すべて v0.5.x カタログの後方互換なスカラー関数追加**であり機能的に同質。これを 3 つの公開リリース (旧 v0.7.4/v0.7.4/v0.7.5) に分割する根拠は「レジストリを先に入れる」という**内部の実装順序**でしかなく、公開リリースを分ける理由にはならない。crates.io は yank のみで取り消し不可、publish は 7 クレート + PyPI の全自動 CI が走るオーバーヘッドを伴う。したがって **公開は v0.7.4 の 1 回に統合**する。
-  - **実装 spec 軸**: ただし 3 カタログ (v0.5.3 + v0.5.1 + v0.5.2) を 1 spec に畳むと範囲が広すぎて実装・レビュー・検証が破綻する。よって **spec は 3 分割**する: (A) `alopex-sql-v0-7-3-registry-scalars` = レジストリ基盤 + v0.5.3、(B) `alopex-sql-v0-7-3-hash-encode` = v0.5.1 ハッシュ/UUID/エンコード、(C) `alopex-sql-v0-7-3-system-pragma` = v0.5.2 システム関数 + PRAGMA。各 spec は独立に requirements/design/tasks/承認/実装を回す。**A が基盤で B/C の前提**（レジストリ先行）。**公開 (crates.io/PyPI publish) は C 完了時の v0.7.4 タグ 1 回のみ**で、A/B は公開せず後続 spec の土台として main に積む。
+  - **実装 spec 軸**: ただし 3 カタログ (v0.5.3 + v0.5.1 + v0.5.2) を 1 spec に畳むと範囲が広すぎて実装・レビュー・検証が破綻する。よって **spec は 3 分割**する: (A) `alopex-sql-v0-7-4-registry-scalars` = レジストリ基盤 + v0.5.3、(B) `alopex-sql-v0-7-4-hash-encode` = v0.5.1 ハッシュ/UUID/エンコード、(C) `alopex-sql-v0-7-4-system-pragma` = v0.5.2 システム関数 + PRAGMA。各 spec は独立に requirements/design/tasks/承認/実装を回す。**A が基盤で B/C の前提**（レジストリ先行）。**公開 (crates.io/PyPI publish) は C 完了時の v0.7.4 タグ 1 回のみ**で、A/B は公開せず後続 spec の土台として main に積む。
 - **v0.8.0 は本来「Metadata Raft + 分散クエリ本実装（B-4/#10b）」の予定**（[alopex-milestones.md](./alopex-milestones.md) DB v0.8 行）。この予定は動かさない。債務是正を混ぜない。
 - **v0.7.1（依存/セキュリティ）は✅完了・公開済み。** リリース後の実機検証で D2 (rpath 伝播バグ + Nim vendoring) が判明し、v0.7.2 として緊急割り込み。**v0.7.3 以降のパッチで機能債務を順に完済**する。
 - #3 は trait へのメソッド追加＝破壊的変更だが、0.x のパッチ内で許容（外部安定 API 契約が確立する前）。
@@ -101,7 +101,7 @@ Cargo.toml の description に基づく公式責務。
 | v0.7.1 | 依存近代化・セキュリティ修正 (pyo3/object_store/rustls) + D1 (Cargo.toml 版整合) | 全クレート | ✅ リリース済 |
 | **v0.7.2** | **D2: rpath 伝播バグ修正 + Nim vendoring (緊急パッチ、新機能なし)** | alopex-sql, alopex-cli/server/py | 🔧 **作業中** |
 | **v0.7.3** | **#3 部分状態集約器 + #4 DISTINCT 集約** | alopex-sql + alopex-core | 🔴 債務・最優先 |
-| **v0.7.4** | **#5 汎用スカラー関数 + レジストリ基盤 (v0.5.3 カタログ全体: 数値/三角/文字列/正規表現/条件/型 + ハッシュ/UUID/エンコード + システム関数/PRAGMA)** | alopex-sql (+ alopex-core 計測) | 🔴 債務 |
+| **v0.7.4** | **#5 汎用スカラー関数 + レジストリ基盤 (v0.5.3 カタログ全体: 数値/三角/文字列/正規表現/条件/型 + ハッシュ/UUID/エンコード + システム関数/PRAGMA)** | alopex-sql (+ alopex-core 計測) | ✅ **完済・公開済** |
 | **v0.8.0** | **Metadata Raft + 分散クエリ本実装 (本来予定・温存)** | alopex-cluster + alopex-sql | ⏳ 元計画 |
 | v0.8.x | 日付・時刻関数 (v0.5.4 カタログ) 等の新規 | alopex-sql | ⏳ 新規 |
 | v1.0.0 | Query Optimizer (コストベース) | alopex-sql | ⏳ 新規 |
