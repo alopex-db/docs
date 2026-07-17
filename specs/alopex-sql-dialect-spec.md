@@ -1,8 +1,8 @@
 # Alopex SQL 方言仕様書
 
-**バージョン**: 0.3.4-draft
-**最終更新**: 2025-12-18
-**ステータス**: ドラフト
+**バージョン**: 0.7.4-draft
+**最終更新**: 2026-07-17
+**ステータス**: v0.7.4 実装反映・公開前
 
 ---
 
@@ -1526,6 +1526,59 @@ BEGIN, COMMIT, ROLLBACK, TRANSACTION, SAVEPOINT
 
 ---
 
+## 13. v0.7.4 SQL 拡張
+
+v0.7.4 は既存のベクトル関数と集約関数を維持したまま、レジストリ管理の
+スカラー関数、ハッシュ/エンコード関数、システム関数、PRAGMA を追加する。
+破壊的変更は意図していない。`md5` は互換性・フィンガープリント用途に限り、
+パスワード保存や署名など衝突耐性が必要な用途には使用しない。
+
+### 13.1 数値・文字列・条件・型情報
+
+以下の関数は型検査後にレジストリ経由で評価される。NULL 規則と短絡評価は
+各関数の SQL semantics に従う。
+
+| 分類 | 関数 |
+|------|------|
+| 数値・三角 | `ABS`, `SIGN`, `ROUND`, `FLOOR`, `CEIL`, `CEILING`, `TRUNC`, `MOD`, `POWER`, `POW`, `SQRT`, `EXP`, `LN`, `LOG`, `LOG10`, `SIN`, `COS`, `TAN`, `ASIN`, `ACOS`, `ATAN`, `ATAN2`, `PI`, `DEGREES`, `RADIANS`, `RANDOM` |
+| 文字列 | `LENGTH`, `CHAR_LENGTH`, `OCTET_LENGTH`, `UPPER`, `LOWER`, `INITCAP`, `SUBSTR`, `LEFT`, `RIGHT`, `TRIM`, `LTRIM`, `RTRIM`, `REPLACE`, `INSTR`, `STRPOS`, `CONCAT`, `CONCAT_WS`, `REPEAT`, `REVERSE`, `LPAD`, `RPAD`, `SPLIT_PART` |
+| 正規表現 | `REGEXP_REPLACE`, `REGEXP_MATCH`, `REGEXP_MATCHES` |
+| 条件・型 | `COALESCE`, `NULLIF`, `IFNULL`, `IIF`, `GREATEST`, `LEAST`, `TYPEOF`, `PG_TYPEOF`, `QUOTE` |
+
+パターン演算子は `LIKE`, `ILIKE`, `GLOB`, `SIMILAR TO` をサポートする。
+`NOT` と `ESCAPE`、NULL 結果、大小文字規則は演算子ごとに適用される。
+SQL 標準形式 `SUBSTRING(s FROM start FOR length)`, `POSITION(sub IN s)`,
+`TRIM(chars FROM s)` は対応する関数形式へ正規化される。
+
+### 13.2 ハッシュ・UUID・エンコード
+
+| 関数 | 戻り値 | 注記 |
+|------|--------|------|
+| `SHA256(value)` | BLOB | SHA-256 digest。入力上限16 MiB |
+| `MD5(value)` | TEXT | 小文字16進。セキュリティ用途禁止 |
+| `SIMHASH(value)` | BIGINT | ASCII空白分割、SHA-256先頭8バイトによる決定的64-bit値 |
+| `HAMMING_DISTANCE(a, b)` | INTEGER | 64-bit bit pattern の popcount |
+| `GEN_RANDOM_UUID()` / `UUIDV7()` | TEXT | 標準UUID表記、非決定的 |
+| `HEX(value)` / `UNHEX(value)` | TEXT / BLOB | HEX出力は大文字、入力不正はエラー |
+| `ENCODE(value, format)` / `DECODE(value, format)` | TEXT / BLOB | `hex` または `base64`、base64は標準padding必須 |
+
+### 13.3 システム関数と PRAGMA
+
+`memory_stats()` と `io_stats()` はバックエンドが提供する統計だけをJSON TEXT
+で返し、対象外の統計は NULL を返す。`clear_cache()` は消去したバイト数を
+BIGINT で返す。
+
+```sql
+SELECT memory_stats(), io_stats(), clear_cache();
+PRAGMA cache_size = 1024;       -- 4096-byte pages
+PRAGMA memory_limit = '256MiB'; -- KiB/MiB/GiB または KB/MB/GB
+PRAGMA io_stats;
+```
+
+`PRAGMA cache_size`、`PRAGMA memory_limit` の変更は実行結果が成功となり、
+`PRAGMA io_stats` は `io_stats` という1列のQuery結果を返す。負値、未知の
+PRAGMA名、不正な単位はエラーとなる。
+
 ## 14. 更新履歴
 
 | バージョン | 日付 | 内容 |
@@ -1536,6 +1589,7 @@ BEGIN, COMMIT, ROLLBACK, TRANSACTION, SAVEPOINT
 | 0.3.2-draft | 2025-12-15 | TS 拡張構文セクション追加、alopex-query-common 依存関係の方向性を明記 |
 | 0.3.3-draft | 2025-12-16 | 依存関係の方向性修正（skulk/alopex-sql が SOURCE OF TRUTH、alopex-query-common が再エクスポート） |
 | 0.3.4-draft | 2025-12-18 | CD ワークフローによる v0.3.0 公開を反映しバージョン番号を再調整（v0.1.x→v0.3.0統合、v0.1.4→v0.4.0、後続バージョン繰り上げ） |
+| 0.7.4-draft | 2026-07-17 | レジストリ・ハッシュ/UUID/エンコード・システム関数・PRAGMA の実装仕様を反映 |
 
 ---
 
