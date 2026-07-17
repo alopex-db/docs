@@ -634,9 +634,11 @@ pub enum AggregateFunction {
 
 /// Aggregate accumulator state
 pub trait Accumulator {
-    fn update(&mut self, value: &SqlValue);
-    fn finalize(&self) -> SqlValue;
-    fn merge(&mut self, other: &Self);
+    fn update(&mut self, value: Option<SqlValue>) -> Result<()>;
+    fn state(&self) -> Result<Vec<SqlValue>>;
+    fn merge(&mut self, state: &[SqlValue]) -> Result<()>;
+    fn finalize(&self) -> Result<SqlValue>;
+    fn clone_box(&self) -> Box<dyn Accumulator>;
 }
 
 /// Create accumulator for aggregate function
@@ -649,6 +651,12 @@ pub struct AvgAccumulator { sum: f64, count: u64 }
 pub struct MinAccumulator { min: Option<SqlValue> }
 pub struct MaxAccumulator { max: Option<SqlValue> }
 ```
+
+**実装状況 (v0.7.3)**: `Accumulator::state()` / `merge()` は実装済み。
+`AVG` は `[DOUBLE(sum), BIGINT(count)]` 状態を使い、`GROUP_CONCAT` /
+`STRING_AGG` は partition index 昇順 merge で入力順を保持する。
+`AggregateMode { Partial, Final, Single }` による単一プロセス partial→final
+集約に対応し、DISTINCT 集約は正しさのため Single 固定とする。
 
 ### New LogicalPlan Variant
 

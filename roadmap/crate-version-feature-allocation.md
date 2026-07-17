@@ -1,6 +1,6 @@
 # クレート × バージョン × 機能 割り付け表 (Feature Allocation Matrix)
 
-> Status: **割り付け提案** / 2026-07-15 (v0.7.2 緊急パッチ割り込みに伴い改訂)
+> Status: **割り付け提案** / 2026-07-16 (v0.7.3 公開・検証完了を反映)
 > 目的: 実装漏れ債務と今後の機能を、担当クレートと着手バージョンに **1つずつ明示配置** する。
 > 「全部いっぺんに」を禁じ、各機能に責任クレートと期日を持たせることで実装漏れの再発を防ぐ。
 > 関連: [distributed-implementation-gap-audit.md](../design/distributed-implementation-gap-audit.md)（漏れの棚卸し）,
@@ -63,14 +63,14 @@ Cargo.toml の description に基づく公式責務。
 
 | # | 機能 | 担当クレート | 是正バージョン | 破壊的変更 | 受入基準 (DoD) |
 |---|---|---|---|---|---|
-| 3 | 集約器 `state()`/`merge()` 追加 | alopex-sql (trait), alopex-core (マージ演算) | **ws v0.7.3** | あり(trait) | 全8集約器が state/merge 実装、AVG=(sum,count)化、単一プロセス内 partial→final が単一パスと同結果 |
-| 4 | DISTINCT 集約 (SUM/AVG/MIN/MAX/GROUP_CONCAT) | alopex-sql | **ws v0.7.3** | なし | 各集約の DISTINCT が型受理され正しい値を返す。#3 と同時 |
+| 3 | 集約器 `state()`/`merge()` 追加 | alopex-sql (trait), alopex-core (マージ演算) | **ws v0.7.3** | あり(trait) | ✅ 公開・検証済み。全8集約器が state/merge 実装、AVG=(sum,count)化、単一プロセス内 partial→final が単一パスと同結果 |
+| 4 | DISTINCT 集約 (SUM/AVG/MIN/MAX/GROUP_CONCAT) | alopex-sql | **ws v0.7.3** | なし | ✅ 公開・検証済み。各集約の DISTINCT が型受理され正しい値を返す。#3 と同時 |
 | 5 | 汎用スカラー関数 + 関数レジストリ基盤 (#6a/#6b を内包) | alopex-sql, alopex-core (#6b 計測) | **ws v0.7.4** | なし(追加のみ) | レジストリ導入、v0.5.3 カタログの数値/三角/文字列/正規表現/条件/型関数が動作。**公開は v0.7.4 の1回**だが、範囲が広いため**実装 spec は3分割**: (A) `registry-scalars`=レジストリ基盤+v0.5.3、(B) `hash-encode`=v0.5.1 ハッシュ/UUID/エンコード、(C) `system-pragma`=v0.5.2 システム関数+PRAGMA。A→B/C の順 (A が基盤)。**C 完了時に v0.7.4 を1回公開**する。C は公開担当として、**issue #45 (alopex-tools 比較ベンチ) 完了を前提に新関数を SQL 比較ベンチ (Phase 1 埋め込み型) へ反映・検証**し、**デモ/検証スクリプト・チュートリアル等の公開情報を更新**する工程まで含む (#45 の publish 方針が確定したら v0.7.4 リリースの publish 対象がそれに追随) |
 | 9 | 分散プラン (Exchange/Repartition/ScatterGather) | alopex-sql | **ws v0.9.0** | あり(LogicalPlan) | DistributedPlanner が論理→ScatterGather 変換。#3 完了が前提 |
 | 10a | cluster metadata contracts + ルーティング simulation | alopex-cluster | **ws v0.7.0** | — | ✅ **リリース済**（3151行、`simulated_harness.rs`） |
 | 10b | cluster 本実装 (remote execution / Raft / 分散 txn) | alopex-cluster | **DB v0.8 (本来予定・B-4)** | なし(未公開) | Chirps Mesh 越しのリモート実行。**v0.8.0 の元計画** |
 | D1 | **Cargo.toml 版を実公開版 (0.7.0) に追随** | 全クレート | **v0.7.1** | — | ✅ **是正済**。crates.io 0.7.0 公開済みなのに Cargo.toml が 0.6.0 の不整合を v0.7.1 で是正 |
-| D2 | **rpath 伝播バグ + Nim ツールチェーン非依存化 (vendoring)** | alopex-sql (build.rs), alopex-cli/server/py (rpath 消費側 build.rs) | **ws v0.7.2** | なし(ビルド設定のみ) | (a) `alopex-cli`/`alopex-server`/`alopex-py` が `LD_LIBRARY_PATH` なしで起動できる (RUNPATH 実機確認済み ✅)。(b) `alopex-sql` の crates.io 公開版が Nim ツールチェーン無しで `cargo install` 可能 (vendored バイナリ同梱、release.yml 改修含め検証中 🔧)。新機能を含まない緊急修正のみ |
+| D2 | **rpath 伝播バグ + Nim ツールチェーン非依存化 (vendoring)** | alopex-sql (build.rs), alopex-cli/server/py (rpath 消費側 build.rs) | **ws v0.7.2** | なし(ビルド設定のみ) | ✅ 公開・検証済み。(a) `alopex-cli`/`alopex-server`/`alopex-py` が `LD_LIBRARY_PATH` なしで起動できる。(b) `alopex-sql` の crates.io 公開版が Nim ツールチェーン無しで `cargo install` 可能。新機能を含まない緊急修正のみ |
 
 **注記（債務を v0.8.0 に繰り越さない原則）**:
 - **v0.7.0 でやるべきだった機能（#3/#4/#5）は、すべて v0.7.x パッチ系列で完済する。** これらは「v0.7 の実装漏れ」であり、新バージョンの予定を消費させない。
@@ -99,8 +99,8 @@ Cargo.toml の description に基づく公式責務。
 | v0.6.0 | JOIN 5種 / Subquery | alopex-sql (+core プリミティブ) | ✅ リリース済 |
 | v0.7.0 | cluster metadata + ルーティング simulation | alopex-cluster ほか | ✅ リリース済 (PyPI/tag) |
 | v0.7.1 | 依存近代化・セキュリティ修正 (pyo3/object_store/rustls) + D1 (Cargo.toml 版整合) | 全クレート | ✅ リリース済 |
-| **v0.7.2** | **D2: rpath 伝播バグ修正 + Nim vendoring (緊急パッチ、新機能なし)** | alopex-sql, alopex-cli/server/py | 🔧 **作業中** |
-| **v0.7.3** | **#3 部分状態集約器 + #4 DISTINCT 集約** | alopex-sql + alopex-core | 🔴 債務・最優先 |
+| **v0.7.2** | **D2: rpath 伝播バグ修正 + Nim vendoring (緊急パッチ、新機能なし)** | alopex-sql, alopex-cli/server/py | ✅ リリース済 |
+| **v0.7.3** | **#3 部分状態集約器 + #4 DISTINCT 集約** | alopex-sql + alopex-core | ✅ 公開・検証済み |
 | **v0.7.4** | **#5 汎用スカラー関数 + レジストリ基盤 (v0.5.3 カタログ全体: 数値/三角/文字列/正規表現/条件/型 + ハッシュ/UUID/エンコード + システム関数/PRAGMA)** | alopex-sql (+ alopex-core 計測) | 🔴 債務 |
 | **v0.8.0** | **Metadata Raft + 分散クエリ本実装 (本来予定・温存)** | alopex-cluster + alopex-sql | ⏳ 元計画 |
 | v0.8.x | 日付・時刻関数 (v0.5.4 カタログ) 等の新規 | alopex-sql | ⏳ 新規 |
@@ -113,12 +113,12 @@ Cargo.toml の description に基づく公式責務。
 | ws版 | 機能 | 担当クレート | Chirps 依存 | 状態 |
 |---|---|---|---|---|
 | v0.7.0 (B-3) | cluster metadata contracts・ルーティング simulation | alopex-cluster | なし(模擬) | ✅ リリース済 |
-| v0.7.3 (B-1) | 単一プロセス内 partial→final 並列 (AggregateMode) | alopex-sql | なし | #3 と同時（債務・v0.7.x で完済） |
+| v0.7.3 (B-1) | 単一プロセス内 partial→final 並列 (AggregateMode) | alopex-sql | なし | ✅ 公開・検証済み |
 | v0.9.0 (B-2) | #9 分散プラン表現・DistributedPlanner | alopex-sql | なし | 🔴 #3 が前提 |
 | DB v0.8 (B-4) | #10b ノード跨ぎ本実装 (remote execution/IPC/RPC/failover) | alopex-cluster + alopex-sql | **Chirps Multi-Raft/TSO v0.6** | ⏳ 元計画・温存 |
 | DB v0.10+ (B-5) | 汎用 shuffle / 多 Final / 分散 JOIN | alopex-cluster + alopex-sql | Chirps 成熟 | ⏳ |
 
-> B-3 は v0.7.0 で **metadata + simulation まで完了済み**。B-1（部分状態集約器の並列化）は債務#3と同時で **v0.7.3 完済**。B-4（remote execution 本実装）は DB v0.8 の**本来予定を温存**。
+> B-3 は v0.7.0 で **metadata + simulation まで完了済み**。B-1（部分状態集約器の並列化）は債務#3と同時で **v0.7.3 公開・検証済み**。B-4（remote execution 本実装）は DB v0.8 の**本来予定を温存**。
 
 ### 基盤: Chirps（別リポジトリ・alopex-cluster が利用）
 
@@ -131,7 +131,7 @@ Cargo.toml の description に基づく公式責務。
 
 ```
 債務完済 (v0.7.x パッチ系列):
-  v0.7.0 ✅ ─► v0.7.1 ✅(依存/セキュリティ + D1) ─► v0.7.2 🔧(D2: rpath伝播+Nim vendoring 緊急パッチ) ─► [v0.7.3 #3/#4 +B-1] ─► [v0.7.4 #5(+#6a/#6b 内包): レジストリ→数値/文字列/条件/型→ハッシュ→システム関数]
+  v0.7.0 ✅ ─► v0.7.1 ✅(依存/セキュリティ + D1) ─► v0.7.2 ✅(D2: rpath伝播+Nim vendoring 緊急パッチ) ─► v0.7.3 ✅(#3/#4 +B-1) ─► [v0.7.4 #5(+#6a/#6b 内包): レジストリ→数値/文字列/条件/型→ハッシュ→システム関数]
                                                                                                                                                     │
 本来予定 (温存・繰り越さない):                                                                                                                      ▼
   v0.8.0 (Metadata Raft + 分散クエリ本実装 = B-4/#10b) ─► v0.9.0 (#9 分散プラン B-2) ─► v0.10+ (B-5)
@@ -141,8 +141,8 @@ Cargo.toml の description に基づく公式責務。
 
 **着手順の絶対制約**:
 - **債務は v0.7.x で完済し、v0.8.0 に繰り越さない。** v0.8.0 の予定（分散クエリ本実装）は動かさない。
-- **v0.7.2（D2: rpath 伝播バグ + Nim vendoring）を先に完結させる。** 新機能を含まない緊急修正のみ。ここに機能を混ぜない。
-- **#3（v0.7.3）が系統B（B-1/B-2）の前提。** これを飛ばして #9 に進んではならない。
+- **v0.7.2（D2: rpath 伝播バグ + Nim vendoring）は完結済み。** 新機能を含まない緊急修正として分離した。
+- **#3（v0.7.3）は系統B（B-1/B-2）の前提として完了済み。** 次の分散プラン #9 はこの前提の上で進める。
 - **#5（レジストリ）を #6a/#6b より先に**（順序制約は 3 spec の順序 A→B/C と各 tasks 内 Phase で担保。公開バージョンは分けず v0.7.4 の 1 回）。
 - **B-4（v0.8.0 本来予定）は Chirps v0.6 が出るまで着手不可。** それまでに v0.7.x 債務を完済しておく。
 - #6a/#6b は **spec 化が着手の前提**（現在 spec 無し）。
@@ -151,9 +151,9 @@ Cargo.toml の description に基づく公式責務。
 
 再発防止のため、着手対象を段階的に限定する。**「全部いっぺんに」は禁止。同時に、債務を v0.8.0 に繰り越すことも禁止（v0.7.x で完済）。**
 
-- **今: v0.7.2（作業中）** — D2 (rpath 伝播バグ修正 + Nim vendoring) の緊急パッチのみ。新機能・機能債務 (#3-#6) は入れない。
-- **次: v0.7.3** — **#3 部分状態集約器 + #4 DISTINCT 集約 + B-1 単一プロセス並列のみ**。
-- **その後: v0.7.4（#5、#6a/#6b 内包）** で v0.5.x カタログのスカラー関数群を**単一公開リリース**として完済する。**実装 spec は 3 分割** (A registry-scalars → B hash-encode / C system-pragma) し、各 spec を独立に承認・実装するが、**公開 (crates.io/PyPI publish) は C 完了時の v0.7.4 タグ 1 回**（同質の後方互換追加を無駄に分割せず、publish/yank 不可のオーバーヘッドを避ける）。
+- **完了: v0.7.2** — D2 (rpath 伝播バグ修正 + Nim vendoring) の緊急パッチのみとして完結。
+- **完了: v0.7.3** — **#3 部分状態集約器 + #4 DISTINCT 集約 + B-1 単一プロセス並列のみ**として公開・検証済み。
+- **次: v0.7.4（#5、#6a/#6b 内包）** で v0.5.x カタログのスカラー関数群を**単一公開リリース**として完済する。**実装 spec は 3 分割** (A registry-scalars → B hash-encode / C system-pragma) し、各 spec を独立に承認・実装するが、**公開 (crates.io/PyPI publish) は C 完了時の v0.7.4 タグ 1 回**（同質の後方互換追加を無駄に分割せず、publish/yank 不可のオーバーヘッドを避ける）。
 - **v0.8.0 は温存**: 本来予定の「Metadata Raft + 分散クエリ本実装」。債務を混ぜない。
 - **各パッチの着手前ゲート**: spec（requirements/design/tasks）を起こし、**ロードマップの約束を tasks が全網羅しているか照合する**（#3 の merge が過去に脱落した原因の是正）。
 
