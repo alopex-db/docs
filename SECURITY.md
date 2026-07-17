@@ -15,7 +15,7 @@
 | ローカルパス | `/home/user/`, `/Users/name/` | Warning |
 | プライベートIP | `192.168.x.x`, `10.x.x.x` | Warning |
 | APIキー | `ghp_*`, `sk-*`, `AKIA*` | **Error（PRブロック）** |
-| 認証情報 | `password = "xxx"` | **Error（PRブロック）** |
+| 認証情報（example） | `password = "xxx"` | **Error（PRブロック）** |
 | 機密ファイル | `.env`, `*.pem`, `*.key` | **Error（PRブロック）** |
 
 **Warning**: 警告は表示されますがマージ可能です。配信時にサニタイズされます。
