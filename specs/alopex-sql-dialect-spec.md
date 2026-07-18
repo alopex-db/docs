@@ -1512,12 +1512,12 @@ BEGIN, COMMIT, ROLLBACK, TRANSACTION, SAVEPOINT
 
 | バージョン | 内容 | 対応 DB |
 |------------|------|---------|
-| v0.5.0 | GROUP BY / Aggregation | v0.5 |
-| v0.5.1 | 次世代検索インデックス基盤（SHA-256/SimHash/UUIDv7） | v0.5 |
-| v0.5.2 | キャッシュ・メモリ管理（I/O計測、アダプティブキャッシュ） | v0.5 |
-| v0.6.0 | JOIN Support（INNER/LEFT/RIGHT） | v0.6 |
-| v0.7.0 | WASM Parser（Read-Only SQL） | v0.7 |
-| v0.8.0 | Subquery（WHERE/FROM 句） | v0.7 |
+| v0.5.0 | GROUP BY / Aggregation | **v0.7.3で出荷** |
+| v0.5.1 | ハッシュ/UUID/エンコード関数 | **v0.7.4で出荷** |
+| v0.5.2 | システム関数 / PRAGMA | **v0.7.4で出荷** |
+| v0.6.0 | JOIN Support（INNER/LEFT/RIGHT） | **v0.7.4で出荷** |
+| v0.6.0-subquery | Subquery（WHERE/FROM 句） | **v0.7.4で出荷** |
+| v1.0+-wasm | WASM Parser（Read-Only SQL、再評価） | v1.0+ |
 | v0.9.0 | Distributed Query Planner（Chirps v0.3 依存） | v0.8 |
 | v0.10.0 | Raft-aware Executor（Chirps v0.6 依存） | v0.9 |
 | v0.11.0 | Multi-Raft Query（Chirps v0.7 依存） | v0.10 |

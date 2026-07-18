@@ -27,13 +27,13 @@ alopex-sql クエリエンジンの実装マイルストーンと、各バージ
 |---------|-----------|--------|---------------|
 | ~~v0.4.0~~ | Embedded Integration | ✅ 完了 | `.spec-workflow/archive/specs/alopex-sql-v0-4-0/` |
 | **v0.4.0** | **Async/Stream 基盤** | ✅ **完了** | `.spec-workflow/archive/specs/alopex-sql-v0-4-0/` |
-| v0.5.0 | GROUP BY / Aggregation | ⏳ Planned | - |
-| v0.5.1 | 次世代検索インデックス基盤 | ⏳ Planned | - |
-| v0.5.2 | キャッシュ・メモリ管理 | ⏳ Planned | - |
-| v0.6.0 | JOIN Support | ⏳ Planned | `.spec-workflow/specs/nim-sql-parser-migration/` |
-| v0.6.0-subquery | Subquery | ⏳ Planned | `.spec-workflow/specs/nim-sql-parser-migration/` |
-| nim-parser | **Nim SQL Parser 移行（Rust パーサー廃止）+ JOIN/Subquery 実行** | ⏳ Planned | `.spec-workflow/specs/nim-sql-parser-migration/` |
-| v1.0+-wasm | WASM Parser (Re-evaluation) | ⏳ Re-evaluation | - |
+| v0.5.0 | GROUP BY / Aggregation | ✅ v0.7.3で出荷 | - |
+| v0.5.1 | ハッシュ/UUID/エンコード関数 | ✅ v0.7.4で出荷 | - |
+| v0.5.2 | システム関数 / PRAGMA | ✅ v0.7.4で出荷 | - |
+| v0.6.0 | JOIN Support | ✅ v0.7.4で出荷 | `.spec-workflow/specs/nim-sql-parser-migration/` |
+| v0.6.0-subquery | Subquery | ✅ v0.7.4で出荷 | `.spec-workflow/specs/nim-sql-parser-migration/` |
+| nim-parser | **Nim SQL Parser 移行（Rust パーサー廃止）+ JOIN/Subquery 実行** | ✅ v0.7.4で出荷 | `.spec-workflow/specs/nim-sql-parser-migration/` |
+| v1.0+-wasm | WASM Parser (Re-evaluation) | ⏳ v1.0以降で再評価 | - |
 
 > **パーサー実装方針 (2026-06-27 改訂)**: Parser コンポーネントは **Nim 実装**（`nim-sql-parser/`）に置き換え、C ABI FFI で alopex-sql に統合する。上記 v0.6.0 JOIN / v0.6.0-subquery のパース〜実行は nim-sql-parser-migration spec が担う。下記の `LogicalPlan::Join` / `TypedExprKind` 等の Rust 型定義は実行層（Planner/Executor）の目標形状として有効。
 
@@ -524,7 +524,7 @@ impl<'txn, 'store, T: KVTransaction> TableStorage<'txn, 'store, T> {
 
 > 以下は旧 v0.1.3 Vector SQL の仕様。v0.3.0 として crates.io に公開済み。
 
-### Planned Functions
+### API shape (historical v0.1.3 design)
 
 ```rust
 // executor/evaluator/functions.rs (v0.1.3)
@@ -556,11 +556,11 @@ pub fn execute_vector_topk<S: KVStore>(
 
 ---
 
-## v0.4.0 Embedded Integration ⏳ 予定
+## v0.4.0 Embedded Integration ✅ 完了
 
 > 旧 v0.1.4。詳細仕様は `.spec-workflow/specs/alopex-sql-v0.4.0/requirements.md` を参照。
 
-### Planned APIs
+### Delivered API shape
 
 ```rust
 // alopex-embedded/src/database.rs (v0.4.0)
@@ -595,9 +595,9 @@ impl Transaction<'_> {
 
 ---
 
-## v0.5.0 GROUP BY / Aggregation ⏳ 予定
+## v0.5.0 GROUP BY / Aggregation ✅ v0.7.3で出荷
 
-> 旧 v0.2.0。対応 Alopex DB: v0.5
+> 旧 v0.2.0の設計を、Alopex DB v0.7.3で出荷した実装に対応付ける。
 
 ### New Keywords (Reserved)
 
@@ -701,9 +701,9 @@ pub fn execute_aggregate<S: KVStore>(
 
 ---
 
-## v0.5.1 次世代検索インデックス基盤 ⏳ 予定
+## v0.5.1 ハッシュ/UUID/エンコード関数 ✅ v0.7.4で出荷
 
-> 旧 v0.2.1。対応 Alopex DB: v0.5
+> ハッシュ/UUID/エンコード関数はAlopex DB v0.7.4で出荷済み。下記の検索インデックス構想は別機能であり、現行版の提供を意味しない。
 
 ### New Index Types
 
@@ -738,9 +738,9 @@ pub fn eval_hamming_distance(a: &SqlValue, b: &SqlValue) -> Result<SqlValue, Eva
 
 ---
 
-## v0.5.2 キャッシュ・メモリ管理 ⏳ 予定
+## v0.5.2 システム関数 / PRAGMA ✅ v0.7.4で出荷
 
-> 旧 v0.2.2。対応 Alopex DB: v0.5
+> 旧 v0.2.2の設計を、Alopex DB v0.7.4のシステム関数 / PRAGMA 実装に対応付ける。
 
 ### New System Functions
 
@@ -767,9 +767,9 @@ PRAGMA io_stats;                 -- Show I/O statistics
 
 ---
 
-## v0.6.0 JOIN Support ⏳ 予定
+## v0.6.0 JOIN Support ✅ v0.7.4で出荷
 
-> 旧 v0.3.0。対応 Alopex DB: v0.6
+> 旧 v0.3.0。Alopex DB v0.7.4で単一ノードのJOINを出荷済み。
 
 ### New Keywords (Reserved)
 
@@ -861,9 +861,9 @@ pub fn hash_join(
 
 ---
 
-## v1.0+ WASM Parser (Re-evaluation) ⏳ 再評価
+## v1.0+ WASM Parser (Re-evaluation) ⏳ v1.0以降で再評価
 
-> 旧 v0.4.0。対応 Alopex DB: v0.7
+> 旧 v0.4.0 の構想を、WASM v1.0以降の再評価項目として整理したもの。v0.7の提供機能ではない。
 
 ### Target
 
@@ -911,9 +911,9 @@ impl WasmSqlEngine {
 
 ---
 
-## v0.6.0 Subquery ⏳ 予定
+## v0.6.0 Subquery ✅ v0.7.4で出荷
 
-> 旧 v0.5.0。対応 Alopex DB: v0.7
+> 旧 v0.5.0。Alopex DB v0.7.4で単一ノードのサブクエリを出荷済み。
 
 ### New Keywords (Reserved)
 
@@ -941,7 +941,7 @@ SELECT * FROM (SELECT id, name FROM users WHERE active) AS active_users;
 ### New TypedExprKind Variants
 
 ```rust
-// planner/typed_expr.rs (v0.8.0 extension)
+// planner/typed_expr.rs (v0.7.4 extension)
 
 pub enum TypedExprKind {
     // ... existing variants ...
@@ -980,7 +980,7 @@ pub enum Quantifier {
 ### Subquery Executor
 
 ```rust
-// executor/query/subquery.rs (v0.8.0)
+// executor/query/subquery.rs (v0.7.4)
 
 /// Execute scalar subquery
 pub fn execute_scalar_subquery<S: KVStore>(

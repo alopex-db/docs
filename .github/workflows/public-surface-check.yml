@@ -1,0 +1,17 @@
+name: Public Surface Check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  public-surface:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Check public surface contracts
+        run: bash scripts/check-public-surface.sh
