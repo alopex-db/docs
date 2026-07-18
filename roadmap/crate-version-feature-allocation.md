@@ -1,6 +1,6 @@
 # クレート × バージョン × 機能 割り付け表 (Feature Allocation Matrix)
 
-> Status: **割り付け提案** / 2026-07-15 (v0.7.2 緊急パッチ割り込みに伴い改訂)
+> Status: **実装・公開状況の記録** / 2026-07-18 (v0.7.4公開後に更新)
 > 目的: 実装漏れ債務と今後の機能を、担当クレートと着手バージョンに **1つずつ明示配置** する。
 > 「全部いっぺんに」を禁じ、各機能に責任クレートと期日を持たせることで実装漏れの再発を防ぐ。
 > 関連: [distributed-implementation-gap-audit.md](../design/distributed-implementation-gap-audit.md)（漏れの棚卸し）,
@@ -16,21 +16,21 @@
 
 ## 1. クレート責務とリリース実態 (割り付けの前提)
 
-### 1.1 実リリース状況 (2026-07-14、crates.io/PyPI/git を観測で確定)
+### 1.1 実リリース状況 (2026-07-18、crates.io/PyPI/git を観測で確定)
 
-**v0.7.0・v0.7.1 は crates.io・PyPI 両方で公開済み。** 製品バージョンは v0.7 系に入っている。**v0.7.1 に、リリース後の実機検証 (crates.io 公開版のみを使う検証コンテナ) で 2 件の重大バグが判明した**: (a) `alopex-sql` の `build.rs` が出す rpath 指定 (`cargo:rustc-link-arg`) が依存クレートの build script からは最終バイナリへ伝播しない cargo の仕様により、`alopex-cli`/`alopex-server`/`alopex-py` の配布バイナリが `LD_LIBRARY_PATH` なしでは起動できない、(b) `alopex-sql` の Nim SQL パーサー共有ライブラリがビルド済みバイナリとして同梱されておらず、Nim ツールチェーンを持たない環境では `cargo install`/`cargo build` 自体が失敗する。**both は crates.io のバージョン不変性 (同一番号の再 publish 不可) のため v0.7.1 自体を差し替えられず、v0.7.2 を新機能なしの緊急修正版として割り込ませる。** これにより本来 v0.7.2 だった「#3 部分状態集約器」以降のパッチ番号を 1 つずつ繰り下げる (旧 v0.7.2→v0.7.3、旧 v0.7.3→v0.7.4)。
+**v0.7.0・v0.7.1 は crates.io・PyPI 両方で公開済み。** その後、v0.7.2（rpath/Nim vendoring）、v0.7.3（集約器/DISTINCT）、v0.7.4（スカラー関数群）まで公開済みである。v0.7.0のcluster-aware foundationとDataFrame P3の実装範囲、およびv0.7.xパッチで解消した債務を、将来の分散実装と混同しない。
 
 | クレート | 実公開版 (crates.io/PyPI) | Cargo.toml 版定義 | 版定義の種別 |
 |---|---|---|---|
-| alopex-core | crates.io **0.7.1** | `0.7.1` | workspace 継承 |
-| alopex-sql | crates.io **0.7.1** | `0.7.1` | **独立指定** |
-| alopex-dataframe | crates.io **0.7.1** | `0.7.1` | **独立指定** |
-| alopex-embedded | crates.io **0.7.1** | `0.7.1` | workspace 継承 |
-| alopex-server | crates.io **0.7.1** | `0.7.1` | workspace 継承 |
-| alopex-cli | crates.io **0.7.1** | `0.7.1` | workspace 継承 |
-| alopex-cluster | crates.io **0.7.1** | `0.7.1` | workspace 継承 |
+| alopex-core | crates.io **0.7.4** | `0.7.4` | workspace 継承 |
+| alopex-sql | crates.io **0.7.4** | `0.7.4` | **独立指定** |
+| alopex-dataframe | crates.io **0.7.4** | `0.7.4` | **独立指定** |
+| alopex-embedded | crates.io **0.7.4** | `0.7.4` | workspace 継承 |
+| alopex-server | crates.io **0.7.4** | `0.7.4` | workspace 継承 |
+| alopex-cli | crates.io **0.7.4** | `0.7.4` | workspace 継承 |
+| alopex-cluster | crates.io **0.7.4** | `0.7.4` | workspace 継承 |
 | alopex-tools | crates.io **未公開** | `0.0.0` | 独立ワークスペース (issue #45 是正済み)。crates.io 公開版 alopex-embedded/alopex-sql に依存し、リリース確認コンテナの `verify-release-embedded` バイナリ等を提供。publish=false (内部ツール) |
-| alopex (=alopex-py) | PyPI **0.7.1** | `0.7.1` | **独立指定** |
+| alopex (=alopex-py) | PyPI **0.7.4** | `0.7.4` | **独立指定** |
 
 **★バージョンはクレートごとに独立管理。「ワークスペース統一」は誤り★**:
 - workspace 継承 (`version.workspace = true`): core / cluster / embedded / server / cli
@@ -41,7 +41,7 @@
 - crates.io は全 Rust クレート 0.7.0 公開済みなのに、リポジトリの Cargo.toml が 0.6.0 のままだった不整合 (債務 D1) は v0.7.1 で解消済み。全クレート Cargo.toml が実公開版 0.7.1 と一致している。
 - 過去の割り付け表に記した「C1: crates.io が v0.7.0 未公開」は**誤り**だった (crates.io は公開済み)。C1 は撤回済み。
 
-**#3 部分状態集約器の実装漏れは v0.7.0/v0.7.1 でも継続** (集約器 `Accumulator` は `update`/`finalize` のみ)。これが v0.7.3 spec の是正対象。alopex-cluster は v0.7.0 で「metadata contracts + simulation」まで (remote execution/Raft/分散 txn は未実装＝B-4 残債務)。
+**#3 部分状態集約器の実装漏れは v0.7.0/v0.7.1 に残っていたが、v0.7.3で是正済み**。alopex-cluster は v0.7.0 で「metadata contracts + simulation」までを提供し、remote execution/Raft/分散txnは未実装のままv0.8以降のB-4に残る。
 
 ### 1.2 クレート責務
 
@@ -51,7 +51,7 @@ Cargo.toml の description に基づく公式責務。
 |---|---|---|
 | **alopex-core** | ストレージエンジン（LSM/columnar/vector index）、**実行プリミティブ**（hash_join, 集約プリミティブ, spill） | 単一ノードの物理演算。分散集約の**部分状態のマージ演算**もここ |
 | **alopex-sql** | SQL パーサ・プランナ・エグゼキュータ（core を呼ぶ） | 論理/分散プランの生成、集約器の trait 定義、coordinator/gather ロジック |
-| **alopex-cluster** (未公開) | 分散クラスタ協調（Chirps 基盤の上） | Range Descriptor、シャード配置、キー→Range 解決、クエリルーティング、リモート実行 |
+| **alopex-cluster** (公開済み) | v0.7 cluster-aware foundation（Chirps 基盤の上） | cluster metadata、status、membership lifecycle、routing simulation。リモート実行は未実装 |
 | alopex-embedded / server / py / cli | 上位インターフェース | 分散クエリの入口（透過的にルーティング） |
 | (外部) **Chirps** | 合意(Raft)・通信(QUIC)・メンバーシップ(SWIM)・(v0.6)Multi-Raft/TSO | 基盤。alopex-cluster が利用 |
 
@@ -70,7 +70,7 @@ Cargo.toml の description に基づく公式責務。
 | 10a | cluster metadata contracts + ルーティング simulation | alopex-cluster | **ws v0.7.0** | — | ✅ **リリース済**（3151行、`simulated_harness.rs`） |
 | 10b | cluster 本実装 (remote execution / Raft / 分散 txn) | alopex-cluster | **DB v0.8 (本来予定・B-4)** | なし(未公開) | Chirps Mesh 越しのリモート実行。**v0.8.0 の元計画** |
 | D1 | **Cargo.toml 版を実公開版 (0.7.0) に追随** | 全クレート | **v0.7.1** | — | ✅ **是正済**。crates.io 0.7.0 公開済みなのに Cargo.toml が 0.6.0 の不整合を v0.7.1 で是正 |
-| D2 | **rpath 伝播バグ + Nim ツールチェーン非依存化 (vendoring)** | alopex-sql (build.rs), alopex-cli/server/py (rpath 消費側 build.rs) | **ws v0.7.2** | なし(ビルド設定のみ) | (a) `alopex-cli`/`alopex-server`/`alopex-py` が `LD_LIBRARY_PATH` なしで起動できる (RUNPATH 実機確認済み ✅)。(b) `alopex-sql` の crates.io 公開版が Nim ツールチェーン無しで `cargo install` 可能 (vendored バイナリ同梱、release.yml 改修含め検証中 🔧)。新機能を含まない緊急修正のみ |
+| D2 | **rpath 伝播バグ + Nim ツールチェーン非依存化 (vendoring)** | alopex-sql (build.rs), alopex-cli/server/py (rpath 消費側 build.rs) | **ws v0.7.2** | なし(ビルド設定のみ) | (a) `alopex-cli`/`alopex-server`/`alopex-py` が `LD_LIBRARY_PATH` なしで起動できる (RUNPATH 実機確認済み ✅)。(b) `alopex-sql` の crates.io 公開版に対象別 vendored バイナリを同梱し、Nim ツールチェーン無しで利用できることを公開版検証済み ✅。新機能を含まない緊急修正 |
 
 **注記（債務を v0.8.0 に繰り越さない原則）**:
 - **v0.7.0 でやるべきだった機能（#3/#4/#5）は、すべて v0.7.x パッチ系列で完済する。** これらは「v0.7 の実装漏れ」であり、新バージョンの予定を消費させない。
@@ -99,8 +99,8 @@ Cargo.toml の description に基づく公式責務。
 | v0.6.0 | JOIN 5種 / Subquery | alopex-sql (+core プリミティブ) | ✅ リリース済 |
 | v0.7.0 | cluster metadata + ルーティング simulation | alopex-cluster ほか | ✅ リリース済 (PyPI/tag) |
 | v0.7.1 | 依存近代化・セキュリティ修正 (pyo3/object_store/rustls) + D1 (Cargo.toml 版整合) | 全クレート | ✅ リリース済 |
-| **v0.7.2** | **D2: rpath 伝播バグ修正 + Nim vendoring (緊急パッチ、新機能なし)** | alopex-sql, alopex-cli/server/py | 🔧 **作業中** |
-| **v0.7.3** | **#3 部分状態集約器 + #4 DISTINCT 集約** | alopex-sql + alopex-core | 🔴 債務・最優先 |
+| **v0.7.2** | **D2: rpath 伝播バグ修正 + Nim vendoring (緊急パッチ、新機能なし)** | alopex-sql, alopex-cli/server/py | ✅ リリース済み |
+| **v0.7.3** | **#3 部分状態集約器 + #4 DISTINCT 集約** | alopex-sql + alopex-core | ✅ リリース済み |
 | **v0.7.4** | **#5 汎用スカラー関数 + レジストリ基盤 (v0.5.3 カタログ全体: 数値/三角/文字列/正規表現/条件/型 + ハッシュ/UUID/エンコード + システム関数/PRAGMA)** | alopex-sql (+ alopex-core 計測) | ✅ **完済・公開済** |
 | **v0.8.0** | **Metadata Raft + 分散クエリ本実装 (本来予定・温存)** | alopex-cluster + alopex-sql | ⏳ 元計画 |
 | v0.8.x | 日付・時刻関数 (v0.5.4 カタログ) 等の新規 | alopex-sql | ⏳ 新規 |
@@ -131,7 +131,7 @@ Cargo.toml の description に基づく公式責務。
 
 ```
 債務完済 (v0.7.x パッチ系列):
-  v0.7.0 ✅ ─► v0.7.1 ✅(依存/セキュリティ + D1) ─► v0.7.2 🔧(D2: rpath伝播+Nim vendoring 緊急パッチ) ─► [v0.7.3 #3/#4 +B-1] ─► [v0.7.4 #5(+#6a/#6b 内包): レジストリ→数値/文字列/条件/型→ハッシュ→システム関数]
+  v0.7.0 ✅ ─► v0.7.1 ✅(依存/セキュリティ + D1) ─► v0.7.2 ✅(D2: rpath伝播+Nim vendoring 緊急パッチ) ─► v0.7.3 ✅(#3/#4 +B-1) ─► [v0.7.4 ✅ #5(+#6a/#6b 内包): レジストリ→数値/文字列/条件/型→ハッシュ→システム関数]
                                                                                                                                                     │
 本来予定 (温存・繰り越さない):                                                                                                                      ▼
   v0.8.0 (Metadata Raft + 分散クエリ本実装 = B-4/#10b) ─► v0.9.0 (#9 分散プラン B-2) ─► v0.10+ (B-5)
@@ -145,15 +145,15 @@ Cargo.toml の description に基づく公式責務。
 - **#3（v0.7.3）が系統B（B-1/B-2）の前提。** これを飛ばして #9 に進んではならない。
 - **#5（レジストリ）を #6a/#6b より先に**（順序制約は 3 spec の順序 A→B/C と各 tasks 内 Phase で担保。公開バージョンは分けず v0.7.4 の 1 回）。
 - **B-4（v0.8.0 本来予定）は Chirps v0.6 が出るまで着手不可。** それまでに v0.7.x 債務を完済しておく。
-- #6a/#6b は **spec 化が着手の前提**（現在 spec 無し）。
+- #6a/#6b は v0.7.4のspec分割（hash-encode / system-pragma）として実装・公開済み。
 
-## 5. 「今すぐやること」の限定 (実装漏れ防止の核心)
+## 5. 完了済み債務と今後の境界 (実装漏れ防止の核心)
 
 再発防止のため、着手対象を段階的に限定する。**「全部いっぺんに」は禁止。同時に、債務を v0.8.0 に繰り越すことも禁止（v0.7.x で完済）。**
 
-- **今: v0.7.2（作業中）** — D2 (rpath 伝播バグ修正 + Nim vendoring) の緊急パッチのみ。新機能・機能債務 (#3-#6) は入れない。
-- **次: v0.7.3** — **#3 部分状態集約器 + #4 DISTINCT 集約 + B-1 単一プロセス並列のみ**。
-- **その後: v0.7.4（#5、#6a/#6b 内包）** で v0.5.x カタログのスカラー関数群を**単一公開リリース**として完済する。**実装 spec は 3 分割** (A registry-scalars → B hash-encode / C system-pragma) し、各 spec を独立に承認・実装するが、**公開 (crates.io/PyPI publish) は C 完了時の v0.7.4 タグ 1 回**（同質の後方互換追加を無駄に分割せず、publish/yank 不可のオーバーヘッドを避ける）。
+- **完了: v0.7.2** — D2 (rpath 伝播バグ修正 + Nim vendoring)。
+- **完了: v0.7.3** — **#3 部分状態集約器 + #4 DISTINCT 集約 + B-1 単一プロセス並列**。
+- **完了: v0.7.4（#5、#6a/#6b 内包）** — v0.5.xカタログのスカラー関数群を単一公開リリースとして出荷。実装specは3分割したが、公開はv0.7.4の1回である。
 - **v0.8.0 は温存**: 本来予定の「Metadata Raft + 分散クエリ本実装」。債務を混ぜない。
 - **各パッチの着手前ゲート**: spec（requirements/design/tasks）を起こし、**ロードマップの約束を tasks が全網羅しているか照合する**（#3 の merge が過去に脱落した原因の是正）。
 
