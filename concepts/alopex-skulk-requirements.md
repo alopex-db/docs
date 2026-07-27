@@ -1,8 +1,10 @@
 # Alopex Skulk 要求仕様書
 
 **バージョン**: 1.0
-**最終更新日**: 2025-11-29
+**最終更新日**: 2026-07-27
 **ステータス**: Draft
+
+> **2026-07-27 改訂**: ストレージをArrow+Parquet(BROTLI q5) wide/columnarへ世代交代（v0.3、再PoCによる）。詳細な経緯・実測は [technical-spec.md](../specs/alopex-skulk-technical-spec.md) 「ストレージ設計の変遷」章、TDR#13 (`.spec-workflow/steering/technical-decisions.md` §13) を参照。
 
 ---
 
@@ -118,16 +120,19 @@ Alopex Skulkは、**Alopex Coreを基盤とする時系列データベース**�
 **NFR-TSDB-001: パフォーマンス**
 - インジェストスループット: >500,000 points/sec (単一ノード)
 - クエリレイテンシ: <100ms (P99, 24時間範囲集約)
-- 圧縮率: >10:1 (Gorilla + LZ4)
+- 圧縮率: >10:1
+
+> v0.3〜、圧縮の実装は Arrow+Parquet(BROTLI 品質q5) に世代交代（旧: Gorilla + LZ4）。実測: 書込 2.6M pts/s（目標の5.2倍）、圧縮率2.81x。詳細は [technical-spec.md](../specs/alopex-skulk-technical-spec.md) 「ストレージ設計の変遷」章参照。
 
 **NFR-TSDB-002: 可用性**
 - Uptime: 99.9% (3ノードクラスタ)
 - データ損失: 最大1分（設定可能なWALバッファ）
 
 **NFR-TSDB-003: ストレージ効率**
-- Gorilla圧縮（タイムスタンプ + 値）
-- Delta-of-Delta エンコーディング
-- 辞書エンコーディング（ラベル）
+- Parquet列エンコード: timestamp=DELTA_BINARY_PACKED、float=BYTE_STREAM_SPLIT、tag=RLE_DICTIONARY
+- ブロック圧縮: BROTLI 品質q5（純Rust、C依存ゼロ）
+
+> **Superseded (2026-07-27, TDR#13)**: 旧仕様（v0.2まで）は Gorilla圧縮（タイムスタンプ+値のXOR/Delta-of-Delta）+ 辞書エンコーディング（ラベル）。当時のPoCに基づく正当な設計だったが、v0.3で再PoCの結果、上記へ世代交代した。
 
 **NFR-TSDB-004: 運用性**
 - Prometheus互換エンドポイント
@@ -451,7 +456,9 @@ INACTIVE → PENDING → FIRING → RESOLVED
 **要求ID**: SR-TSDB-STORAGE-001
 **概要**: 時系列最適化ストレージ形式
 
-**ファイル構造** (`.skulk` 拡張子):
+> **Superseded (2026-07-27, TDR#13)**: 以下のファイル構造（自前TSM/Gorilla）は v0.2 までの仕様。当時のPoCに基づく正当な設計だが、v0.3で再PoCによりArrow+Parquet(BROTLI q5) wide/columnarへ世代交代した。新仕様（物理レイアウト・列エンコード・依存構成）は [technical-spec.md](../specs/alopex-skulk-technical-spec.md) 「ストレージ設計の変遷」章を参照。
+
+**ファイル構造** (`.skulk` 拡張子、Superseded、v0.2まで):
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                   Skulk File (.skulk)                        │
@@ -886,6 +893,7 @@ crates/skulk-cluster/src/
 | 1.1 | 2025-11-29 | Claude | 製品名を「Alopex Skulk」に変更:<br>- 「Skulk」= キツネの群れを意味する英語の集合名詞 |
 | 1.2 | 2025-11-29 | Claude | タイムスタンプ設計要件を追加（3.1.2節）:<br>- Raft TSOを使用しない設計判断<br>- O3データ処理ポリシー<br>- クロックスキュー監視 |
 | 1.3 | 2025-11-30 | Claude | リリースマイルストーン詳細化（7節）:<br>- ファイル配置<br>- 各バージョンの実装タスク |
+| 1.4 | 2026-07-27 | Claude | ストレージをArrow+Parquet(BROTLI q5) wide/columnarへ世代交代（再PoCによる、TDR#13）:<br>- 冒頭に改訂注記追加<br>- NFR-TSDB-001/003を更新<br>- §3.2.1にSuperseded注記<br>- 詳細はtechnical-spec.md参照 |
 
 ---
 

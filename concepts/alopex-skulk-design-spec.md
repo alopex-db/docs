@@ -1,8 +1,10 @@
 # Alopex Skulk 方式設計書
 
 **バージョン**: 1.0
-**最終更新日**: 2025-11-29
+**最終更新日**: 2026-07-27
 **ステータス**: Draft
+
+> **2026-07-27 改訂**: ストレージをArrow+Parquet(BROTLI q5) wide/columnarへ世代交代（v0.3、再PoCによる）。詳細な経緯・実測は [technical-spec.md](../specs/alopex-skulk-technical-spec.md) 「ストレージ設計の変遷」章、TDR#13 (`.spec-workflow/steering/technical-decisions.md` §13) を参照。
 
 ---
 
@@ -100,7 +102,8 @@
 │  └───────────────────┘  │        │  └───────────────────┘  │
 │  ┌───────────────────┐  │        │  ┌───────────────────┐  │
 │  │ Vector Index      │  │        │  │ TSM Storage       │  │
-│  │ (Flat/HNSW)       │  │        │  │ (Gorilla Compress)│  │
+│  │ (Flat/HNSW)       │  │        │  │ (Arrow+Parquet,   │  │
+│  │                   │  │        │  │  BROTLI q5, v0.3〜)│  │
 │  └───────────────────┘  │        │  └───────────────────┘  │
 │  ┌───────────────────┐  │        │  ┌───────────────────┐  │
 │  │ Transaction       │  │        │  │ Lifecycle Manager │  │
@@ -531,6 +534,8 @@ Data Lifecycle Pipeline
 
 ### 3.1 TSM Storage Engine
 
+> **Superseded (2026-07-27, TDR#13)**: 以下 §3.1.2（TSMファイル構造）・§3.1.3（Gorilla圧縮実装）は v0.2 までの自前TSM/Gorilla設計。当時のPoCに基づく正当な設計だが、v0.3で最新情報に基づく再PoCによりArrow+Parquet(BROTLI q5) wide/columnarへ世代交代した。新設計の物理レイアウト・圧縮codec・データモデルは [technical-spec.md](../specs/alopex-skulk-technical-spec.md) 「ストレージ設計の変遷」章を参照。
+
 #### 3.1.1 時系列最適化MemTable
 
 ```rust
@@ -571,7 +576,7 @@ struct PartitionStats {
 }
 ```
 
-#### 3.1.2 TSMファイル構造
+#### 3.1.2 TSMファイル構造（Superseded、v0.2まで）
 
 ```
 Skulk File Layout (.skulk)
@@ -631,7 +636,7 @@ EOF-48    Footer (48 bytes)
           └─ Reserved (4 bytes)
 ```
 
-#### 3.1.3 Gorilla圧縮実装
+#### 3.1.3 Gorilla圧縮実装（Superseded、v0.2まで）
 
 ```rust
 /// Gorilla圧縮エンコーダ（タイムスタンプ用）
@@ -1920,3 +1925,4 @@ CREATE TIMESERIES TABLE _internal.tsdb_metrics (
 |----------|------|--------|---------|
 | 1.0 | 2025-11-29 | Claude | 初版作成 |
 | 1.1 | 2025-11-29 | Claude | 製品名を「Alopex Skulk」に変更 |
+| 1.2 | 2026-07-27 | Claude | ストレージをArrow+Parquet(BROTLI q5) wide/columnarへ世代交代（再PoCによる、TDR#13）:<br>- 冒頭に改訂注記追加<br>- §3.1.2/§3.1.3にSuperseded注記<br>- §1.2アーキ図のTSM Storage表記更新<br>- 詳細はtechnical-spec.md参照 |

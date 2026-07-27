@@ -1,8 +1,10 @@
 # Alopex Skulk 技術仕様書
 
 **バージョン**: 1.0
-**最終更新日**: 2025-11-29
+**最終更新日**: 2026-07-27
 **ステータス**: Draft
+
+> **2026-07-27 改訂**: ストレージエンジンを自前 TSM/Gorilla から Arrow + Parquet(BROTLI q5) wide/columnar へ世代交代（v0.3、再 PoC による）。経緯は「## 1.4 ストレージ設計の変遷（v0.2 → v0.3）」、実測は同章および TDR#13 を参照。
 
 ---
 
@@ -15,12 +17,89 @@
 | プログラミング言語 | Rust 1.75+ | Alopex DB と統一 |
 | 非同期ランタイム | Tokio | Alopex Core から継承 |
 | ストレージ基盤 | alopex-core | WAL, MemTable, Compaction |
-| 圧縮 | Gorilla (自前実装) + LZ4 | 時系列最適化 |
+| ストレージ物理形式 | Arrow(in-memory) + Parquet(on-disk) | wide/columnar、v0.3〜。旧: 自前TSM/Gorilla（`## 1.4` 参照） |
+| 圧縮 | BROTLI 品質q5（`parquet` crate, 純Rust） | v0.3〜。旧: Gorilla自前実装 + LZ4（`## 1.4` 参照） |
 | クラスタ通信 | alopex-chirps | Raft Consensus API, SWIM, QUIC |
 | クエリパーサー | nom (PromQL), sqlparser-rs拡張 (SQL-TS) | - |
+| クエリ実行 | 自前 Parser→Planner→Executor（v0.4） | DataFusion不採用（`## 1.4` 参照） |
 | シリアライゼーション | bincode, serde | 内部通信 |
 | エラーハンドリング | thiserror + anyhow | Alopex と統一 |
 | メトリクス | prometheus (client) | self-monitoring |
+
+### 1.4 ストレージ設計の変遷（v0.2 → v0.3）
+
+> 本節は透明性のための意思決定記録（decision narrative）である。旧設計（v0.1/v0.2）は「誤り」ではなく、**当時の PoC・比較検証に基づく正当な設計判断**であった。v0.3 実装への着手にあたり、2026-07 時点の最新情報に基づいて改めて PoC をやり直し、新しい事実に基づいて設計を世代交代させた。詳細な決定記録は TDR: `.spec-workflow/steering/technical-decisions.md` §13、実測ログは `skulk-worktrees/fdap-poc/poc/VERIFICATION_LOG.md`（第1〜4回）。
+
+#### 1.4.1 v0.1/v0.2: 自前 TSM/Gorilla 単値ストレージ（当時の正当な判断）
+
+Skulk v0.1/v0.2 では、自前 TSM v3 ファイル形式・自前 Gorilla（XOR / Delta-of-Delta）圧縮・自前 compaction・単値 f64 データモデル（1 series = metric+tags → 単一 f64）を実装し、`alopex-skulk-v0.2.0` としてリリース・crates.io 公開した。仕様は本書 `## 3. TSMファイル形式仕様` に記録されている（Superseded 注記付きで保持）。
+
+#### 1.4.2 v0.3 着手にあたっての再 PoC
+
+v0.3 実装への着手にあたり、新世代 TSDB のデータモデル動向（InfluxDB 3 = IOx、GreptimeDB が独立に Arrow + Parquet の wide/columnar 物理設計へ収束）、および Parquet の時系列向けエンコード進化を踏まえ、机上調査で終わらせず実地検証（PoC）をやり直した。ワークツリー `skulk-worktrees/fdap-poc`（branch `poc/fdap-footprint`）で第1〜4回の PoC を実施し、未検証項目ゼロで確定させた。
+
+**PoC 第1回（フットプリント・圧縮率）**:
+
+| 指標 | 現行skulk(自前TSM/Gorilla) | FDAP全部入り(datafusion+arrow+parquet) | 倍率 |
+|---|---|---|---|
+| release バイナリ(stripped,LTO) | 332 KB | 64.0 MB | ≈202× |
+| ランタイム依存クレート数 | 48 | 251 | ≈5.2× |
+| cold ビルド時間(release,LTO) | ~55秒 | 24分52秒 | ≈27× |
+| ビルド時ピークRSS | 中 | 6.0 GB | — |
+
+FDAP 全面採用は Embedded 要件（エッジ/組込）に不合格と判明。一方、圧縮率は Parquet が Gorilla を明確に上回った（100k点実測、揮発ゲージで2.0×小、典型TSDB反復値ワークロードで12.8×小）。
+
+**PoC 第2回（分割構成の段階的フットプリント）**:
+
+| # | 構成 | バイナリ | 依存数 | native C依存 |
+|---|---|---|---|---|
+| 1 | baseline(serdeのみ) | 362 KB | 12 | なし |
+| 2 | arrow のみ | 397 KB | 65 | なし(純Rust) |
+| 3 | arrow+parquet(default) | 4.9 MB | 89 | brotli/flate2/snap/zstd-sys/cc |
+| 4 | arrow+parquet(zstdのみ) | 3.6 MB | 81 | zstd-sys, cc |
+| 4b | arrow+parquet(codec無) | 3.0 MB | 73 | 完全ゼロ(純Rust) |
+
+DataFusion が肥大化の主犯（64MB→3.6MB、≈1/18）であり、arrow+parquet 単独は Embedded に収まることを確認した。
+
+**PoC 第3回（DataFusion 要否・圧縮codec決定）**:
+
+- **DataFusion は不採用と決着**: alopex 組織全体が DataFusion 非採用・自前クエリエンジン路線（SQL=Nim FFI、dataframe=自前、skulk v0.4=自前 Parser→Planner→Executor）。Parquet I/O は `parquet` crate 単体（`ArrowWriter`/`ParquetRecordBatchReaderBuilder`）で完結し、参考実装 influxdb でも DataFusion は sort/dedup/compaction のクエリ実行専用であることを確認。DataFusion を入れると v0.4 自前エンジンと二重になるため不採用。
+- **圧縮 codec は BROTLI（純Rust）に決定**: 4 codec（snappy/brotli/lz4_flex/miniz_oxide）は全て C 依存ゼロと実測。圧縮率比較（100k点、Parquet実ファイルサイズ）:
+
+| codec | 揮発ゲージ(ZSTD比) | 典型TSDB反復値(ZSTD比) |
+|---|---|---|
+| ZSTD(C) 基準 | 1.00 | 1.00 |
+| **BROTLI(純Rust)** | **0.93** | **0.74** |
+| GZIP(純Rust) | 0.96 | 1.44 |
+| LZ4(純Rust) | 1.02 | 3.03 |
+| SNAPPY(純Rust) | 1.12 | 27.8 |
+
+BROTLI が両ワークロードで C 依存の ZSTD より小さく、C 依存 zstd を残す理由が消滅した。release バイナリは 4.1 MB / 77 crate / C依存ゼロ(純Rust)。
+
+**PoC 第4回（codec 書き込みスループット）**:
+
+書込目標 500K points/sec を満たせるかをフィジビリティとして実測（N=1M点、単一スレッド）。
+
+| codec/品質 | write pts/s | 圧縮率(raw比) | 500K達成 |
+|---|---:|---:|:---:|
+| **BROTLI q5** | **2.6M** | **2.81x** | **YES(目標5.2倍)** |
+| BROTLI q9 | 837K | 2.82x | 不安定 |
+| BROTLI q11(default) | 56K | 2.82x | **NO(目標の9%)** |
+
+**決定的発見**: BROTLI のデフォルト品質(q11)は目標の 9% しか出ず採用不可。q11 と q5 の圧縮率差はわずか 0.47%（誤差）にもかかわらず速度は約46倍の差があり、q11 は無意味な設定と判明した。これによりベンチで **BROTLI 品質 q5** が write 2.6M pts/s（目標の5.2倍）・圧縮率2.81x（q11の99.5%）で確定した。
+
+#### 1.4.3 世代交代の結論
+
+実地検証（PoC 第1〜4回、未検証項目ゼロ）に基づき、以下へ確定した。旧設計（Gorilla の値列圧縮に優位性があるという当初の想定）は誤りではなく、**新しい事実（実測）に基づく設計の世代交代**である。
+
+1. **データモデル**: 単値 narrow（1 series = metric+tags → 単一 f64）→ **wide/multi-field**（measurement=table、series key=tags のみ、field=独立 column、(series,ts)→複数 field 値の1行）
+2. **物理レイアウト**: in-memory は Arrow RecordBatch（`(低カーディナリティ tag…, timestamp, sequence)` でソート）、on-disk は Parquet SST（tag は個別列として保持、time で日次パーティション）
+3. **列エンコード**: timestamp=DELTA_BINARY_PACKED、float=BYTE_STREAM_SPLIT、tag=RLE_DICTIONARY、ブロック圧縮=**BROTLI 品質 q5（純Rust）**
+4. **クエリ**: v0.4 の自前 Parser→Planner→Executor で統一。**DataFusion は不採用**。sort/dedup/compaction も自前実装
+5. **依存**: `arrow` + `parquet`(`features=["arrow","brotli"]`) のみ、**C 依存ゼロ・純Rust**、release バイナリ 4.1MB / 77 crate
+6. **互換性**: v0.3 を移行点とし、v0.2 のオンディスクフォーマット（TSM v3, Gorilla）との後方互換は持たない（破壊的変更。0.x 段階のため許容）
+
+「最高・理想（columnar/Parquet+BROTLI圧縮）」と「Embedded要件（エッジ/組込, 4.1MB純Rust）」「書き込み500K pts/s要件」を同時に満たす構成として確定した。詳細な設計選択肢の比較・却下理由は TDR §13 を参照。
 
 ### 1.2 アーキテクチャ原則
 
@@ -881,6 +960,8 @@ impl SectionAwareCompactionScheduler {
 
 ## 3. TSMファイル形式仕様
 
+> **Superseded (2026-07-27, TDR#13)**: 本節は v0.2 までの自前 TSM/Gorilla 仕様。当時の PoC に基づく正当な設計だが、v0.3 で最新情報に基づく再 PoC により Arrow+Parquet(BROTLI q5) wide/columnar へ世代交代した。経緯は「## 1.4 ストレージ設計の変遷」章、新仕様は同章 §1.4.3 参照。
+
 ### 3.1 ファイルレイアウト詳細
 
 ```
@@ -941,6 +1022,8 @@ EOF-48      48        Footer
 ```
 
 ### 3.2 Gorillaエンコーディング仕様
+
+> **Superseded (2026-07-27, TDR#13)**: 本節は v0.2 までの自前 Gorilla 仕様。当時の PoC に基づく正当な設計だが、v0.3 で最新情報に基づく再 PoC により Arrow+Parquet(BROTLI q5) wide/columnar へ世代交代した。経緯は「## 1.4 ストレージ設計の変遷」章、新仕様は同章 §1.4.3 参照。
 
 **タイムスタンプ (Delta-of-Delta)**:
 
@@ -2117,3 +2200,4 @@ pub fn example_embedded_usage() -> Result<()> {
 | 1.0 | 2025-11-29 | Claude | 初版作成 |
 | 1.1 | 2025-11-29 | Claude | file-format-comparison.md を参考にリファイン:<br>- §2.1.1 バックプレッシャ制御追加 (Pebble/TiKV参照)<br>- §2.3.1 書き込み増幅トラッキング追加<br>- §2.3.2 External Ingest API追加 (TiKV参照)<br>- §2.3.3 セクション分離設計追加 (YugabyteDB参照)<br>- §3.1 TSMヘッダ拡張 (Version 2, Section Flags, Level) |
 | 1.2 | 2025-11-29 | Claude | 製品名を「Alopex Skulk」に変更:<br>- alopex-tsdb → alopex-skulk |
+| 1.3 | 2026-07-27 | Claude | ストレージをArrow+Parquet(BROTLI q5) wide/columnarへ世代交代（再PoCによる、TDR#13）:<br>- §1.1技術スタック表を更新<br>- §1.4「ストレージ設計の変遷」章を新規追加<br>- §3 TSMファイル形式仕様・§3.2 GorillaエンコーディングにSuperseded注記 |
