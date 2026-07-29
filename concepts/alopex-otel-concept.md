@@ -289,15 +289,34 @@ Grafana 向けのダッシュボード JSON を Alopex 自身の mixin として
 
 Grafana のダッシュボードスキーマは `schemaVersion` を持ち、**13 以上であれば自動マイグレーションにより新しい Grafana でも読み込める**（現行は 42）。実証として、Tempo の mixin はリポジトリ内に schemaVersion 14 / 40 / 41 を混在させたまま運用している。**一度書けば長期間バージョン非依存で持つ。**
 
-### 9.4 Tempo / Loki 互換は慎重に扱う
+### 9.4 Traces / Logs も Grafana 互換とする
 
-Traces / Logs についても Tempo・Loki の HTTP API 互換という選択肢はあるが、Prometheus とは事情が異なる。
+**全 Signal で Grafana 互換を目指す。**
 
-- Grafana のドキュメントに「Tempo / Loki 互換実装でも動く」という明文が**見つからない**。Prometheus には存在する保証が、これらには無い
-- Grafana 本体からデータソース実装が外部リポジトリへ切り出されており、要求される正確なエンドポイント集合を追跡しにくい
-- Tempo 互換は TraceQL パーサと v1/v2 二世代の API 一式を要求する
+| Signal | 互換対象 | Grafana 側 |
+|---|---|---|
+| Metrics | Prometheus Query API | 組み込み Prometheus |
+| Traces | Tempo HTTP API + TraceQL | Tempo |
+| Logs | Loki HTTP API + LogQL | Loki |
 
-したがって **Traces / Logs の外部公開は Observe を第一とし、Tempo / Loki 互換は後続で判断する**。
+Traces / Logs の互換は Trail のクエリ層が担う。Trail は内部言語（Signal 横断 JOIN を持つ集計特化 DSL）を正典とし、TraceQL / LogQL は**共通論理プランへ desugar する互換フロントエンド**として実装する。
+
+#### Prometheus との違い
+
+Traces / Logs には、Prometheus のような「互換実装でも動く」という明文の保証が Grafana ドキュメントに**見つからない**。また Grafana 本体からデータソース実装が外部リポジトリへ切り出されており、要求される正確なエンドポイント集合を追跡しにくい。
+
+一方で契約の実態は明確である。**Grafana は生の TraceQL / LogQL 文字列をそのまま転送する**（`GET /api/search?q={...}`）。したがって互換の要件は、
+
+1. 彼らの文法を受理するパーサ
+2. クエリパラメータとレスポンス JSON の形
+
+の 2 点に尽きる。中間表現の互換は要求されない。
+
+**文法のサブセット実装で実用に足る。** Grafana 自身が「Builder mode は一部の複雑なクエリをサポートしない」と認めており、複雑なクエリは Code mode に落ちる。
+
+#### 順序
+
+Prometheus 互換を先行させる。Metrics は Skulk v0.3.0 が既に Remote Write を持ち、OTel の MVP が Metrics から始まるためである。TraceQL / LogQL 互換は Trail v0.6 で追加する。
 
 ---
 
