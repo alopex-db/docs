@@ -456,11 +456,11 @@ Alopex OTel は Trail のこの機構をそのまま使う。
 
 ## 8. クエリ層 — 内部言語と外部互換 API
 
-Trail は Observe（ダッシュボード）を内蔵する。したがってクエリ層には**性格の異なる 2 つの面**がある。両者を混同すると、どちらも中途半端になる。
+Trail は 2 通りの経路から問い合わせられる。**上位に構築される製品から**（Alopex OTel の Observe など）と、**既存のツールから**（Grafana など）である。両者は要求が逆方向であり、混同するとどちらも中途半端になる。
 
 | 層 | 用途 | 選択基準 |
 |---|---|---|
-| **内部クエリ言語** | Observe が自分のストレージを読む | Trail の能力を最大限引き出せること |
+| **内部クエリ言語** | 上位製品が Trail を読む | Trail の能力を最大限引き出せること |
 | **外部互換 API** | Grafana など既存ツールから読まれる | 相手が期待する形に合わせること |
 
 内部言語は Trail の設計に最適な形を選べる。外部 API には**こちらの都合を持ち込めない**。この非対称性が層を分ける理由である。
@@ -471,9 +471,9 @@ Trail は Observe（ダッシュボード）を内蔵する。したがってク
 
 **方式: 集計特化 DSL とし、JOIN と集計を第一級で持つ。**
 
-#### 「DSL は表現力が落ちる」は誤り
+#### 参照実装が到達している水準
 
-TraceQL は豊富な集計を持つ。`rate` / `count_over_time` / `min_over_time` / `max_over_time` / `avg_over_time` / `sum_over_time` / `quantile_over_time` / `histogram_over_time`、`by()` によるグルーピング、系列間の算術、`topk` / `bottomk`、結果への閾値フィルタ。
+TraceQL は次を持つ。`rate` / `count_over_time` / `min_over_time` / `max_over_time` / `avg_over_time` / `sum_over_time` / `quantile_over_time` / `histogram_over_time`、`by()` によるグルーピング、系列間の算術、`topk` / `bottomk`、結果への閾値フィルタ。
 
 ```
 ({status=error} | count_over_time()) / ({} | count_over_time())
@@ -482,7 +482,7 @@ TraceQL は豊富な集計を持つ。`rate` / `count_over_time` / `min_over_tim
 
 LogQL も同様に、範囲集約・`by`/`without` グルーピング・二項演算を持つ。
 
-**表現力は言語形式ではなく設計で決まる。** SQL でなければ集計や結合が書けない、という前提は成り立たない。
+Trail の内部言語もこの水準を前提とする。
 
 #### 既存 DSL に無いもの — Signal 横断 JOIN
 
