@@ -250,6 +250,26 @@ Overview / Services / Metrics / Traces / Logs / Alerts / SLO / Cluster / Alopex 
 
 UI の静的アセットはバイナリへ埋め込み、外部 Node.js ランタイムを必須としない。これにより組み込み構成でも UI が付いてくる。
 
+### 8.5 Observe が使うクエリ言語
+
+Observe は**内部クエリ言語**で問い合わせる。これは Trail が持つ集計特化 DSL であり、**Signal 横断 JOIN を第一級で持つ**（Trail 設計 §8）。
+
+§8.3 で示した障害調査の導線——Metrics から Trace へ、Trace から Log へ——は、この JOIN があって初めて 1 クエリで表現できる。
+
+```sql
+-- Trace と、その trace_id を持つ Log と、同時刻帯の Metric を一度に
+SELECT t.trace_id, t.duration, l.body, m.cpu_usage
+FROM traces t
+LEFT JOIN logs l ON t.trace_id = l.trace_id
+LEFT JOIN metrics m ON t.service_instance_id = m.service_instance_id
+   AND m.time BETWEEN t.start_time AND t.end_time
+WHERE t.status = 'ERROR';
+```
+
+**内部言語は外部の形式に合わせる必要がない。** Trail の能力——型シャドー列の束縛指定、schema fingerprint による枝刈り、統計サマリの透過利用——をそのまま使える。
+
+外部からの問い合わせ（§9）は別の層である。両者を 1 つの言語で兼ねると、内部は Grafana の形式に縛られ、外部は Grafana から使えなくなる。
+
 ---
 
 ## 9. 閉じないこと — Grafana からも見える
