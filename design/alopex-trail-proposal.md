@@ -238,7 +238,20 @@ skulk の compaction は重複解決キーが `(Tags, Timestamp)` であり、�
 | v0.1 | 追記パス最小構成 — Event モデル、WAL（辞書付き）、動的列 union バッファ、Parquet 公開、manifest（列サマリ付き）、単一ライタ排他、クラッシュ回復 |
 | v0.2 | type-shadowing と読み取り時 coalesce、JSON Lines / OTLP logs デコーダ、retention |
 | v0.3 | 述語プッシュダウンと列プロジェクション、manifest による枝刈り |
-| v0.4 | compaction と sidecar 索引、全文検索の要否判断 |
+| v0.4 | compaction と sidecar 索引、全文検索の要否判断。**Python バインディング** |
+
+### 8.1 Python バインディング（v0.4）
+
+ログ分析は Python から扱われることが多いため、バインディングを提供する。方式は
+alopex-py および Skulk と揃える。
+
+- PyO3 + maturin、abi3 wheel を PyPI で配布する
+- 取り込み（JSON Lines / dict）と、v0.3 のクエリを公開する
+- 結果は Arrow 経由で pandas / Polars へ渡す。Trail は内部が Arrow のため変換は不要
+- **late-bound schema は Python と相性が良い**。列集合が実行時に決まる点は
+  DataFrame の扱いと一致し、静的な型宣言を要求しない
+- 型シャドー列は、既定では coalesce した論理列として見せる。`status@str` の
+  形で物理列を直接指定することもできる
 
 述語プッシュダウンと列プロジェクションは skulk v0.3.0 では未実装であり、trail v0.3 で新規に設計・実装する必要がある。
 
