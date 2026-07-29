@@ -42,18 +42,33 @@ Alopex OTel はこれらを単一の統合基盤として提供する。最小�
 
 ---
 
-## 3. Signal の配分 — 適材適所
+## 3. Signal の配分 — 時系列とイベントを分ける
 
 Alopex OTel の設計上の中核は、**Signal の性質に応じてストレージを使い分けつつ、利用者には一つに見せる**点にある。
 
-| Signal | ストレージ | なぜそこか |
-|---|---|---|
-| **Metrics** | [Skulk](alopex-skulk-design-spec.md) | 数値時系列そのもの。series が事前に定まり型も安定。列指向の圧縮とダウンサンプリングが直接効く |
-| **Traces** | [Trail](../design/alopex-trail-proposal.md) | Span は時系列ではなく構造化イベント。attributes は任意、events は入れ子 |
-| **Logs** | Trail | 同上。加えて時刻欠損の許容と body の任意性 |
-| メタデータ・索引・関係 | Alopex DB | 高選択度検索、SQL、グラフ、認可 |
+### 3.0 分類基準
 
-### 3.1 なぜ Traces と Logs に late-bound schema が要るのか
+時系列とイベントを分ける基準は、**到着タイミングが決まっているか**である。
+
+| 分類 | 定義 |
+|---|---|
+| **時系列** | 一定周期で到着する前提のデータ。多少のずれは許容するが、次がいつ来るかは既知 |
+| **イベント** | 発生タイミングが決まらない。事象が起きたときに起きる |
+
+この基準で配分は一意に決まる。
+
+| Signal | 分類 | ストレージ | 理由 |
+|---|---|---|---|
+| **Metrics** | 時系列 | [Skulk](alopex-skulk-design-spec.md) | 収集周期が決まっている。列指向の圧縮とダウンサンプリングが直接効く |
+| **Traces** | イベント | [Trail](../design/alopex-trail-proposal.md) | リクエストが来たときに発生し、周期がない |
+| **Logs** | イベント | Trail | 何かが起きたときに発生する |
+| メタデータ・索引・関係 | — | Alopex DB | 高選択度検索、SQL、グラフ、認可 |
+
+周期を前提とした機構——固定間隔のパーティション、ダウンサンプリング、欠損補間——は、イベントに対しては意味を持たない。逆に、任意属性の列展開や型シャドーイングは、周期の定まった数値時系列には過剰である。
+
+Span から派生させた RED メトリクスは、派生した時点で収集周期が定まるため**時系列**となり、Skulk 側へ置く。
+
+### 3.1 イベントに late-bound schema が要る理由
 
 OTel の LogRecord と Span の `attributes` は任意の `AnyValue` である。送信側のライブラリ差やバージョン差で、**同じキーの型が変わることが日常的に起きる**。
 
@@ -232,10 +247,10 @@ OTLP/HTTP Receiver → Telemetry Pipeline → Telemetry Coordinator
 
 設計を固める前に決めるべきことを、隠さず挙げる。
 
-1. **Traces を Trail に置く判断** — Span を「時系列」と見るか「イベント」と見るかで分かれる。保持期間管理とダウンサンプリングは Skulk の lifecycle が適する面もあり、実装フェーズで再評価する
-2. **Trail の Chirps 対応** — Trail のロードマップに分散が入っていない。本企画が要求するなら Trail 側に追加が要る
-3. **Skulk と Trail のコード共有形態** — Trail 提案の未決事項。OTel が両方を使う以上、この決定は OTel にも影響する
-4. **Span の集約メトリクス** — RED メトリクスを Span から派生させて Skulk に置くか、都度 Trail で集約するか
+1. **Trail の Chirps 対応** — Trail のロードマップに分散が入っていない。本企画が要求するなら Trail 側に追加が要る
+2. **Skulk と Trail のコード共有形態** — Trail 提案の未決事項。OTel が両方を使う以上、この決定は OTel にも影響する
+3. **Span の集約メトリクス** — RED メトリクスを事前に派生させて Skulk へ書くか、クエリ時に Trail から集約するか。派生先が Skulk であることは決まっており、生成タイミングのみ未決
+4. **Trace の保持期間管理** — イベントには周期ベースのダウンサンプリングを適用できない。Trail の retention でどう表現するか
 5. **着手時期** — 依存が揃うまで待つか、Metrics のみで先行するか
 
 これらに意見がある場合は、[GitHub Discussions](https://github.com/alopex-db/alopex/discussions) へ。**API が固まる前が、最も反映しやすい。**
