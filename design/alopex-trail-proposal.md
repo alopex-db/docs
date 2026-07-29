@@ -119,6 +119,31 @@ attrs: { status: "timeout" }  → 物理列 status@str を新設（過去行は 
 
 なお coalesce の際に同一行で複数のシャドー列が非 null になることはない（1 イベントの 1 属性は 1 つの型にしか振り分けられないため）。
 
+#### 型の網羅と逃げ道
+
+OTLP の `AnyValue` は string / bool / int64 / double / bytes / array / kvlist の 7 種を取り、**array の要素ごとに型が異なることすら許される**。シャドー列を primitive 型ごとに用意するだけでは表現しきれない。
+
+Grafana Tempo は同じ問題を、4 つの型付きカラム（`Value` / `ValueInt` / `ValueDouble` / `ValueBool`）に加えて、
+
+- **`ValueUnsupported`** — 収まらない値を JSON 文字列へ退避する optional カラム
+- **`IsArray`** — 配列かどうかのフラグ
+
+で解決している。Trail もこれに倣う。
+
+| シャドー列 | 対象 |
+|---|---|
+| `@str` / `@i64` / `@f64` / `@bool` / `@bytes` | primitive |
+| `@json` | array、kvlist、混在配列など、上記に収まらないもの。JSON 文字列として退避 |
+| `@is_array` | 配列であることのフラグ |
+
+**`@json` の逃げ道は必須である。** これがなければ OTLP の一部を表現できず、取り込みが止まる。
+
+なお SigNoz は int64 と float64 を単一の `Float64` マップに統合しているが、これは 2^53 を超える ID 系属性で精度が失われる。**Trail は `@i64` と `@f64` を分離する。**
+
+#### 型メタデータによる枝刈り
+
+常に全シャドー列を coalesce すると読み取りコストが上がる。SigNoz は型メタデータ表を持ち、**型が既知のキーは単一列だけを読み、未知のキーに限って coalesce を生成する**という二段構えを採る。Trail も manifest の列サマリ（§3.3）を同じ用途に使う。
+
 ### 3.3 読み取り時 — manifest からのスキーマ引き当て
 
 skulk の manifest が `ActiveFile` として保持するのは `(measurement, name, row_count, file_bytes, min_timestamp, max_timestamp)` のみで、**列集合もスキーマも記録しない**。skulk では全 Parquet が同一 measurement 内で同じ論理スキーマを持つ前提のため問題にならないが、trail ではファイルごとに列集合が異なるため、これでは列の所在を知るのに全 Parquet フッタを読む必要が生じる。
@@ -211,9 +236,189 @@ skulk の compaction は重複解決キーが `(Tags, Timestamp)` であり、�
 
 「読む → 変換 → 書く → manifest で原子的に差し替える」という骨格は skulk から借用する。
 
+### 6.1 グルーピングキーにスキーマ指紋を含める
+
+**スキーマが異なるファイルは統合できない。** Grafana Tempo は compaction のグルーピングキーにブロックのフォーマット版と dedicated column の割り当てハッシュを含めており、コード中に「同じ版のブロック同士を、同じ dedicated column のブロック同士を必ず一緒にする」と明記している。
+
+late-bound schema では列集合がファイルごとに異なるため、この制約はより強く効く。Trail は次をグルーピングキーとする。
+
+```
+(stream, time_window, schema_fingerprint)
+```
+
+指紋が異なるファイルを混ぜると、統合後のスキーマが両者の union となり列が肥大化する。**近い指紋を優先的にまとめ、遠い指紋は別グループに残す。**
+
+### 6.2 再書き込み回数の上限
+
+Tempo は `MaxCompactionLevel` により、一定回数以上 compaction されたブロックを対象から外す。**古いデータを何度も書き直さない**という方針である。
+
+Trail も compaction レベルを持ち、上限を設ける。これは §7.1 の保持階層とも整合する — 古いデータに対する追加 I/O を避けるという同じ判断に基づく。
+
 ---
 
-## 7. skulk からの流用マップ
+## 7. 保持・サンプリング・統計
+
+イベントは量が多い。時系列であれば古いデータを粗い粒度へダウンサンプリングできるが、**イベントには周期がないため同じ手法が使えない**。
+
+本節の設計は、参照実装（Grafana Tempo、SigNoz、OpenTelemetry Collector）の実装を調査した上で定めた。**独自の語彙を作らず、OpenTelemetry 仕様および既存実装の用語に合わせる**ことを原則とする。調査で判明した反証は §7.7 に記録する。
+
+### 7.1 保持階層 — 軸は圧縮率ではなく媒体コスト
+
+「古いデータをどうするか」に対する答えは、削除だけではない。ただし**階層化の軸を圧縮率に取るのは誤り**である。
+
+Tempo は Parquet の圧縮を snappy に固定し、年齢別のコーデック設定を持たない。利用している parquet-go は BROTLI をサポートしているにもかかわらず使っていない。さらに `MaxCompactionLevel` により**古いブロックの再書き込み回数を制限している**。再圧縮は、この制限が避けようとしている I/O を増やす行為にあたる。
+
+SigNoz は ClickHouse の TTL を使い、`TO VOLUME '<cold>'`（媒体移動）と `DELETE` を併用する。ClickHouse は `RECOMPRESS` も持つが、**使っていない**。
+
+したがって Trail の保持階層は**媒体コストを軸**とする。
+
+| 階層 | 内容 | 媒体 | 取り出し |
+|---|---|---|---|
+| **Hot** | 全件。通常の Parquet、sidecar 索引あり | ローカル SSD | 即座 |
+| **Cold** | 全件。同一形式のまま媒体のみ移動。索引は manifest 側に残す | オブジェクトストレージ等 | ネットワーク往復分だけ遅い |
+
+**形式は変えない。移すだけである。** これにより再圧縮の I/O が発生せず、読み取り経路も同一のまま保てる。
+
+圧縮パラメータを年齢で変える案は、**測定してから判断する**。compaction が既にファイルを書き直す契機であれば追加コストは小さいが、Tempo が意図的に避けている以上、根拠なく採用しない。
+
+### 7.2 解像度の並置 — 元データを要約で置き換えない
+
+集計済みデータを持つ場合、**元データの置き換えではなく、別解像度として並置する**。
+
+SigNoz はメトリクスについて `samples_v4` / `samples_v4_agg_5m` / `samples_v4_agg_30m` の 3 つを並置し、クエリの時間範囲に応じてルーティングする。粗い表を作っても細かい表は消さない。削除は TTL が別途行う。
+
+Tempo は metrics-generator でトレースから RED メトリクスを抽出し、**Prometheus という別ストアへ書き出す**。トレース本体を要約で置き換えるのではない。
+
+Trail もこれに倣う。統計サマリ（§7.4）は元データとは独立に存在し、**サマリの生成が元データの削除条件にならない**。元データの削除は retention policy が単独で決める。
+
+### 7.3 サンプリング — OTel の adjusted count に従う
+
+サンプリングは**利用者が明示的に選ぶ**手段であり、既定では行わない。
+
+#### 語彙は OpenTelemetry 仕様に従う
+
+独自の `_sample_rate` は定義しない。OpenTelemetry には仕様化された機構が既に存在する。
+
+| 用語 | 意味 | 所在 |
+|---|---|---|
+| **adjusted count** | そのイベントが代表する件数。サンプリング確率の逆数 | OTel 仕様 |
+| **threshold（`th`）** | 56 ビット固定小数のサンプリング閾値 | W3C tracestate の `ot=` セクション |
+| **R-value（`rv`）** | サンプリング判定に用いる乱数 | 同上 |
+
+Span の `trace_state` フィールド（`trace.proto`）にこれらが載る。**Trail は専用列を新設せず、`tracestate` 文字列をそのまま保持し、読み取り時にパースする。** Tempo が採る方式であり、冗長な列を増やさない。
+
+パースコストが問題になる場合に限り、materialize を検討する。その判断は測定に基づく。
+
+#### 補正の規則
+
+adjusted count による補正には、実装から学んだ規則がある。
+
+**確率的丸め（stochastic rounding）を行う。** 素朴に `count × (1/probability)` を足すと小数が発生し、カウンタ系の下流を壊す。R-value を乱数源として `floor(m)` または `floor(m)+1` に丸め、期待値を保ちながら各イベントの寄与を整数にする。
+
+**集約関数ごとに補正の要否が異なる。**
+
+| 集約 | 補正 |
+|---|---|
+| COUNT / SUM / rate | 補正する |
+| AVG | 加重平均として補正する |
+| 分位数 / ヒストグラム | 補正する |
+| **MIN / MAX** | **補正しない**。極値はサンプリングでスケールしない |
+
+**「不明」と「0」を区別する。** tracestate に threshold が無い場合は「情報なし」であり、呼び出し側が 1.0 にフォールバックする。「決してサンプルされない」を意味する 0 とは別物である。
+
+**補正はオプトインとする。** 既定で常に補正すると、サンプリングしていない環境で tracestate の残骸により値が壊れる。クエリ側で明示的に要求した場合のみ適用する。
+
+#### 補正より前に、補正不要な地点で集計する
+
+OpenTelemetry Collector のドキュメントは、span からメトリクスを生成する処理を **tail sampling の前に置く**よう指示している。サンプリングで捨てられる前に集計すれば、そもそも補正が要らない。
+
+Trail もこの順序を推奨する。補正は「集計地点をサンプリング前に置けない場合」の手段である。
+
+#### サンプリングの段階
+
+| 段階 | 実行時点 | 目的 |
+|---|---|---|
+| **Head sampling** | 取り込み時、個々のイベント単位 | 取り込み量の即時削減 |
+| **Tail sampling** | 取り込み時、相関グループ単位 | 「エラーを含む trace は全 span 残す」など、結果を見てから決める |
+
+Head sampling は**ハッシュ方式ではなく threshold 方式**を採る。ハッシュ方式は多段サンプリング時に「1 段目を通過したものが 2 段目も必ず通過する」問題があり、OTEP-235 の threshold 方式はこれを解決するために作られた。
+
+Tail sampling は本質的に `decision_wait` 幅の時間窓バッファである。バッファ上限（保持 trace 数、待機時間）を持ち、超過分は head sampling の結果に従って確定させる。**判定の遅延がバックプレッシャの原因にならないこと**を要件とする。
+
+### 7.4 統計サマリ
+
+compaction 時にマージ可能な集計構造を生成する。**これは元データの置き換えではなく、追加の解像度である**（§7.2）。
+
+| 統計量 | 構造 | 備考 |
+|---|---|---|
+| 分位数 | **exponential histogram**（= DDSketch、Prometheus の native histogram と同等） | OTLP から入ってくる形式そのもの。変換不要 |
+| 相異なり数 | HyperLogLog | Tempo がカーディナリティ制限に使用 |
+| 頻出値 | Count-Min Sketch / Space-Saving | 参照実装に前例なし |
+| 数値集計 | 合計・最小・最大・二乗和 | 平均と分散を後から算出可能にする |
+
+**新しい語彙を作らない。** 「マージ可能スケッチ」と呼んでいたものは、この生態系では exponential histogram（OTel）、native histogram（Prometheus）、DDSketch（Datadog 由来）の 3 つの名を持つ。OTLP から届くのは exponential histogram であり、**それをそのまま格納するのが最短路**である。
+
+サマリの粒度は `(stream, 属性グループ, 時間バケット)` を単位とし、対象属性は設定で明示指定する。全属性の組み合わせを持つとカーディナリティが爆発する。
+
+> **前例の不在について**: SigNoz はスケッチ用のロールアップ表を持たず、コード中に `// we don't have any aggregated table for sketches (yet)` と未実装であることを明記している。compaction 時のスケッチ事前計算は**実装例が存在しない領域**であり、差別化の余地であると同時に、設計を自力で正当化する必要がある。
+
+### 7.5 統計クエリ API
+
+サマリは通常のクエリから透過的に使えることを要件とする。
+
+```sql
+SELECT service, percentile(duration_ms, 0.99) AS p99
+FROM trail.events
+WHERE stream = 'api' AND _time > NOW() - INTERVAL '7 days'
+GROUP BY service;
+```
+
+プランナは次を判断する。
+
+1. 要求された時間範囲と粒度がサマリで満たせるか
+2. 満たせるならサマリを読む（元データを読まない）
+3. 満たせないなら元データから計算する
+4. adjusted count による補正が要求されていれば適用する（§7.3）
+5. いずれの経路でも、**結果に精度メタデータを付与する**（誤差境界、サマリ由来か否か、補正の有無）
+
+**近似値を正確な値のように見せない。** これは §3.2 の型シャドーイングと同じ原則である。都合の悪い事実を隠すのではなく、扱える形で提示する。
+
+### 7.6 探索的集約と定常集約の両輪
+
+事前計算だけでは足りない。Tempo は 2 つの経路を持つ。
+
+- **metrics-generator** — 低カーディナリティの定常 RED メトリクスを事前計算し、別ストアへ書き出す
+- **TraceQL metrics** — 任意の属性による探索的な集約を、生の span から実行時に計算する
+
+Trail も両方を要件とする。統計サマリ（§7.4）だけでは「任意の group-by による探索」に応えられず、生スキャンだけでは定常ダッシュボードが高価になる。
+
+### 7.7 調査で判明した反証と修正
+
+参照実装の調査により、本提案の初版から次を修正した。記録として残す。
+
+| 初版の設計 | 反証 | 修正後 |
+|---|---|---|
+| Hot(q5) → Warm(q9-11) → Cold の圧縮階層 | Tempo は snappy 固定。parquet-go が BROTLI を持つのに使わず、`MaxCompactionLevel` で再書き込みを制限。SigNoz も `RECOMPRESS` 不使用 | 媒体コストを軸とした Hot / Cold の 2 階層。形式は変えない（§7.1） |
+| Summary-only 階層で元データを削除 | SigNoz は raw / 5m / 30m を並置し細かい表を消さない。Tempo は別ストアへ書き出す | 解像度の並置。サマリ生成は削除条件にしない（§7.2） |
+| 独自の `_sample_rate` 列 | OTel に adjusted count / threshold(`th`) / R-value(`rv`) が仕様化済み。Tempo は tracestate をそのまま保存し読み取り時にパース | OTel 語彙に統一。専用列を作らない（§7.3） |
+| `COUNT(*)` をサンプリング率で補正 | 確率的丸めが必要（小数が下流を壊す）。MIN/MAX は補正禁止。SUM も補正対象。オプトインであるべき | 集約ごとの規則を明記（§7.3） |
+| 型シャドーイングは `@i64` / `@str` | OTLP の `AnyValue` は 8 型 + 任意ネスト。Tempo は 4 型 + `ValueUnsupported` への JSON 退避 + `IsArray` フラグ | §3.2 を改訂。逃げ道を必須とする |
+| 「マージ可能スケッチ」 | exponential histogram / native histogram / DDSketch という既存名がある | 既存語彙に統一（§7.4） |
+
+なお、**型シャドーイングと読み取り時 coalesce という中核方式そのものは、実装に裏付けられた**。Tempo は `ValueInt` / `ValueDouble` / `ValueBool` / `Value` と型別カラムを持ち、読み取り時に case チェーンで解決する。SigNoz は `attributes_string` / `attributes_number` / `attributes_bool` の 3 マップを持ち、型が未知のキーには `multiIf` による coalesce を生成する。独自案ではなく業界の標準的な解法であった。
+
+### 7.8 OTel における位置づけ
+
+Alopex OTel は Trail のこの機構をそのまま使う。
+
+- Tail sampling — 「エラーを含む trace は全 span 保持」は OTel の標準的な要求
+- adjusted count — サンプリング済み trace から算出したエラー率を母集団の推定値として扱う
+- 統計サマリ — RED メトリクスの一部は span からの派生集計であり、サマリから直接得られる
+- 媒体階層 — trace の保持期間管理。イベントにダウンサンプリングは適用できないため、これが代替となる
+
+---
+
+## 8. skulk からの流用マップ
 
 | 対象 | 扱い | 備考 |
 |---|---|---|
@@ -231,16 +436,21 @@ skulk の compaction は重複解決キーが `(Tags, Timestamp)` であり、�
 
 ---
 
-## 8. 段階計画
+## 9. 段階計画
 
 | 版 | 内容 |
 |---|---|
 | v0.1 | 追記パス最小構成 — Event モデル、WAL（辞書付き）、動的列 union バッファ、Parquet 公開、manifest（列サマリ付き）、単一ライタ排他、クラッシュ回復 |
 | v0.2 | type-shadowing と読み取り時 coalesce、JSON Lines / OTLP logs デコーダ、retention |
 | v0.3 | 述語プッシュダウンと列プロジェクション、manifest による枝刈り |
-| v0.4 | compaction と sidecar 索引、全文検索の要否判断。**Python バインディング** |
+| v0.4 | compaction（スキーマ指紋グルーピング、レベル上限）と sidecar 索引、**保持階層（Hot / Cold の媒体移動）**、全文検索の要否判断。**Python バインディング** |
+| v0.5 | **統計サマリ（exponential histogram / HLL）と統計クエリ API**、**Head / Tail サンプリング**と adjusted count による補正 |
 
-### 8.1 Python バインディング（v0.4）
+保持階層は compaction の基盤の上に載るため v0.4 に置く。統計サマリは compaction 時に生成するため、compaction が動いてからになる。
+
+サンプリングを最後に置くのは優先順位の反映である。**全件保持のまま容量を下げる手段（媒体階層）を先に用意し、それでも足りない場合の手段としてサンプリングを後から加える。**
+
+### 9.1 Python バインディング（v0.4）
 
 ログ分析は Python から扱われることが多いため、バインディングを提供する。方式は
 alopex-py および Skulk と揃える。
@@ -257,11 +467,11 @@ alopex-py および Skulk と揃える。
 
 ---
 
-## 9. 未確定事項
+## 10. 未確定事項
 
 本提案は以下を意図的に未確定として残す。これらは合意形成の対象であり、決定なしに実装へ進むべきではない。
 
-### 9.1 skulk とのコード共有形態（最優先）
+### 10.1 skulk とのコード共有形態（最優先）
 
 共通クレートへ切り出すか、フォークして独立させるかが決まらないと着手できない。
 
@@ -270,7 +480,7 @@ alopex-py および Skulk と揃える。
 
 **推奨**: 当面はフォークとし、trail が v0.2 に到達した時点で共通化を再評価する。現段階では trail 側の要求がまだ固まっておらず、未成熟な要求で skulk のインタフェースを歪めるリスクがある。
 
-### 9.2 skulk v0.3.1 との着手順序
+### 10.2 skulk v0.3.1 との着手順序
 
 skulk は v0.3.1 でインジェストのスループット改善を予定しており、その対象と trail の流用範囲が一部重なる。**trail の着手可否はモジュールごとに異なる。**
 
@@ -293,19 +503,19 @@ skulk v0.4（クエリエンジン）は読み取り側の新規追加であり�
 1. 第 8 章 v0.1 のうち、データモデル・manifest 拡張・バッファ改造・Parquet 公開・単一ライタ排他を先行実装する
 2. WAL と取り込み層は skulk v0.3.1 のリリース後に取り込む。先行してフォークすると、v0.3.1 の改善を再適用する二重作業が生じる
 
-### 9.3 スループット目標値
+### 10.3 スループット目標値
 
 目標値が行表現の設計（入力バッファ借用ベースか owned か）を左右するため、先に決める必要がある。skulk の目標を踏襲するのか、ログ向けに別途設定するのかも含めて未定である。
 
-### 9.4 クエリインタフェース
+### 10.4 クエリインタフェース
 
 SQL（alopex の Nim パーサー経由）とするか、ログ検索に特化した専用 DSL とするかが未定である。この選択は第 8 章の v0.3 の設計に直接影響する。
 
-### 9.5 全文検索の要否
+### 10.5 全文検索の要否
 
 全文検索を要件に含める場合、inverted index は v0.4 の追加機能ではなく**設計全体の前提**となる。Parquet レイアウトと compaction の設計に遡って影響するため、早期の判断が必要である。
 
-### 9.6 その他
+### 10.6 その他
 
 - 時刻欠損時の補完ポリシーの詳細（取り込み時刻で十分か、ソース側の順序保証をどう扱うか）
 - パーティション幅の既定値
@@ -314,7 +524,9 @@ SQL（alopex の Nim パーサー経由）とするか、ログ検索に特化�
 
 ---
 
-## 10. 参考
+## 11. 参考
+
+### 11.1 Alopex 内部
 
 - [alopex-skulk 技術仕様](../specs/alopex-skulk-technical-spec.md)
 - [alopex-skulk 要求仕様](../concepts/alopex-skulk-requirements.md)
@@ -322,3 +534,14 @@ SQL（alopex の Nim パーサー経由）とするか、ログ検索に特化�
 - [カラムナ DB 調査](../tech/columnar-db-research.md)
 - [ファイルフォーマット比較](../tech/file-format-comparison.md)
 - [TSDB ソース解析](../tech/tsdb-source-analysis.md)
+
+### 11.2 参照実装
+
+§7 の設計は次の実装を調査した上で定めた。反証の詳細は §7.7 を参照。
+
+| 実装 | 参照した点 |
+|---|---|
+| [OpenTelemetry Proto](https://github.com/open-telemetry/opentelemetry-proto) | `AnyValue` の型定義。属性の型が揺れることの根拠 |
+| [Grafana Tempo](https://github.com/grafana/tempo) | Parquet での型別カラムと読み取り時 coalesce、dedicated columns、compaction のグルーピング、adjusted count による補正、時間パーティション + trace ID クラスタリング |
+| [SigNoz](https://github.com/SigNoz/signoz) | ClickHouse での型別マップ、未知キーの `multiIf` coalesce、型メタデータ表、`TO VOLUME` による媒体階層、解像度の並置、DDSketch のマージ |
+| [OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector) | tail sampling のバッファ設計、サンプリング前に集計するという方針 |
