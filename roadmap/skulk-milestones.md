@@ -107,9 +107,7 @@ v0.3.0 は機能・耐久性・圧縮・フットプリントの受け入れ条�
 - SQL-TS 拡張（`TIME_BUCKET` / `RATE` / `DELTA` / `FIRST` / `LAST` 等の関数と型推論）
 - クエリ実行エンジン（Parquet スキャン + tag predicate pushdown、downsample 自動選択、集約 / 演算子パイプライン）
 
-**パーサーは Alopex DB と共有する。** PromQL・SQL-TS とも字句・構文解析は Alopex DB が既に使う Nim パーサー（`nim-sql-parser`）に文法モジュールとして実装し、**契約バージョンを付与した事前ビルド済み共有ライブラリを Skulk へ vendor** する。Skulk crate は alopex-sql に Cargo 依存しない。Skulk 側が実装するのは FFI ブリッジと意味層以降（AST マッピング・型推論・プラン化・Executor）である。
-
-テキストクエリフロントエンドは **feature ゲートでコアから分離**する。無効時のコア（ストレージ + Executor + プログラマティック API）は Nim 成果物なしでビルド・動作する。
+パーサーは Alopex DB と共有する（事前ビルド済み共有ライブラリを vendor）。テキストクエリフロントエンドは feature ゲートでコアから分離し、無効時のコアはそれなしで動作する。
 
 v0.3.0 のリーダーは書き込み検証に必要な最小限の実装に留めており、述語プッシュダウンと列プロジェクションを含むフルクエリ実装は v0.4 で行う。**DataFusion は採用せず、自前で実装する**（TDR#13）。
 
