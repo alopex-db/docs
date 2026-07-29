@@ -332,7 +332,6 @@ Prometheus 互換を先行させる。Metrics は Skulk v0.3.0 が既に Remote 
 | Trail（Traces / Logs） | ❌ 設計公開のみ、未実装 | Trail v0.1〜v0.3 |
 | Skulk の Chirps 対応 | ❌ 依存ゼロ | Skulk v0.8 / v0.9 |
 | Alopex DB の分散実行 | ❌ v0.7 は single-node compatible | Alopex DB v0.8 以降 |
-| Trail の Chirps 対応 | ❌ 未計画 | 本企画で新規定義が必要 |
 
 つまり **§6 のスケールアウト／シュリンクは、現時点ではどの製品でも動かない**。§8 の Observe も同様に未実装である。これは北極星として掲げる目標であり、達成済みの機能ではない。
 
@@ -379,11 +378,10 @@ OTLP/HTTP Receiver → Telemetry Pipeline → Telemetry Coordinator
 
 設計を固める前に決めるべきことを、隠さず挙げる。
 
-1. **Trail の Chirps 対応** — Trail のロードマップに分散が入っていない。本企画が要求するなら Trail 側に追加が要る
-2. **Skulk と Trail のコード共有形態** — Trail 提案の未決事項。OTel が両方を使う以上、この決定は OTel にも影響する
-3. **Span の集約メトリクス** — RED メトリクスを事前に派生させて Skulk へ書くか、クエリ時に Trail から集約するか。派生先が Skulk であることは決まっており、生成タイミングのみ未決
-4. **Trace の保持期間管理** — イベントには周期ベースのダウンサンプリングを適用できない。Trail の retention でどう表現するか
-5. **着手時期** — 依存が揃うまで待つか、Metrics のみで先行するか
+1. **Skulk と Trail のコード共有形態** — Trail 提案の未決事項。OTel が両方を使う以上、この決定は OTel にも影響する
+2. **Span の集約メトリクス** — RED メトリクスを事前に派生させて Skulk へ書くか、クエリ時に Trail から集約するか。派生先が Skulk であることは決まっており、生成タイミングのみ未決
+3. **Trace の保持期間管理** — イベントには周期ベースのダウンサンプリングを適用できない。Trail の retention でどう表現するか
+4. **着手時期** — 依存が揃うまで待つか、Metrics のみで先行するか
 
 これらに意見がある場合は、[GitHub Discussions](https://github.com/alopex-db/alopex/discussions) へ。**API が固まる前が、最も反映しやすい。**
 
