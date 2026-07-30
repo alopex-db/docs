@@ -1,10 +1,15 @@
 # Alopex Skulk 要求仕様書
 
-**バージョン**: 1.0
-**最終更新日**: 2026-07-27
+**バージョン**: 1.5
+**最終更新日**: 2026-07-30
 **ステータス**: Draft
 
 > **2026-07-27 改訂**: ストレージをArrow+Parquet(BROTLI q5) wide/columnarへ世代交代（v0.3、再PoCによる）。詳細な経緯・実測は [technical-spec.md](../specs/alopex-skulk-technical-spec.md) 「ストレージ設計の変遷」章、TDR#13 (`.spec-workflow/steering/technical-decisions.md` §13) を参照。
+>
+> **2026-07-30 O3契約改訂（Skulk v0.4 / 裁定D5）**:
+> 既定windowは1時間、判定はIngestノードのwall-clock時刻との差、
+> `Drop`は取り込み結果へ破棄件数を計上し、backfill時は明示的な
+> `allow_backfill`で一時的にwindow判定を無効化する。
 
 ---
 
@@ -213,24 +218,36 @@ CREATE TIMESERIES TABLE cpu_metrics (
 
 **Out-of-Order (O3) データ処理**:
 
+O3判定は `Ingestノードの現在時刻 - point timestamp` のwall-clock差で
+行う。既定の許容windowは1時間であり、現在partitionとの相対位置では
+判定しない。`allow_backfill`は履歴投入時に呼び出し側が明示的に有効化
+する一時的なoverrideで、通常取り込みの既定値は`false`とする。
+
 ```rust
 /// O3データ処理ポリシー
 pub struct O3Config {
-    /// 許容するO3ウィンドウ（デフォルト: 5分）
+    /// 許容するO3ウィンドウ（デフォルト: 1時間）
     pub allowed_window: Duration,
     /// ウィンドウ外データの処理ポリシー
     pub too_old_policy: TooOldPolicy,
+    /// 履歴backfill時にwindow判定を明示的に無効化
+    pub allow_backfill: bool,
 }
 
 pub enum TooOldPolicy {
     /// 拒否（エラー返却）
     Reject,
-    /// 警告ログを出して受け入れ
+    /// 受理し、取り込み結果へ警告件数を計上
     AcceptWithWarning,
-    /// 静かにドロップ
+    /// 破棄し、取り込み結果へ破棄件数を計上
     Drop,
 }
 ```
+
+`Drop`はサイレントな成功にしない。行単位の判定結果は共通の
+`IngestOutcome`へ集約し、受理・拒否・警告付き受理・破棄の件数と理由を
+呼び出し側が確認できること。これにより、再送判断と監視の双方でデータ
+損失を観測できる。
 
 **クロックスキュー監視**:
 
@@ -248,7 +265,9 @@ pub struct ClockSkewMonitor {
 **検証基準**:
 - [ ] クライアント指定タイムスタンプが正確に保存される
 - [ ] サーバー割当時のスループット劣化が<5%
-- [ ] O3データが設定ポリシーに従って処理される
+- [ ] O3データが1時間の既定wall-clock windowと設定ポリシーに従って処理される
+- [ ] `Drop`と`AcceptWithWarning`の件数が取り込み結果から観測できる
+- [ ] `allow_backfill=true`の場合だけwindow外履歴データを通常受理できる
 - [ ] クロックスキュー>1秒で警告ログが出力される
 
 ---
@@ -894,6 +913,7 @@ crates/skulk-cluster/src/
 | 1.2 | 2025-11-29 | Claude | タイムスタンプ設計要件を追加（3.1.2節）:<br>- Raft TSOを使用しない設計判断<br>- O3データ処理ポリシー<br>- クロックスキュー監視 |
 | 1.3 | 2025-11-30 | Claude | リリースマイルストーン詳細化（7節）:<br>- ファイル配置<br>- 各バージョンの実装タスク |
 | 1.4 | 2026-07-27 | Claude | ストレージをArrow+Parquet(BROTLI q5) wide/columnarへ世代交代（再PoCによる、TDR#13）:<br>- 冒頭に改訂注記追加<br>- NFR-TSDB-001/003を更新<br>- §3.2.1にSuperseded注記<br>- 詳細はtechnical-spec.md参照 |
+| 1.5 | 2026-07-30 | Codex | Skulk v0.4裁定D5をSR-TSDB-TIMESTAMP-001へ反映:<br>- O3既定windowを1時間へ統一<br>- wall-clock判定と`allow_backfill`を明記<br>- Drop/警告を`IngestOutcome`で非サイレントに計上 |
 
 ---
 
