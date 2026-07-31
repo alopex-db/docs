@@ -895,18 +895,65 @@ ALTER TABLE table_name
 
 ```sql
 SELECT [DISTINCT] select_list
-    FROM table_ref
+    FROM from_item [, from_item ...]
     [WHERE condition]
+    [GROUP BY expr [, ...]]
+    [HAVING condition]
     [ORDER BY order_list]
     [LIMIT count [OFFSET start]];
 
 select_list:
     *
+  | table_name '.' '*'
   | expr [[AS] alias] [, ...]
+
+from_item:
+    table_name [[AS] alias]
+  | '(' select_stmt ')' [AS] alias        -- 派生テーブル（別名は必須）
+  | from_item join_clause
+
+join_clause:
+    [INNER] JOIN from_item join_condition
+  | LEFT  [OUTER] JOIN from_item join_condition
+  | RIGHT [OUTER] JOIN from_item join_condition
+  | FULL  [OUTER] JOIN from_item join_condition
+  | CROSS JOIN from_item
+  | NATURAL [INNER | LEFT | RIGHT | FULL] JOIN from_item
+
+join_condition:
+    ON condition
+  | USING '(' column_name [, ...] ')'
 
 order_list:
     expr [ASC | DESC] [NULLS FIRST | NULLS LAST] [, ...]
 ```
+
+`FROM a, b` はフィルタ条件を伴う暗黙の CROSS JOIN として扱う。
+`NATURAL JOIN` は両側の共通列名で結合し、共通列は結果で 1 列に統合する。
+`USING` も同様に指定列を 1 列へ統合する。`ON` は列を統合しない。
+
+**サブクエリ**: 以下の位置で使用できる。
+
+```sql
+-- スカラーサブクエリ（SELECT リスト / WHERE 句）
+SELECT name, (SELECT COUNT(*) FROM orders WHERE user_id = u.id) AS n FROM users u;
+SELECT * FROM t WHERE v > (SELECT AVG(v) FROM t);
+
+-- IN / NOT IN
+SELECT * FROM users WHERE id IN (SELECT user_id FROM orders);
+
+-- EXISTS / NOT EXISTS
+SELECT * FROM users u WHERE EXISTS (SELECT 1 FROM orders WHERE user_id = u.id);
+
+-- 量化比較 ANY / SOME / ALL
+SELECT * FROM t WHERE v > ALL (SELECT w FROM u);
+
+-- 派生テーブル（別名必須）
+SELECT * FROM (SELECT id, name FROM users) AS active_users;
+```
+
+列名は内側のスコープを優先して解決する。内側で解決できない場合にのみ
+外側のスコープへフォールバックする（相関サブクエリ）。
 
 **例**:
 ```sql
@@ -929,9 +976,15 @@ SELECT * FROM documents
 INSERT INTO table_name [(column_list)]
     VALUES (value_list) [, (value_list) ...];
 
+INSERT INTO table_name [(column_list)]
+    select_stmt;
+
 value_list:
-    literal [, ...]
+    expr [, ...]
 ```
+
+`INSERT INTO ... SELECT` は SELECT の結果を挿入する。SELECT の列数は
+挿入先の列数（`column_list` 指定時はその数）と一致しなければならない。
 
 **例**:
 ```sql
@@ -991,6 +1044,22 @@ DELETE FROM sessions WHERE expires_at < NOW();
 ```
 
 **注意**: WHERE 句なしの DELETE は全行削除（警告出力）
+
+### 6.5 パラメータバインド
+
+`?` プレースホルダで値をバインドする。SQL 文字列への値の埋め込みを避け、
+インジェクションを防ぐ。
+
+```sql
+SELECT email FROM users WHERE id = ?;
+INSERT INTO users (id, name, email) VALUES (?, ?, ?);
+INSERT INTO docs (id, embedding) VALUES (?, ?);
+```
+
+- プレースホルダの個数とパラメータの個数は一致しなければならない。
+- 文字列リテラル内およびコメント内の `?` はプレースホルダとして扱わない。
+- バインド可能な値は NULL / 真偽値 / 整数 / 浮動小数点数 / 文字列 / 数値列（ベクトル）。
+- 名前付きパラメータ（`:name`）と序数パラメータ（`$1`）はサポートしない。
 
 ---
 
@@ -1622,13 +1691,33 @@ PRAGMA名、不正な単位はエラーとなる。
               | <drop_index_stmt>
 
 <select_stmt> ::= SELECT [DISTINCT] <select_list>
-                  FROM <table_ref>
+                  FROM <from_item> (',' <from_item>)*
                   [WHERE <expr>]
+                  [GROUP BY <expr> (',' <expr>)*]
+                  [HAVING <expr>]
                   [ORDER BY <order_list>]
                   [LIMIT <number> [OFFSET <number>]]
 
+<select_list> ::= '*'
+                | <table_name> '.' '*'
+                | <select_item> (',' <select_item>)*
+
+<from_item> ::= <table_name> [[AS] <alias>]
+              | '(' <select_stmt> ')' [AS] <alias>
+              | <from_item> <join_clause>
+
+<join_clause> ::= [INNER] JOIN <from_item> <join_condition>
+                | LEFT  [OUTER] JOIN <from_item> <join_condition>
+                | RIGHT [OUTER] JOIN <from_item> <join_condition>
+                | FULL  [OUTER] JOIN <from_item> <join_condition>
+                | CROSS JOIN <from_item>
+                | NATURAL [INNER | LEFT | RIGHT | FULL] JOIN <from_item>
+
+<join_condition> ::= ON <expr>
+                   | USING '(' <column_list> ')'
+
 <insert_stmt> ::= INSERT INTO <table_name> [( <column_list> )]
-                  VALUES <values_list>
+                  ( VALUES <values_list> | <select_stmt> )
 
 <update_stmt> ::= UPDATE <table_name>
                   SET <assignment_list>
@@ -1642,8 +1731,20 @@ PRAGMA名、不正な単位はエラーとなる。
          | <expr> <binary_op> <expr>
          | <unary_op> <expr>
          | <function_call>
+         | <cast_expr>
+         | <subquery_expr>
+         | <parameter>
          | '(' <expr> ')'
          | <vector_literal>
+
+<cast_expr> ::= CAST '(' <expr> AS <data_type> ')'
+
+<subquery_expr> ::= '(' <select_stmt> ')'
+                  | <expr> [NOT] IN '(' <select_stmt> ')'
+                  | [NOT] EXISTS '(' <select_stmt> ')'
+                  | <expr> <comparison_op> (ANY | SOME | ALL) '(' <select_stmt> ')'
+
+<parameter> ::= '?'
 
 <vector_literal> ::= '[' <number> (',' <number>)* ']'
 
