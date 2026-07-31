@@ -4,8 +4,9 @@
 
 ## クレート間バージョン対応
 
-> **Note (2026-06-27)**: alopex-sql の SQL パーサーを **Nim 実装に置き換える方針を決定**（C ABI FFI で統合、Rust 手書きパーサーは廃止）。あわせて JOIN/Subquery を Planner/Executor まで実装する（対応 DB v0.6）。技術選定は steering `tech.md` / `technical-decisions.md`、実装 spec は `.spec-workflow/specs/nim-sql-parser-migration/` を参照。詳細な機能対応は `alopex-sql-milestone.md` を参照。
+> **Note (2026-07-31)**: **Alopex DB v0.8.1 はリリース済み**。Nim SQL/PromQL parser contract `0.2.0` と、Ubuntu/Windows の full release gate を出荷した。v0.8.2 は不具合対応専用としてリリースし、機能追加を混在させない。Skulk v0.5 の事前調査で未実装と確認した `CREATE CONTINUOUS AGGREGATE` と contract `0.3.0` は、Alopex v0.8.3 の予定済み parser prerequisite とする。Alopex main への parser PR merge は v0.8.3 リリース列への投入であり、未リリース状態で Skulk を先行させない。詳細は [Skulk v0.5 SQL パーサー準備状況](../reports/skulk-v0.5-sql-parser-readiness.md) を参照。
 > **Note (2026-07-18)**: **Alopex DB v0.7.0 はリリース済み**。v0.7のクラスタ機能は single-node compatible な cluster-aware foundation（status、join/leave lifecycle、routing diagnostics、simulation）までで、ノード跨ぎの実行・Raft・分散トランザクションは未実装。これらは v0.8 以降の計画である。DataFrame P3（`str`/`dt`/`list`、`explode`/`implode`）も v0.7.0 で出荷済み。
+> **Note (2026-06-27)**: alopex-sql の SQL パーサーを **Nim 実装に置き換える方針を決定**（C ABI FFI で統合、Rust 手書きパーサーは廃止）。あわせて JOIN/Subquery を Planner/Executor まで実装する（対応 DB v0.6）。技術選定は steering `tech.md` / `technical-decisions.md`、実装 spec は `.spec-workflow/specs/nim-sql-parser-migration/` を参照。詳細な機能対応は `alopex-sql-milestone.md` を参照。
 > **Note (2026-01-14)**: **Alopex DB v0.4.0 リリース完了**。GitHub Release + crates.io 公開済み。
 > **Note (2026-01-13)**: alopex-sql v0.4.0 Async/Stream 基盤、alopex-server v0.4 実装完了。
 > **Note (2025-12-18)**: CD ワークフロー修正により alopex-sql v0.3.0 が crates.io に公開済み（旧 v0.1.3 Vector SQL 相当）。
@@ -21,7 +22,10 @@
 | v0.5 | v0.5 | v0.5 | v0.5 | - | Durability + GROUP BY |
 | v0.6 | v0.6 | v0.6 | v0.6 | - | Embedded/Server 実用化 + Nim SQL パーサー移行 + JOIN/Subquery + DataFrame/Python 強化 |
 | **v0.7.0** | **v0.7** | **v0.7.4** | **v0.7** | **v0.3** | **Cluster-aware foundation + routing simulation** ✅ リリース済（single-node compatible、分散実行なし） |
-| v0.8 | v0.8 | v0.9 | v0.8 | v0.6 | Metadata Raft + ノード跨ぎの分散クエリ本実装（予定） |
+| **v0.8.0** | **v0.8.0** | **v0.8.0** | **v0.8.0** | v0.6 | Cluster-aware / streaming / Python surfaces ✅ **リリース済** |
+| **v0.8.1** | **v0.8.1** | **v0.8.1** | **v0.8.1** | v0.6 | Parser contract `0.2.0` + Ubuntu/Windows release gate ✅ **リリース済** |
+| **v0.8.2** | **v0.8.2** | **v0.8.2** | **v0.8.2** | v0.6 | 不具合対応（機能追加なし）⏳ **予定** |
+| **v0.8.3** | **v0.8.3** | **v0.8.3** | **v0.8.3** | v0.6 | Skulk v0.5 prerequisite: Continuous Aggregate parser contract `0.3.0` ⏳ **予定** |
 | v0.9 | v0.9 | v0.10 | v0.9 | v0.7 | Raft Metadata + Raft DDL |
 | v0.10 | v0.10 | v0.11 | v0.10 | v0.7 | Multi-Raft + 分散 Txn |
 | v1.0 | v1.0 | v0.12-v1.0 | v1.0 | v0.8 | Federation + Optimizer |
@@ -48,6 +52,9 @@
 | v0.5.2 | キャッシュ・メモリ管理 | alopex-sql v0.5.1 | I/O計測、アダプティブキャッシュ | v0.5 | ⏳ 予定 |
 | v0.6.0 | Nim パーサー移行 + JOIN Support | alopex-sql v0.5.2 | Nim 製パーサー(FFI) + INNER/LEFT/RIGHT/FULL/CROSS JOIN | v0.6 | ⏳ 予定 |
 | v0.6.0-subquery | Subquery | alopex-sql v0.6 | スカラー/IN/EXISTS/FROM 派生/ANY,ALL サブクエリ | v0.6 | ⏳ 予定 |
+| **v0.8.1** | **Parser / release gate reliability** | alopex-sql v0.8.0 | SQL-TS/PromQL contract `0.2.0`、Ubuntu/Windows full gate | v0.8.1 | ✅ **リリース済** |
+| **v0.8.2** | **Bugfix release** | alopex-sql v0.8.1 | 不具合修正。parser 機能追加は含めない | v0.8.2 | ⏳ **予定** |
+| **v0.8.3** | **Skulk v0.5 parser prerequisite** | alopex-sql v0.8.2 | `CREATE CONTINUOUS AGGREGATE`、wire contract `0.3.0`、target 別 parser assets | Skulk v0.5 | ⏳ **予定** |
 | v1.0+-wasm | WASM Parser (再評価) | alopex-sql v1.0+ | Read-Only SQL (wasm32) | v1.0+ | ⏳ 再評価 |
 | v0.9.0 | Distributed Query Planner | Chirps v0.3 | シャード対応クエリ計画 | v0.8 | ⏳ 予定 |
 | v0.9.0-index | TSO 統合分散インデックス | Chirps v0.6 (TSO) | Point-in-Time/整合性チェック | v0.8 | ⏳ 予定 |
@@ -68,7 +75,10 @@
 | v0.5 | GROUP BY, 次世代インデックス, キャッシュ | v0.5.0 - v0.5.2 |
 | v0.6 | JOIN (単一ノード) | v0.6.0 |
 | v0.7 | cluster-aware foundation + routing diagnostics (single-node) | **v0.7.0 / v0.7.x** |
-| v0.8 | Raft 合意付き DDL | v0.10.0 |
+| v0.8.0 | Cluster-aware / streaming / Python surfaces | **v0.8.0** |
+| v0.8.1 | Parser contract `0.2.0` + release gate reliability | **v0.8.1** |
+| v0.8.2 | 不具合対応（機能追加なし） | **v0.8.2（予定）** |
+| Skulk v0.5 prerequisite | Continuous Aggregate parser contract `0.3.0` | **v0.8.3（先行リリース予定）** |
 | v0.9 | Multi-Raft クエリ | v0.11.0 |
 | v0.10 | Hardening/安定化 | v0.11.0+ |
 | v1.0 | Federation クエリ、オプティマイザ | v0.12.0 - v1.0.0 |

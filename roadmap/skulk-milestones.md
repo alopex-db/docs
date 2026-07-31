@@ -2,9 +2,11 @@
 
 Alopex Skulk（時系列データベース）のバージョン系列と機能マッピング。
 
-> **本系列は Alopex DB 本体とは独立している。** Skulk は独立したワークスペース・独立したリポジトリ（`alopex-db/alopex-skulk`）で開発され、`alopex-core` / `alopex-sql` 等の本体クレートに依存しない。バージョン系列も本体と無関係に進行する（本体 v0.7.4 に対し Skulk v0.3.0）。本体クレートの割り付けは [crate-version-feature-allocation.md](crate-version-feature-allocation.md)、本体のマイルストーンは [alopex-milestones.md](alopex-milestones.md) を参照。
+> **本系列は Alopex DB 本体とは独立している。** Skulk は独立したワークスペース・独立したリポジトリ（`alopex-db/alopex-skulk`）で開発され、`alopex-core` / `alopex-sql` 等の本体 Rust クレートに依存しない。バージョン系列も本体と無関係に進行する。ただし optional な SQL-TS / PromQL text frontend は、Alopex が所有する Nim parser の versioned ABI と target 別成果物を利用する。この build/release dependency は Rust crate dependency と分けて明記する。本体クレートの割り付けは [crate-version-feature-allocation.md](crate-version-feature-allocation.md)、本体のマイルストーンは [alopex-milestones.md](alopex-milestones.md) を参照。
 >
-> **Note (2026-07-29)**: v0.3.0 リリース後、ingest スループットと p99 レイテンシの固定目標が未達のまま open であることを受け、**v0.3.1 を緊急パッチとして割り込ませる**。これにより v0.4 の依存は v0.3.0 から v0.3.1 へ変更となる。
+> **Note (2026-07-31)**: **Skulk v0.4.0 は 2026-07-30 にリリース済み**。v0.5 の事前調査で、通常の SQL-TS 集約 `SELECT` は実装済みだが、公開要求の `CREATE CONTINUOUS AGGREGATE` は parser/wire/Skulk control plane の全てで未実装と確認した。v0.5 は Alopex v0.8.3 / parser contract `0.3.0` の先行リリースを開始ゲートとする。Alopex v0.8.2 は不具合対応専用である。詳細は [Skulk v0.5 SQL パーサー準備状況](../reports/skulk-v0.5-sql-parser-readiness.md) を参照。
+>
+> **Note (2026-07-29)**: v0.3.0 リリース後、ingest スループットと p99 レイテンシの固定目標が未達のまま open であることを受け、**v0.3.1 を緊急パッチとして割り込ませ、同日にリリースした**。これにより v0.4 の依存は v0.3.0 から v0.3.1 へ変更となった。
 >
 > **Note (2026-07-28)**: **Skulk v0.3.0 リリース済み**（crates.io 公開）。ストレージエンジンを自前 TSM/Gorilla から Arrow + Parquet の wide/columnar へ破壊的刷新した。v0.2 のオンディスク形式との互換性はない。
 >
@@ -17,16 +19,16 @@ Alopex Skulk（時系列データベース）のバージョン系列と機能�
 | v0.1 | - | 基盤ストレージ（TSM v1、Gorilla 圧縮、WAL、MemTable） | ✅ リリース済 |
 | v0.2 | Skulk v0.1 | Lifecycle（Retention/TTL、時刻パーティション、TSM Compaction、WAL truncate 連動） | ✅ リリース済 |
 | **v0.3.0** | Skulk v0.2 | **ストレージ刷新（Arrow + Parquet wide/columnar）+ Ingest 3 プロトコル** | ✅ **リリース済**（2026-07-28、破壊的変更） |
-| **v0.3.1** | Skulk v0.3.0 | **ingest スループット / p99 レイテンシ改善**（API・オンディスク形式は不変） | 🔴 緊急パッチ |
-| v0.4 | Skulk v0.3.1 | Query（PromQL、SQL-TS、クエリ実行エンジン + predicate pushdown） | ⏳ 予定 |
-| v0.5 | Skulk v0.4 | Downsampling（Downsampler、Continuous Query） | ⏳ 予定 |
+| **v0.3.1** | Skulk v0.3.0 | **ingest スループット / p99 レイテンシ改善**（API・オンディスク形式は不変） | ✅ **リリース済**（2026-07-29） |
+| **v0.4.0** | Skulk v0.3.1 / Alopex parser contract `0.2.0` | Query（PromQL、SQL-TS、クエリ実行エンジン + predicate pushdown） | ✅ **リリース済**（2026-07-30） |
+| v0.5 | Skulk v0.4.0 / Alopex v0.8.3 parser contract `0.3.0` | Downsampling（Downsampler、Continuous Query） | ⏳ parser 先行リリース待ち |
 | v0.6 | Skulk v0.5 | Server（HTTP API、Prometheus 互換エンドポイント、Self-monitoring） | ⏳ 予定 |
 | v0.7 | Skulk v0.6 | Alert | ⏳ 予定 |
 | v0.8 | Skulk v0.7 / Chirps v0.3 | Distributed | ⏳ 予定 |
 | v0.9 | Skulk v0.8 / Chirps v0.6 | Replication | ⏳ 予定 |
 | v1.0 | Skulk v0.9 | Stable | ⏳ 予定 |
 
-外部依存は Chirps（合意・通信・メンバーシップ基盤）のみで、v0.8 以降の分散機能で利用する。v0.7 までは単一ノードで完結する。
+Rust crate としての外部プロジェクト依存は Chirps（合意・通信・メンバーシップ基盤）のみで、v0.8 以降の分散機能で利用する。v0.7 までは単一ノードで完結する。Alopex Nim parser は optional text frontend の build/release dependency であり、contract と成果物を release gate で固定する。
 
 ---
 
@@ -64,11 +66,16 @@ v0.2 のオンディスク形式（TSM / WAL）は読み込まれず、明示的
 
 ---
 
-## v0.3.1 スループット緊急対応（緊急パッチ）
+## v0.3.1 スループット緊急対応（2026-07-29 リリース済み）
 
-v0.3.0 は機能・耐久性・圧縮・フットプリントの受け入れ条件を満たしてリリースしたが、ingest スループットと p99 レイテンシの固定目標が未達のまま open である。**目標を緩和せず据え置いた結果として open になっている**ため、緊急パッチとして割り込ませる。
+v0.3.0 の未達を調査し、オンディスク形式を変えず LP→WAL ACK 約4.9倍、
+Remote Write→WAL ACK 約3.9倍を達成してリリースした。LP 500K points/s と
+p99 <10ms の固定目標は緩和せず、Known Limitation として後続へ持ち越している。
+実測と完了内容は
+[Skulk v0.3.1 ingest performance](../reports/skulk-v0.3.1-ingest-performance.md)
+を参照。
 
-### 未達の実測値
+### v0.3.0 の出発点
 
 10,000 points / 100 series / 単一ライタ / ACK 前 fsync の条件で計測。
 
@@ -81,13 +88,13 @@ v0.3.0 は機能・耐久性・圧縮・フットプリントの受け入れ条�
 
 耐久性を含めると、両プロトコルとも 35–40K/s に収束する。ストレージ側も同様に未達である（Parquet durable 260–406K points/s、WAL + flush 22.3–33.7K points/s）。いずれも p99 10ms 未満の目標には到達していない。
 
-### 作業項目
+### 完了内容と持ち越し
 
-1. **真因のプロファイル取得（先行必須）** — 被疑箇所はコードの静的読解と計測記録に基づく仮説であり、着手前に計測で確定させる。決め打ちで最適化を始めない
-2. 行表現の見直し — 行ごとの owned string / map 構築のコスト削減
-3. WAL 書き込みパスの見直し — フレームエンコードとバッチ append
-4. 共通検証の見直し — 行単位バリデーション
-5. p99 専用レイテンシハーネスの追加
+1. [x] 真因のプロファイル取得と段階 PoC
+2. [x] 行表現の見直しと Line Protocol 高速パス
+3. [x] WAL の借用バッチ append と checkpoint ストリーム化
+4. [x] 共通検証の単一走査化
+5. [ ] p99 <10ms と LP 500K points/s の固定目標（後続へ持ち越し）
 
 ### 受け入れ条件
 
@@ -101,18 +108,34 @@ v0.3.0 は機能・耐久性・圧縮・フットプリントの受け入れ条�
 
 ## v0.4 以降
 
-### v0.4 Query（Skulk v0.3.1 依存）
+### v0.4.0 Query（2026-07-30 リリース済み）
 
-- PromQL パーサー / AST（range vector、関数、集約、label matcher）
-- SQL-TS 拡張（`TIME_BUCKET` / `RATE` / `DELTA` / `FIRST` / `LAST` 等の関数と型推論）
-- クエリ実行エンジン（Parquet スキャン + tag predicate pushdown、downsample 自動選択、集約 / 演算子パイプライン）
+- [x] PromQL パーサー / AST（range vector、関数、集約、label matcher）
+- [x] SQL-TS 拡張（`TIME_BUCKET` / `RATE` / `DELTA` / `FIRST` / `LAST` 等の関数と型推論）
+- [x] クエリ実行エンジン（Parquet スキャン + tag predicate pushdown、downsample 自動選択、集約 / 演算子パイプライン）
 
-v0.3.0 のリーダーは書き込み検証に必要な最小限の実装に留めており、述語プッシュダウンと列プロジェクションを含むフルクエリ実装は v0.4 で行う。**DataFusion は採用せず、自前で実装する**（TDR#13）。
+DataFusion を採用せず、自前 Planner/Executor で実装した（TDR#13）。parser の tokenizer/parser/wire AST は Alopex Nim parser contract `0.2.0`、Skulk Rust は mapping 以降を担当する。v0.4 の resolution catalog は raw のみを登録し、v0.5 の rollup 登録に備えた coverage/capability 選択境界を実装済みである。
 
-### v0.5 Downsampling（Skulk v0.4 依存）
+### v0.5 Downsampling（Skulk v0.4.0 / Alopex v0.8.3 parser 依存）
+
+**実装開始ゲート**:
+
+1. `.spec-workflow/specs/skulk-v0-5/` の Requirements で canonical grammar、AST、target matrix、percentile 入力モデルを固定する
+2. Alopex Nim parser に `CREATE CONTINUOUS AGGREGATE` と wire contract `0.3.0` を実装する
+3. Ubuntu/Windows release gate を完走し、Alopex v0.8.3 と target 別 parser 成果物を全て先行リリースする
+4. Skulk が release asset と contract を exact pin し、consumer fixture を通してから parser-dependent task を開始する
+
+parser PR を Alopex main に未リリースのまま置かない。merge は Alopex
+リリース列への投入として扱い、tag/crates/Python/GitHub Release/parser
+asset の公開完了を dependency gate とする。
 
 - Downsampler（集約ルール、raw → rollup 生成、保持期間ポリシー）
 - Continuous Query（スケジューラ、再計算 / 遅延データ対応、冪等実行）
+- typed percentile（p50/p99）と rollup schema
+
+parser と Skulk の過不足、責任分界、release gate の詳細は
+[Skulk v0.5 SQL パーサー準備状況](../reports/skulk-v0.5-sql-parser-readiness.md)
+を参照。
 
 ### v0.6 Server（Skulk v0.5 依存）
 
@@ -131,5 +154,6 @@ v0.8 以降は Chirps（v0.3 / v0.6）に依存する。
 - [Alopex Skulk 技術仕様](../specs/alopex-skulk-technical-spec.md) — ストレージ設計の変遷と現行仕様
 - [Alopex Skulk 要求仕様](../concepts/alopex-skulk-requirements.md)
 - [Alopex Skulk 設計仕様](../concepts/alopex-skulk-design-spec.md)
+- [Skulk v0.5 SQL パーサー準備状況](../reports/skulk-v0.5-sql-parser-readiness.md) — parser/意味層/実行層の gap と先行リリース gate
 - [alopex-trail 構想提案](../design/alopex-trail-proposal.md) — Skulk の追記機構を流用する派生製品の提案（Proposal）
 - [Alopex / Chirps マイルストーン対応表](alopex-milestones.md) — 本体の系列

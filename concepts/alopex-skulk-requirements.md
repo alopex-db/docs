@@ -319,6 +319,15 @@ Write Path:
 **要求ID**: SR-TSDB-LIFECYCLE-001
 **概要**: 自動データローテーション
 
+> **v0.5 scope clarification (2026-07-31)**: 現行 Alopex v0.8.1
+> parser contract `0.2.0` は、以下の `CREATE/ALTER TIMESERIES TABLE` と
+> `CREATE CONTINUOUS AGGREGATE` をまだ受理しない。v0.5 の parser 必須範囲は
+> canonical な Continuous Aggregate DDL とし、Alopex v0.8.3 / contract
+> `0.3.0` を Skulk より先にリリースする。`CREATE/ALTER TIMESERIES TABLE`
+> は将来構文の例であり、v0.5 の parser gate には含めない。調査と依存順序は
+> [Skulk v0.5 SQL パーサー準備状況](../reports/skulk-v0.5-sql-parser-readiness.md)
+> を参照。
+
 **TTLポリシー**:
 ```sql
 -- テーブルレベルTTL
@@ -332,15 +341,16 @@ ALTER TIMESERIES TABLE cpu_metrics SET retention = '72h';
 ```sql
 -- 連続集約定義
 CREATE CONTINUOUS AGGREGATE cpu_hourly
-FROM cpu_metrics
-GROUP BY time_bucket('1 hour', time), host, region
+AS
 SELECT
-  time_bucket('1 hour', time) AS time,
+  time_bucket(INTERVAL '1 hour', time) AS time,
   host,
   region,
   avg(usage_user) AS usage_user_avg,
   max(usage_user) AS usage_user_max,
   min(usage_user) AS usage_user_min
+FROM cpu_metrics
+GROUP BY time_bucket(INTERVAL '1 hour', time), host, region
 WITH (
   retention = '30d',
   refresh_interval = '1h'
