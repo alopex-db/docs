@@ -1288,20 +1288,6 @@ UNIXEPOCH(ts)               -- Unix時刻 (SQLite 3.38+)
 ### v0.6.0+ (Advanced Functions)
 
 ```
--- ウィンドウ関数 (PostgreSQL互換, v0.6.0)
-ROW_NUMBER() OVER (...)     -- 連番
-RANK() OVER (...)           -- 順位 (同値で同順位、次は飛ぶ)
-DENSE_RANK() OVER (...)     -- 密順位 (同値で同順位、次は連続)
-NTILE(n) OVER (...)         -- n分割グループ番号
-LAG(expr, offset, default) OVER (...)   -- N行前の値
-LEAD(expr, offset, default) OVER (...)  -- N行後の値
-FIRST_VALUE(expr) OVER (...) -- フレーム内最初の値
-LAST_VALUE(expr) OVER (...)  -- フレーム内最後の値
-NTH_VALUE(expr, n) OVER (...) -- フレーム内N番目の値
-SUM(...) OVER (...)         -- ウィンドウ集約
-AVG(...) OVER (...)
-COUNT(...) OVER (...)
-
 -- JSON関数 (v0.6.1)
 -- SQLite互換
 JSON(text)                  -- JSON検証・正規化
@@ -1391,7 +1377,7 @@ BROADCAST(inet)             -- ブロードキャスト
 | 日付・時刻 | ✅ | ✅ | v0.5.4 |
 | 条件 | ✅ | ✅ | v0.5.3 |
 | 集約 | ✅ | ✅ | v0.5.0 |
-| ウィンドウ | ✅ | ✅ | v0.6.0 |
+| ウィンドウ | ✅ | ✅ | v0.9+ |
 | JSON | ✅ | ✅ | v0.6.1 |
 | 配列 | ❌ | ✅ | v0.6.2 (PostgreSQL互換) |
 | 集合生成 | ❌ | ✅ | v0.6.2 (PostgreSQL互換) |
