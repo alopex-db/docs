@@ -955,6 +955,13 @@ SELECT * FROM (SELECT id, name FROM users) AS active_users;
 列名は内側のスコープを優先して解決する。内側で解決できない場合にのみ
 外側のスコープへフォールバックする（相関サブクエリ）。
 
+**FROM 句のない SELECT**: 式のみを評価する場合は `FROM` を省略できる。
+
+```sql
+SELECT 1 + 1 AS result;
+SELECT memory_stats(), io_stats(), clear_cache();
+```
+
 **例**:
 ```sql
 -- 基本
@@ -1248,6 +1255,18 @@ SELECT id, title,
 vector_similarity(column, vector_literal, 'metric')
 ```
 
+### 8.3.1 ベクトル属性関数
+
+| 関数 | 戻り値 | 説明 |
+|------|--------|------|
+| `vector_dims(column)` | INTEGER | ベクトルの次元数 |
+| `vector_norm(column)` | DOUBLE | L2 ノルム（ユークリッド長） |
+
+```sql
+SELECT id, vector_dims(embedding) AS dims, vector_norm(embedding) AS norm
+    FROM documents;
+```
+
 ### 8.4 Top-K 検索最適化
 
 以下のパターンは HNSW インデックスを利用した Top-K 検索に最適化される:
@@ -1397,12 +1416,17 @@ use alopex_query_common::{TSFunction, LabelMatcher, MatchOp};
 |------|------|-----------|
 | `COUNT(*)` | 行数 | NULL を含む |
 | `COUNT(col)` | 非 NULL 値の数 | NULL を除外 |
+| `COUNT(DISTINCT col)` | 非 NULL のユニーク値の数 | NULL を除外 |
 | `SUM(col)` | 合計 | NULL を無視 |
+| `TOTAL(col)` | 合計（常に浮動小数点） | NULL を無視。全行 NULL または 0 行のとき 0.0 |
 | `AVG(col)` | 平均 | NULL を無視 |
 | `MIN(col)` | 最小値 | NULL を無視 |
 | `MAX(col)` | 最大値 | NULL を無視 |
+| `GROUP_CONCAT(col [, sep])` | 文字列連結（既定の区切りは `,`） | NULL を無視 |
+| `STRING_AGG(col, sep)` | 文字列連結（区切り必須） | NULL を無視 |
 
-**注意**: v0.3 では集約関数はあるが、GROUP BY はサポートしない（テーブル全体の集約のみ）。
+`GROUP BY` / `HAVING` と組み合わせられる（6.1 参照）。`GROUP BY` を伴わない場合は
+テーブル全体を 1 グループとして集約する。
 
 ---
 
@@ -1517,18 +1541,18 @@ BEGIN, COMMIT, ROLLBACK, TRANSACTION, SAVEPOINT
 
 ## 12. PostgreSQL との差分まとめ
 
-| 機能 | PostgreSQL | Alopex SQL v0.3 | 備考 |
-|------|------------|-----------------|------|
+| 機能 | PostgreSQL | Alopex SQL | 備考 |
+|------|------------|------------|------|
 | 型キャスト | `::type`, `CAST()` | `CAST()` のみ | `::` は将来検討 |
-| 文字列リテラル | `'string'`, `E'escape'` | `'string'` のみ | エスケープ記法なし |
-| 識別子引用 | `"identifier"` | 未サポート | 将来追加予定 |
+| 文字列リテラル | `'string'`, `E'escape'` | `'string'` のみ | エスケープ記法なし。`''` による単一引用符のエスケープは可 |
+| 識別子引用 | `"identifier"` | `"identifier"` | 引用時は大文字小文字を区別する |
+| 正規表現 | `~`, `~*` | 関数形式のみ | 演算子は未サポート。`REGEXP_REPLACE` / `REGEXP_MATCH` / `REGEXP_MATCHES` および `SIMILAR TO` を提供（13.1 参照） |
 | 配列型 | `int[]` | 未サポート | ベクトル型で代替 |
-| JSON 型 | `json`, `jsonb` | 未サポート | v0.5+ で検討 |
+| JSON 型 | `json`, `jsonb` | 未サポート | 将来検討 |
 | SERIAL | `SERIAL`, `BIGSERIAL` | 未サポート | INTEGER + 手動採番 |
 | スキーマ | `schema.table` | 未サポート | 単一スキーマ |
-| RETURNING | `INSERT ... RETURNING *` | 未サポート | v0.4 で検討 |
-| UPSERT | `ON CONFLICT` | 未サポート | v0.4 で検討 |
-| 正規表現 | `~`, `~*` | 未サポート | LIKE のみ |
+| RETURNING | `INSERT ... RETURNING *` | 未サポート | 将来検討 |
+| UPSERT | `ON CONFLICT` | 未サポート | 将来検討 |
 
 ---
 
