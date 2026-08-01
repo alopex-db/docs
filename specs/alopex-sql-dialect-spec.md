@@ -23,22 +23,38 @@ Alopex SQL は **SQLite をベースとし、PostgreSQL の一部構文を参考
 - PostgreSQL 完全互換は実装コストが高く、Alopex のユースケースに過剰
 - ベクトル検索機能は既存 SQL 標準にないため、独自拡張が必須
 
-### 1.2 サポートしない機能（v0.3 スコープ外）
+### 1.2 サポートしない機能
 
-以下の機能は v0.3 では**意図的にサポートしない**。将来バージョンで追加を検討する。
+以下の機能は現行バージョンでは**サポートしない**。将来バージョンで追加を検討する。
 
 | 機能 | 理由 | 将来検討 |
 |------|------|----------|
-| **JOIN** | 複雑なプランナー/オプティマイザが必要 | v0.6+ |
-| **サブクエリ** | AST/プランナーの複雑化、Box 再帰が必要 | v0.8+ |
 | **CTE (WITH句)** | サブクエリ依存 | v0.9+ |
-| **GROUP BY / HAVING** | 集約プランナーが必要 | v0.5 |
-| **UNION / INTERSECT** | 複数結果セットのマージ | v0.6+ |
+| **UNION / INTERSECT / EXCEPT** | 複数結果セットのマージ | v0.9+ |
 | **ウィンドウ関数** | 高度な集約処理 | v0.9+ |
+| **CASE WHEN 式** | 条件分岐式の AST 拡張が必要（代替: `IIF()`, `COALESCE()`） | v0.9+ |
+| **ALTER TABLE** | DDL 拡張 | v0.9+ |
 | **トリガー / ビュー** | DDL 拡張 | v0.10+ |
-| **外部キー制約** | 参照整合性チェック | v0.5 |
-| **トランザクション分離レベル指定** | 現状は Snapshot Isolation 固定 | v0.6+ |
-| **TS 拡張** (MATCH, TIME_BUCKET, RATE) | skulk 型を `alopex-query-common` 経由で使用 | v0.5.x |
+| **外部キー制約** | 参照整合性チェック | 未定 |
+| **トランザクション分離レベル指定** | 現状は Snapshot Isolation 固定 | 未定 |
+| **TS 拡張** (MATCH, TIME_BUCKET, RATE) | skulk 型を `alopex-query-common` 経由で使用 | 未定 |
+
+### 1.3 サポート済みの主要機能
+
+以下は出荷済みである。構文の詳細は各章を参照。
+
+| 機能 | 出荷バージョン | 参照 |
+|------|----------------|------|
+| **GROUP BY / HAVING** | v0.7.3 | 6.1 SELECT 構文 |
+| **JOIN** (INNER / LEFT / RIGHT / FULL / CROSS / NATURAL / USING) | v0.7.4 | 6.1 SELECT 構文 |
+| **サブクエリ** (スカラー / IN / EXISTS / ANY / ALL / 派生テーブル) | v0.7.4 | 6.1 SELECT 構文 |
+| **スカラー関数レジストリ** | v0.7.4 | 13.1 |
+| **ハッシュ / UUID / エンコード関数** | v0.7.4 | 13.2 |
+| **システム関数 / PRAGMA** | v0.7.4 | 13.3 |
+| **CAST(expr AS type)** | v0.8.2 | 4.4 型変換 |
+| **INSERT INTO ... SELECT** | v0.8.2 | 6.2 INSERT |
+| **テーブル修飾ワイルドカード** (`t.*`) | v0.8.2 | 6.1 SELECT 構文 |
+| **パラメータバインド** (`?`) | v0.8.2 | 6.6 パラメータバインド |
 
 ### 1.3 Vector 拡張構文の設計根拠
 
@@ -879,17 +895,71 @@ ALTER TABLE table_name
 
 ```sql
 SELECT [DISTINCT] select_list
-    FROM table_ref
+    FROM from_item [, from_item ...]
     [WHERE condition]
+    [GROUP BY expr [, ...]]
+    [HAVING condition]
     [ORDER BY order_list]
     [LIMIT count [OFFSET start]];
 
 select_list:
     *
+  | table_name '.' '*'
   | expr [[AS] alias] [, ...]
+
+from_item:
+    table_name [[AS] alias]
+  | '(' select_stmt ')' [AS] alias        -- 派生テーブル（別名は必須）
+  | from_item join_clause
+
+join_clause:
+    [INNER] JOIN from_item join_condition
+  | LEFT  [OUTER] JOIN from_item join_condition
+  | RIGHT [OUTER] JOIN from_item join_condition
+  | FULL  [OUTER] JOIN from_item join_condition
+  | CROSS JOIN from_item
+  | NATURAL [INNER | LEFT | RIGHT | FULL] JOIN from_item
+
+join_condition:
+    ON condition
+  | USING '(' column_name [, ...] ')'
 
 order_list:
     expr [ASC | DESC] [NULLS FIRST | NULLS LAST] [, ...]
+```
+
+`FROM a, b` はフィルタ条件を伴う暗黙の CROSS JOIN として扱う。
+`NATURAL JOIN` は両側の共通列名で結合し、共通列は結果で 1 列に統合する。
+`USING` も同様に指定列を 1 列へ統合する。`ON` は列を統合しない。
+
+**サブクエリ**: 以下の位置で使用できる。
+
+```sql
+-- スカラーサブクエリ（SELECT リスト / WHERE 句）
+SELECT name, (SELECT COUNT(*) FROM orders WHERE user_id = u.id) AS n FROM users u;
+SELECT * FROM t WHERE v > (SELECT AVG(v) FROM t);
+
+-- IN / NOT IN
+SELECT * FROM users WHERE id IN (SELECT user_id FROM orders);
+
+-- EXISTS / NOT EXISTS
+SELECT * FROM users u WHERE EXISTS (SELECT 1 FROM orders WHERE user_id = u.id);
+
+-- 量化比較 ANY / SOME / ALL
+SELECT * FROM t WHERE v > ALL (SELECT w FROM u);
+
+-- 派生テーブル（別名必須）
+SELECT * FROM (SELECT id, name FROM users) AS active_users;
+```
+
+列名は内側のスコープを優先して解決する。内側で解決できない場合にのみ
+外側のスコープへフォールバックする（相関サブクエリ）。
+
+**FROM 句のない SELECT**: 式のみを評価する場合は `FROM` を省略できる。
+
+```sql
+SELECT 1 + 1 AS result;
+SELECT memory_stats(), io_stats(), clear_cache();
 ```
 
 **例**:
@@ -913,9 +983,15 @@ SELECT * FROM documents
 INSERT INTO table_name [(column_list)]
     VALUES (value_list) [, (value_list) ...];
 
+INSERT INTO table_name [(column_list)]
+    select_stmt;
+
 value_list:
-    literal [, ...]
+    expr [, ...]
 ```
+
+`INSERT INTO ... SELECT` は SELECT の結果を挿入する。SELECT の列数は
+挿入先の列数（`column_list` 指定時はその数）と一致しなければならない。
 
 **例**:
 ```sql
@@ -975,6 +1051,22 @@ DELETE FROM sessions WHERE expires_at < NOW();
 ```
 
 **注意**: WHERE 句なしの DELETE は全行削除（警告出力）
+
+### 6.5 パラメータバインド
+
+`?` プレースホルダで値をバインドする。SQL 文字列への値の埋め込みを避け、
+インジェクションを防ぐ。
+
+```sql
+SELECT email FROM users WHERE id = ?;
+INSERT INTO users (id, name, email) VALUES (?, ?, ?);
+INSERT INTO docs (id, embedding) VALUES (?, ?);
+```
+
+- プレースホルダの個数とパラメータの個数は一致しなければならない。
+- 文字列リテラル内およびコメント内の `?` はプレースホルダとして扱わない。
+- バインド可能な値は NULL / 真偽値 / 整数 / 浮動小数点数 / 文字列 / 数値列（ベクトル）。
+- 名前付きパラメータ（`:name`）と序数パラメータ（`$1`）はサポートしない。
 
 ---
 
@@ -1163,6 +1255,18 @@ SELECT id, title,
 vector_similarity(column, vector_literal, 'metric')
 ```
 
+### 8.3.1 ベクトル属性関数
+
+| 関数 | 戻り値 | 説明 |
+|------|--------|------|
+| `vector_dims(column)` | INTEGER | ベクトルの次元数 |
+| `vector_norm(column)` | DOUBLE | L2 ノルム（ユークリッド長） |
+
+```sql
+SELECT id, vector_dims(embedding) AS dims, vector_norm(embedding) AS norm
+    FROM documents;
+```
+
 ### 8.4 Top-K 検索最適化
 
 以下のパターンは HNSW インデックスを利用した Top-K 検索に最適化される:
@@ -1312,12 +1416,17 @@ use alopex_query_common::{TSFunction, LabelMatcher, MatchOp};
 |------|------|-----------|
 | `COUNT(*)` | 行数 | NULL を含む |
 | `COUNT(col)` | 非 NULL 値の数 | NULL を除外 |
+| `COUNT(DISTINCT col)` | 非 NULL のユニーク値の数 | NULL を除外 |
 | `SUM(col)` | 合計 | NULL を無視 |
+| `TOTAL(col)` | 合計（常に浮動小数点） | NULL を無視。全行 NULL または 0 行のとき 0.0 |
 | `AVG(col)` | 平均 | NULL を無視 |
 | `MIN(col)` | 最小値 | NULL を無視 |
 | `MAX(col)` | 最大値 | NULL を無視 |
+| `GROUP_CONCAT(col [, sep])` | 文字列連結（既定の区切りは `,`） | NULL を無視 |
+| `STRING_AGG(col, sep)` | 文字列連結（区切り必須） | NULL を無視 |
 
-**注意**: v0.3 では集約関数はあるが、GROUP BY はサポートしない（テーブル全体の集約のみ）。
+`GROUP BY` / `HAVING` と組み合わせられる（6.1 参照）。`GROUP BY` を伴わない場合は
+テーブル全体を 1 グループとして集約する。
 
 ---
 
@@ -1432,18 +1541,18 @@ BEGIN, COMMIT, ROLLBACK, TRANSACTION, SAVEPOINT
 
 ## 12. PostgreSQL との差分まとめ
 
-| 機能 | PostgreSQL | Alopex SQL v0.3 | 備考 |
-|------|------------|-----------------|------|
+| 機能 | PostgreSQL | Alopex SQL | 備考 |
+|------|------------|------------|------|
 | 型キャスト | `::type`, `CAST()` | `CAST()` のみ | `::` は将来検討 |
-| 文字列リテラル | `'string'`, `E'escape'` | `'string'` のみ | エスケープ記法なし |
-| 識別子引用 | `"identifier"` | 未サポート | 将来追加予定 |
+| 文字列リテラル | `'string'`, `E'escape'` | `'string'` のみ | エスケープ記法なし。`''` による単一引用符のエスケープは可 |
+| 識別子引用 | `"identifier"` | `"identifier"` | 引用時は大文字小文字を区別する |
+| 正規表現 | `~`, `~*` | 関数形式のみ | 演算子は未サポート。`REGEXP_REPLACE` / `REGEXP_MATCH` / `REGEXP_MATCHES` および `SIMILAR TO` を提供（13.1 参照） |
 | 配列型 | `int[]` | 未サポート | ベクトル型で代替 |
-| JSON 型 | `json`, `jsonb` | 未サポート | v0.5+ で検討 |
+| JSON 型 | `json`, `jsonb` | 未サポート | 将来検討 |
 | SERIAL | `SERIAL`, `BIGSERIAL` | 未サポート | INTEGER + 手動採番 |
 | スキーマ | `schema.table` | 未サポート | 単一スキーマ |
-| RETURNING | `INSERT ... RETURNING *` | 未サポート | v0.4 で検討 |
-| UPSERT | `ON CONFLICT` | 未サポート | v0.4 で検討 |
-| 正規表現 | `~`, `~*` | 未サポート | LIKE のみ |
+| RETURNING | `INSERT ... RETURNING *` | 未サポート | 将来検討 |
+| UPSERT | `ON CONFLICT` | 未サポート | 将来検討 |
 
 ---
 
@@ -1606,13 +1715,33 @@ PRAGMA名、不正な単位はエラーとなる。
               | <drop_index_stmt>
 
 <select_stmt> ::= SELECT [DISTINCT] <select_list>
-                  FROM <table_ref>
+                  FROM <from_item> (',' <from_item>)*
                   [WHERE <expr>]
+                  [GROUP BY <expr> (',' <expr>)*]
+                  [HAVING <expr>]
                   [ORDER BY <order_list>]
                   [LIMIT <number> [OFFSET <number>]]
 
+<select_list> ::= '*'
+                | <table_name> '.' '*'
+                | <select_item> (',' <select_item>)*
+
+<from_item> ::= <table_name> [[AS] <alias>]
+              | '(' <select_stmt> ')' [AS] <alias>
+              | <from_item> <join_clause>
+
+<join_clause> ::= [INNER] JOIN <from_item> <join_condition>
+                | LEFT  [OUTER] JOIN <from_item> <join_condition>
+                | RIGHT [OUTER] JOIN <from_item> <join_condition>
+                | FULL  [OUTER] JOIN <from_item> <join_condition>
+                | CROSS JOIN <from_item>
+                | NATURAL [INNER | LEFT | RIGHT | FULL] JOIN <from_item>
+
+<join_condition> ::= ON <expr>
+                   | USING '(' <column_list> ')'
+
 <insert_stmt> ::= INSERT INTO <table_name> [( <column_list> )]
-                  VALUES <values_list>
+                  ( VALUES <values_list> | <select_stmt> )
 
 <update_stmt> ::= UPDATE <table_name>
                   SET <assignment_list>
@@ -1626,8 +1755,20 @@ PRAGMA名、不正な単位はエラーとなる。
          | <expr> <binary_op> <expr>
          | <unary_op> <expr>
          | <function_call>
+         | <cast_expr>
+         | <subquery_expr>
+         | <parameter>
          | '(' <expr> ')'
          | <vector_literal>
+
+<cast_expr> ::= CAST '(' <expr> AS <data_type> ')'
+
+<subquery_expr> ::= '(' <select_stmt> ')'
+                  | <expr> [NOT] IN '(' <select_stmt> ')'
+                  | [NOT] EXISTS '(' <select_stmt> ')'
+                  | <expr> <comparison_op> (ANY | SOME | ALL) '(' <select_stmt> ')'
+
+<parameter> ::= '?'
 
 <vector_literal> ::= '[' <number> (',' <number>)* ']'
 
