@@ -2,13 +2,15 @@
 
 **調査日**: 2026-07-31
 
+**更新日**: 2026-08-03
+
 **対象**: Skulk v0.5 Downsampling / Continuous Query
 
 **現在の結論**: 通常の集約 `SELECT` は実装済みだが、Continuous
-Aggregate の定義構文とライフサイクル制御契約は未実装である。Skulk v0.5
-の実装開始前に Alopex 側で Nim パーサー契約 `0.3.0` を実装し、予定された
-Alopex v0.8.3 として先行リリースする。v0.8.2 は不具合対応専用とし、
-parser 機能追加を混在させない。
+Aggregate の定義構文とライフサイクル制御契約は未実装である。Alopex
+v0.8.2 と v0.8.3 は contract `0.3.0` のまま既に公開済みであり、この構文を
+含まない。Skulk v0.5 の parser-dependent 実装開始前に Alopex 側で Nim
+パーサー契約 `0.4.0` を実装し、Alopex v0.8.4 として先行リリースする。
 
 ## 決定事項
 
@@ -17,8 +19,8 @@ parser 機能追加を混在させない。
 2. tokenizer / parser / wire AST は Alopex の Nim 実装が所有する。Skulk
    の Rust は AST mapping、型・意味検証、計画、実行だけを担当し、構文解析を
    重複実装しない。
-3. 新しい statement variant を含む wire contract は `0.3.0` とする。
-   Alopex v0.8.3 のリリース完了と成果物検証を、Skulk v0.5 の
+3. 新しい statement variant を含む wire contract は `0.4.0` とする。
+   Alopex v0.8.4 のリリース完了と成果物検証を、Skulk v0.5 の
    parser-dependent task の開始条件にする。
 4. `CREATE/ALTER TIMESERIES TABLE` は現状未実装だが、v0.5 の必須 parser
    scope には含めない。保持期間は Continuous Aggregate の `WITH
@@ -123,29 +125,31 @@ WITH (
 ## リリース順序
 
 ```text
-Skulk v0.5 Requirements
+Skulk v0.5 Requirements revision 2
   └─ grammar / AST / target matrix を固定
-      └─ Alopex Nim parser contract 0.3.0
-          └─ Alopex v0.8.3 release
+      └─ Alopex Nim parser contract 0.4.0
+          └─ Alopex v0.8.4 release
               └─ Skulk consumer contract tests
                   └─ Skulk v0.5 scheduler / rollup implementation
                       └─ Skulk v0.5 release
 ```
 
-### Gate A: Alopex v0.8.3
+### Gate A: Alopex v0.8.4
 
 - Nim contextual keyword/parser/AST、MessagePack contract、host Rust AST を同じ PR で更新
 - 正常系・異常系・span・wire golden fixture を Nim と Rust の両側で検証
+- Nim test harness が失敗を必ず非ゼロ終了で伝播することを negative self-test で検証
 - 既存 SQL/PromQL contract の回帰を検証
 - Ubuntu x86_64 と Windows x86_64 で Nim native test と全 release gate を完走
-- tag、crates/Python、GitHub Release、parser library を含む全対象の公開完了
+- tag、crates/Python、GitHub Release、target-qualified parser library、
+  version/contract/target/size/SHA-256 manifest を含む全対象の公開完了
 
 Alopex の parser PR は main に未リリースのまま滞留させない。main への
 merge はリリース列への投入であり、上記公開が完了して初めて Gate A 完了とする。
 
 ### Gate B: Skulk consumer
 
-- contract `0.3.0` を exact pin し、異なる版を起動時に拒否
+- contract `0.4.0` を exact pin し、異なる版を起動時に拒否
 - Alopex release asset の checksum を固定
 - Ubuntu/Windows の対応 target で DDL fixture を parse し、同じ typed
   definition へ mapping されることを検証
@@ -164,10 +168,10 @@ merge はリリース列への投入であり、上記公開が完了して初�
 
 ## v0.5 spec 開始条件
 
-次を満たすまでは `.spec-workflow/specs/skulk-v0-5/` の実装 task を開始しない。
+次を満たすまでは `.spec-workflow/specs/skulk-v0-5-0/` の実装 task を開始しない。
 
 - 本文の canonical grammar と scope を Requirements で承認
-- Alopex v0.8.3 の version、contract `0.3.0`、release asset matrix を確定
+- Alopex v0.8.4 の version、contract `0.4.0`、release asset matrix を確定
 - percentile の入力モデルと rollup schema を Design で確定
 - data/watermark の原子性、再計算、削除順序を Design で確定
 - Alopex release と Skulk consumer gate を Tasks の先頭に配置

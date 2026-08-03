@@ -4,7 +4,7 @@ Alopex Skulk（時系列データベース）のバージョン系列と機能�
 
 > **本系列は Alopex DB 本体とは独立している。** Skulk は独立したワークスペース・独立したリポジトリ（`alopex-db/alopex-skulk`）で開発され、`alopex-core` / `alopex-sql` 等の本体 Rust クレートに依存しない。バージョン系列も本体と無関係に進行する。ただし optional な SQL-TS / PromQL text frontend は、Alopex が所有する Nim parser の versioned ABI と target 別成果物を利用する。この build/release dependency は Rust crate dependency と分けて明記する。本体クレートの割り付けは [crate-version-feature-allocation.md](crate-version-feature-allocation.md)、本体のマイルストーンは [alopex-milestones.md](alopex-milestones.md) を参照。
 >
-> **Note (2026-07-31)**: **Skulk v0.4.0 は 2026-07-30 にリリース済み**。v0.5 の事前調査で、通常の SQL-TS 集約 `SELECT` は実装済みだが、公開要求の `CREATE CONTINUOUS AGGREGATE` は parser/wire/Skulk control plane の全てで未実装と確認した。v0.5 は Alopex v0.8.3 / parser contract `0.3.0` の先行リリースを開始ゲートとする。Alopex v0.8.2 は不具合対応専用である。詳細は [Skulk v0.5 SQL パーサー準備状況](../reports/skulk-v0.5-sql-parser-readiness.md) を参照。
+> **Note (2026-08-03)**: **Skulk v0.4.0 は 2026-07-30 にリリース済み**。Alopex v0.8.2 と v0.8.3 は parser contract `0.3.0` のまま既にリリースされ、`CREATE CONTINUOUS AGGREGATE` は含まない。Skulk v0.5 はこの新 statement を含む **Alopex v0.8.4 / parser contract `0.4.0`** の完全な先行リリースを開始ゲートとする。詳細は [Skulk v0.5 SQL パーサー準備状況](../reports/skulk-v0.5-sql-parser-readiness.md) を参照。
 >
 > **Note (2026-07-29)**: v0.3.0 リリース後、ingest スループットと p99 レイテンシの固定目標が未達のまま open であることを受け、**v0.3.1 を緊急パッチとして割り込ませ、同日にリリースした**。これにより v0.4 の依存は v0.3.0 から v0.3.1 へ変更となった。
 >
@@ -21,7 +21,7 @@ Alopex Skulk（時系列データベース）のバージョン系列と機能�
 | **v0.3.0** | Skulk v0.2 | **ストレージ刷新（Arrow + Parquet wide/columnar）+ Ingest 3 プロトコル** | ✅ **リリース済**（2026-07-28、破壊的変更） |
 | **v0.3.1** | Skulk v0.3.0 | **ingest スループット / p99 レイテンシ改善**（API・オンディスク形式は不変） | ✅ **リリース済**（2026-07-29） |
 | **v0.4.0** | Skulk v0.3.1 / Alopex parser contract `0.2.0` | Query（PromQL、SQL-TS、クエリ実行エンジン + predicate pushdown） | ✅ **リリース済**（2026-07-30） |
-| v0.5 | Skulk v0.4.0 / Alopex v0.8.3 parser contract `0.3.0` | Downsampling（Downsampler、Continuous Query） | ⏳ parser 先行リリース待ち |
+| v0.5 | Skulk v0.4.0 / Alopex v0.8.4 parser contract `0.4.0` | Downsampling（Downsampler、Continuous Query） | ⏳ parser 先行リリース待ち |
 | v0.6 | Skulk v0.5 | Server（HTTP API、Prometheus 互換エンドポイント、Self-monitoring） | ⏳ 予定 |
 | v0.7 | Skulk v0.6 | Alert | ⏳ 予定 |
 | v0.8 | Skulk v0.7 / Chirps v0.3 | Distributed | ⏳ 予定 |
@@ -116,13 +116,13 @@ p99 <10ms の固定目標は緩和せず、Known Limitation として後続へ�
 
 DataFusion を採用せず、自前 Planner/Executor で実装した（TDR#13）。parser の tokenizer/parser/wire AST は Alopex Nim parser contract `0.2.0`、Skulk Rust は mapping 以降を担当する。v0.4 の resolution catalog は raw のみを登録し、v0.5 の rollup 登録に備えた coverage/capability 選択境界を実装済みである。
 
-### v0.5 Downsampling（Skulk v0.4.0 / Alopex v0.8.3 parser 依存）
+### v0.5 Downsampling（Skulk v0.4.0 / Alopex v0.8.4 parser 依存）
 
 **実装開始ゲート**:
 
-1. `.spec-workflow/specs/skulk-v0-5/` の Requirements で canonical grammar、AST、target matrix、percentile 入力モデルを固定する
-2. Alopex Nim parser に `CREATE CONTINUOUS AGGREGATE` と wire contract `0.3.0` を実装する
-3. Ubuntu/Windows release gate を完走し、Alopex v0.8.3 と target 別 parser 成果物を全て先行リリースする
+1. `.spec-workflow/specs/skulk-v0-5-0/` の Requirements で canonical grammar、AST、target matrix、percentile 入力モデルを固定する
+2. Alopex Nim parser に `CREATE CONTINUOUS AGGREGATE` と wire contract `0.4.0` を実装する
+3. 失敗を非ゼロ終了で伝播する Nim test harness を含む Ubuntu/Windows release gate を完走し、Alopex v0.8.4 と target 別 parser 成果物・checksum manifest を全て先行リリースする
 4. Skulk が release asset と contract を exact pin し、consumer fixture を通してから parser-dependent task を開始する
 
 parser PR を Alopex main に未リリースのまま置かない。merge は Alopex

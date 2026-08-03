@@ -1355,7 +1355,7 @@ impl TTLManager {
 > **v0.5 responsibility boundary (2026-07-31)**: `DownsampleConfig` は
 > Skulk 内部の型付き実行契約である。公開 DDL の
 > `CREATE CONTINUOUS AGGREGATE ... AS SELECT ... WITH (...)` は Alopex
-> Nim parser contract `0.3.0`（Alopex v0.8.3）で構文解析し、Skulk Rust がこの型へ
+> Nim parser contract `0.4.0`（Alopex v0.8.4）で構文解析し、Skulk Rust がこの型へ
 > mapping・検証する。以下の `build_aggregate_query` は既存 SQL-TS
 > `SELECT` を再利用する内部処理であり、Rust で DDL parser を実装しない。
 > `Percentile(f64)` は v0.4 の `HISTOGRAM_QUANTILE` と別の集約として

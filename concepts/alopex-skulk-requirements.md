@@ -322,8 +322,9 @@ Write Path:
 > **v0.5 scope clarification (2026-07-31)**: 現行 Alopex v0.8.1
 > parser contract `0.2.0` は、以下の `CREATE/ALTER TIMESERIES TABLE` と
 > `CREATE CONTINUOUS AGGREGATE` をまだ受理しない。v0.5 の parser 必須範囲は
-> canonical な Continuous Aggregate DDL とし、Alopex v0.8.3 / contract
-> `0.3.0` を Skulk より先にリリースする。`CREATE/ALTER TIMESERIES TABLE`
+> canonical な Continuous Aggregate DDL とする。Alopex v0.8.2 / v0.8.3 の
+> contract `0.3.0` は公開済みだがこの DDL を含まないため、Alopex v0.8.4 /
+> contract `0.4.0` を Skulk より先にリリースする。`CREATE/ALTER TIMESERIES TABLE`
 > は将来構文の例であり、v0.5 の parser gate には含めない。調査と依存順序は
 > [Skulk v0.5 SQL パーサー準備状況](../reports/skulk-v0.5-sql-parser-readiness.md)
 > を参照。
