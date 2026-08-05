@@ -27,6 +27,15 @@ Chirps v0.6は、v0.5で構築したRaft Consensus APIを拡張し、大規模�
 - クラスタ間レプリケーション（v1.0）
 - CRDT実装（v0.9）
 
+**v0.7着手のためv0.6で確定する前方互換契約（実装対象は非Durable部分のみ）**:
+- `MessageBackend`のprofile-aware routingとbackend capability/errorの拡張点
+- Control/Ephemeralのack、順序、retry、idempotencyの意味論
+- Durable用envelope予約フィールド（message id、sequence/partition、ack、replay、checkpoint/offset）
+- Durable要求を別profileへ黙ってfallbackせず、feature未提供時は明示的なunsupportedを返す境界
+- backend/profile共通メトリクスhookと、Iggy永続化を後から追加できるfeature boundary
+
+IggyBackend、Durableの永続化・再送・consumer offset実装そのものはv0.7の責務であり、v0.6の受入条件ではない。
+
 ### Version Dependencies
 
 | Alopex | Chirps | 利用可能機能 |
