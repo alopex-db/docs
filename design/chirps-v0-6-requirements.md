@@ -19,7 +19,7 @@ Chirps v0.6は、v0.5で構築したRaft Consensus APIを拡張し、大規模�
 - Gossip HLC（LocalHlc）
 - スナップショット転送最適化（チャンク転送、並列化）
 - 包括的なメトリクスAPI（Prometheus形式）
-- alopex-core v0.1.0 crates.io公開
+- alopex-coreの公開済みregistry版利用（互換性検証で採用版を確定）
 
 **v0.6 スコープ外（将来バージョン）**:
 - Durableプロファイル / IggyBackend（v0.7）
@@ -43,7 +43,7 @@ Chirps v0.6は、v0.5で構築したRaft Consensus APIを拡張し、大規模�
 |-------------|-------------|
 | **APIシグネチャ互換** | 維持 ― v0.5のRaftNode APIはそのまま動作 |
 | **クロスバージョン互換** | 非対応 ― v0.5ノードとv0.6ノードの混在クラスタは拒否 |
-| **crates.io互換** | alopex-core v0.1.xとの互換性を維持 |
+| **crates.io互換** | 公開済みalopex-core registry版との互換性を検証し、採用版とSemVer範囲を固定 |
 
 ## Alignment with Product Vision
 
@@ -316,15 +316,15 @@ pub struct SnapshotTransferConfig {
 | `chirps_hlc_logical_advances_total` | Counter | - | 論理カウンタ進行回数 |
 | `chirps_hlc_physical_advances_total` | Counter | - | 物理時刻進行回数 |
 
-### Requirement 8: alopex-core crates.io公開
+### Requirement 8: alopex-core registry公開・依存整合
 
 **User Story:** 外部開発者として、alopex-coreをcrates.ioから取得して独自プロジェクトで使用したい。
 
 #### Acceptance Criteria
 
-1. WHEN alopex-core v0.1.0がリリースされる THEN システムSHALL crates.ioに公開する
+1. WHEN Chirps v0.6の依存候補を選定する THEN システムSHALL crates.ioで公開済みのalopex-core版から、必要APIと互換性を満たす版を採用する
 2. WHEN 公開される THEN システムSHALL 適切なREADME、CHANGELOG、LICENSEを含める
-3. WHEN chirps-raftがalopex-coreを使用する THEN システムSHALL crates.io版への依存に切り替える
+3. WHEN chirps-raftがalopex-coreを使用する THEN システムSHALLローカルpath依存ではなく、採用したcrates.io版と明示的なSemVer範囲へ切り替える
 4. WHEN APIに破壊的変更がある THEN システムSHALL セマンティックバージョニングに従う
 
 **公開前チェックリスト**:
@@ -335,6 +335,8 @@ pub struct SnapshotTransferConfig {
 - [ ] LICENSE（Apache-2.0 / MIT）選定
 - [ ] CIパイプライン整備（テスト、clippy、fmt）
 - [ ] 最小限の外部依存確認
+- [ ] registry-onlyでChirps workspaceを解決・ビルドできることの確認
+- [ ] 採用版、API互換性、SemVer範囲、Cargo.lockの証跡記録
 
 ## Non-Functional Requirements
 
