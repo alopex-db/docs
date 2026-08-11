@@ -127,7 +127,7 @@ Cargo.toml の description に基づく公式責務。
 | v0.6.0 | Multi-Raft 管理 / TSO / Gossip HLC / snapshot transfer | ✅ リリース済み |
 | v0.6.1 | feature 組み合わせ compile gate と代表デモ経路 | ✅ リリース済み |
 | v0.6.2 | QUIC flow-control、connection admission、idle eviction、transport metrics | ✅ リリース済み |
-| v0.6.3 | mTLS 必須化、仕様・移行・release contract の整合 | 🟡 リリース準備中（本作業） |
+| v0.6.3 | mTLS 必須化、仕様・移行・release contract の整合 | 🟡 リリース準備済み（公開操作未実施） |
 
 ## 4. 依存グラフ (着手順の制約)
 
