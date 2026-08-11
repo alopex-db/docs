@@ -1559,7 +1559,7 @@ impl ShardRouter {
 > **参照**: [chirps-raft-integration-proposal.md](chirps-raft-integration-proposal.md)
 
 Skulkは `alopex-chirps` が提供するRaft Consensus APIを利用する。
-Raftメッセージの送受信は `chirps-raft` モジュールが自動的に処理するため、
+Raftメッセージの送受信は `alopex-chirps::raft` module が自動的に処理するため、
 アプリケーション側ではRaftメッセージを直接扱う必要はない。
 
 ```rust
@@ -1567,7 +1567,7 @@ use alopex_chirps::{Mesh, MessageProfile, NodeId};
 use alopex_chirps::raft::{StateMachine, MultiRaftManager, WalRaftStorage};
 
 /// Skulkアプリケーションメッセージ（Raft以外）
-/// Raftメッセージは chirps-raft が自動的に Control Profile で処理
+/// Raftメッセージは alopex-chirps::raft が自動的に Control Profile で処理
 #[derive(Serialize, Deserialize)]
 pub enum SkulkMessage {
     /// クエリリクエスト（シャード間分散クエリ）
@@ -1712,7 +1712,7 @@ impl SkulkClusterNode {
 
 | メッセージ種別 | Profile | 理由 |
 |--------------|---------|------|
-| Raft AppendEntries/Vote | Control | chirps-raft が自動処理、最高優先度 |
+| Raft AppendEntries/Vote | Control | alopex-chirps::raft が自動処理、最高優先度 |
 | クエリリクエスト/応答 | Ephemeral | 損失時はクライアントがリトライ |
 | Changefeed | Durable | 到達保証が必要 |
 | ShardMetaSync | Ephemeral | Gossipで冗長に配信 |
@@ -2085,7 +2085,7 @@ quic_cert = "/etc/alopex-skulk/cert.pem"
 quic_key = "/etc/alopex-skulk/key.pem"
 
 [cluster.chirps.raft]
-# Raft Consensus API設定（chirps-raft）
+# Raft Consensus API設定（alopex-chirps::raft）
 # 選挙タイムアウト（ミリ秒）
 election_timeout_ms = 1000
 # ハートビート間隔（ミリ秒）

@@ -1,7 +1,7 @@
 # Chirps ノードメモリ管理仕様書
 
-> **対象バージョン**: Chirps v0.6.1
-> **ステータス**: 未着手
+> **対象バージョン**: Chirps v0.6.3以降
+> **ステータス**: 未着手（v0.6.3の受入対象外）
 > **前提**: Chirps v0.6 Multi-Raft + TSO 完了後
 
 ## 概要
@@ -13,111 +13,112 @@ alopex-core のキャッシュ管理と連携した統合的なメモリ管理�
 
 ## メッセージバッファ管理
 
-### ファイル配置
+### 現行実装との責務境界
 
 ```
-crates/chirps/src/buffer/
-├── mod.rs
-├── message_buffer.rs
-├── priority_queue.rs
-└── backpressure.rs
+crates/chirps-transport-quic/src/
+├── config.rs       # flow-control、stream、queue、QoS、接続上限
+├── lib.rs          # QUIC endpoint、送信キュー、接続 map、idle eviction
+└── metrics.rs      # transport 単位の観測値
 ```
 
-### メッセージバッファ（`message_buffer.rs`）
+`crates/chirps/src/buffer/` は現行 workspace に存在しない。メッセージ
+buffer、priority queue、backpressure はこの仕様の論理コンポーネント名であり、
+実装を追加する場合も上記 transport crate の責務境界をまたいで独立 crate に
+複製しない。
 
-- `MessageBuffer` 構造体
-- 受信メッセージのバッファリング
-- プロファイル別バッファサイズ（Control/Ephemeral/Durable）
-- メモリ上限設定（`max_buffer_bytes`）
-- バッファ満杯時のバックプレッシャー
+### transport の送信キュー／backpressure（`chirps-transport-quic/src/lib.rs`）
 
-### 優先度キュー（`priority_queue.rs`）
+- mpsc 送信キューと semaphore による受付制限
+- プロファイル別 queue limit と再送 buffer
+- flow-control window、stream 数、接続数の設定
+- 満杯時の待機・拒否
+- `MessageBuffer` という独立型、ノード全体の `max_buffer_bytes` は未実装
 
-- `PriorityQueue` 構造体
-- メッセージプロファイル別優先度
-- Control > Durable > Ephemeral の処理順序
-- 優先度別メモリ割り当て比率
+### transport の優先度制御（`chirps-transport-quic/src/config.rs`）
 
-### バックプレッシャー制御（`backpressure.rs`）
+- message profile ごとの priority と queue limit
+- Control / Durable / Ephemeral の送信制御
+- `PriorityQueue` という独立型と比率配分は未実装
 
-- `BackpressureController` 構造体
-- 送信側への流量制御シグナル
-- メモリ使用量閾値でのトリガー
-- 段階的な制御（警告 → 制限 → 拒否）
+### backpressure の現状
+
+- queue／semaphore 単位の送信受付制御は実装済み
+- ノード全体のメモリ閾値に基づく警告 → 制限 → 拒否の統合制御は未実装
 
 ---
 
 ## Raft ログキャッシュ
 
-### ファイル配置
+### 現行実装との責務境界
 
 ```
-crates/chirps/src/raft/cache/
-├── mod.rs
-├── log_cache.rs
-├── snapshot_cache.rs
-└── state_cache.rs
+crates/chirps-raft-storage/src/wal_storage.rs
+└── log_cache / log_order  # WAL 読み出し用の現行キャッシュ（FIFO）
+
+crates/alopex-chirps/src/raft/
+└── # Raft facade、node、transport、metrics
 ```
 
-### ログキャッシュ（`log_cache.rs`）
+`crates/chirps/src/raft/cache/` は存在しない。Raft log cache は storage
+crate が WAL と同じ責務として保持し、Raft の公開 facade は
+`alopex-chirps::raft` に置く。`snapshot_cache` と `state_cache`、LRU eviction
+は現行実装にないため、この仕様の将来候補として扱う。
 
-- `RaftLogCache` 構造体
-- 最近の Raft ログエントリのキャッシュ
-- インデックスベースの高速検索
-- キャッシュサイズ設定（`max_cached_entries`）
-- LRU ベースの eviction
+### WAL log cache（`chirps-raft-storage/src/wal_storage.rs`）
 
-### スナップショットキャッシュ（`snapshot_cache.rs`）
+- `BTreeMap` の `log_cache` と `VecDeque` の `log_order`
+- 最近の Raft ログエントリの index ベース検索
+- WAL の読み出しを減らすための挿入順 FIFO
+- `RaftLogCache` 型、`max_cached_entries`、LRU eviction は未実装
 
-- `SnapshotCache` 構造体
-- 最新スナップショットのメモリ保持
-- スナップショット転送時の参照カウント
-- 複数バージョンの部分キャッシュ
+### スナップショットキャッシュ（将来候補）
 
-### ステートキャッシュ（`state_cache.rs`）
+- `SnapshotCache` 構造体、転送時の参照カウント、複数バージョンの保持は未実装
 
-- `StateCache` 構造体
-- コミット済みステートの高速アクセス
-- 読み取り専用クエリのキャッシュヒット
-- キャッシュ一貫性保証
+### ステートキャッシュ（将来候補）
+
+- `StateCache` 構造体、read query cache、cache 一貫性保証は未実装
 
 ---
 
 ## 接続プール管理
 
-### ファイル配置
+### 現行実装との責務境界
 
 ```
-crates/chirps/src/connection/
-├── mod.rs
-├── pool.rs
-├── quic_pool.rs
-└── metrics.rs
+crates/chirps-transport-quic/src/config.rs
+crates/chirps-transport-quic/src/lib.rs
+crates/chirps-transport-quic/src/metrics.rs
 ```
 
-### 接続プール（`pool.rs`）
+`crates/chirps/src/connection/` は存在しない。connection pool、QUIC
+flow-control、connection admission、idle eviction、transport metrics は
+`chirps-transport-quic` が担当する。Raft の接続利用側と facade は
+`crates/alopex-chirps/src/raft/`、wire の型は `crates/chirps-wire/src/` に
+分離されている。
 
-- `ConnectionPool` 構造体
-- ノード間接続の再利用
-- 接続数上限設定（`max_connections_per_node`）
-- アイドル接続のタイムアウト
-- 接続ヘルスチェック
+### 接続 admission と idle eviction（`chirps-transport-quic/src/lib.rs`）
 
-### QUIC 接続プール（`quic_pool.rs`）
+- 接続 map と peer ごとの接続再利用
+- 接続数上限設定（`max_connections`）
+- idle timeout 後の map 退避と close
+- health check は未実装
 
-- `QuicConnectionPool` 構造体
-- QUIC ストリームの多重化
-- ストリーム数の動的調整
-- 0-RTT 接続の再利用
-- 証明書キャッシュ
+### QUIC 接続管理（`chirps-transport-quic/src/lib.rs`）
 
-### 接続メトリクス（`metrics.rs`）
+- QUIC 接続管理（`chirps-transport-quic/src/lib.rs`）
+- QUIC ストリームの多重化と stream 数上限
+- flow-control window の設定反映
+- 0-RTT 接続の再利用（未実装）
+- 証明書キャッシュ（未実装）
 
-- `ConnectionMetrics` 構造体
-- アクティブ接続数
-- 接続確立/切断レート
-- ストリーム使用統計
-- メモリ使用量
+### 接続メトリクス（`chirps-transport-quic/src/metrics.rs`）
+
+- active connection / stream 数
+- connection rejection / idle eviction counter
+- retransmit buffer 使用量
+- ノード全体の memory stats は未実装
 
 ---
 
