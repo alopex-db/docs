@@ -86,7 +86,7 @@
 │  │                   alopex-chirps                          │   │
 │  │  - QUIC Transport (chirps-transport-quic)               │   │
 │  │  - SWIM Membership (chirps-gossip-swim)                 │   │
-│  │  - Raft Consensus API (chirps-raft)                     │   │
+│  │  - Raft Consensus API (alopex-chirps::raft)                     │   │
 │  │    * StateMachine / RaftStorage traits                  │   │
 │  │    * RaftNode, MultiRaftManager                         │   │
 │  │    * HybridTimestamp (TSO)                              │   │
@@ -1828,7 +1828,7 @@ Response:
 > **参照**: [chirps-raft-integration-proposal.md](chirps-raft-integration-proposal.md) Section 3
 
 Chirpsが提供するMessage Profileを活用し、メッセージの重要度に応じた通信制御を行う。
-Raftメッセージは `chirps-raft` モジュールが自動的に Control Profile で送信するため、
+Raftメッセージは `alopex-chirps::raft` module が自動的に Control Profile で送信するため、
 アプリケーション側ではRaftメッセージを直接扱う必要はない。
 
 ```rust

@@ -40,7 +40,7 @@ Alopex Skulkは、**Alopex Coreを基盤とする時系列データベース**�
 **共有基盤**:
 - `alopex-core`: LSM-Tree、WAL、Compaction（フォーク or trait抽象化）
 - `alopex-chirps`: クラスタ通信
-  - Raft Consensus API（chirps-raft）: 分散合意、レプリケーション
+  - Raft Consensus API（alopex-chirps::raft）: 分散合意、レプリケーション
   - SWIM Membership（chirps-gossip-swim）: ノード検出、障害検知
   - QUIC Transport（chirps-transport-quic）: セキュア通信
 
@@ -612,7 +612,7 @@ use alopex_chirps::{Mesh, MessageProfile};
 use alopex_chirps::raft::{StateMachine, MultiRaftManager, WalRaftStorage};
 
 // ShardStateMachine: Skulk側で実装
-// Raftロジックは chirps-raft が提供
+// Raftロジックは alopex-chirps::raft が提供
 pub struct ShardStateMachine { /* ... */ }
 
 impl StateMachine for ShardStateMachine {
@@ -621,7 +621,7 @@ impl StateMachine for ShardStateMachine {
 }
 
 // クラスタノードは MultiRaftManager を使用
-// Raftメッセージは chirps-raft が Control Profile で自動送信
+// Raftメッセージは alopex-chirps::raft が Control Profile で自動送信
 let cluster_node = SkulkClusterNode::new(config, mesh).await?;
 
 // メトリクス書き込み（Raft経由で合意）

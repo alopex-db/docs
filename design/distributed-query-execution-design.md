@@ -81,7 +81,7 @@ alopex-db は単なる RDBMS ではなく**分散データベース**である�
 | ノードメンバーシップ (discovery / failure detection) | **Chirps** (SWIM) | 実装済 | `chirps/crates/chirps-gossip-swim/src/engine.rs`, `alopex-chirps/src/mesh.rs:280-341` |
 | ノード間通信 (QUIC / Mesh) | **Chirps** | 実装済 | `chirps/crates/chirps-transport-quic/`, `chirps-core/src/backend.rs:10-28` |
 | 合意 (Raft: 選挙・複製・メンバーシップ・スナップショット) | **Chirps** (openraft ラッパ) | 実装済 (単一グループ) | `alopex-chirps/src/raft/node.rs:106-337` |
-| Multi-Raft グループ管理 (`MultiRaftManager`) | **Chirps** | v0.6 予定 (未実装) | proposal `chirps-raft-integration-proposal.md:389-427`, `chirps-v0-6-requirements.md:60-99` |
+| Multi-Raft グループ管理 (`MultiRaftManager`) | **Chirps** | v0.6.0 で実装済み | proposal `chirps-raft-integration-proposal.md:389-427`, `chirps-v0-6-requirements.md:60-99` |
 | タイムスタンプ (Raft TSO / Gossip HLC) | **Chirps** | v0.6 予定 (未実装) | proposal:429-772, `chirps-v0-6-requirements.md:129-248` |
 | Range Descriptor (キーレンジ→シャード対応) | **alopex-db** | 設計のみ | `alopex-db-design-spec.md:636-663` |
 | シャード配置 (Range→ノード) / Split・Merge | **alopex-db** | 設計のみ | spec:653, 665-687 |
