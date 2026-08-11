@@ -9,7 +9,7 @@ Chirps v0.6は、v0.5で構築したRaft Consensus APIを拡張し、大規模�
 - **Raft TSO**: Raftベースの分散タイムスタンプサービス（MVCC/トランザクション用）
 - **Gossip HLC**: Gossipプロトコル内のHybrid Logical Clock（イベント順序付け用）
 - **メトリクスAPI**: Prometheus互換の包括的なメトリクスエクスポート
-- **alopex-core crates.io公開**: 外部プロジェクトからも利用可能に
+- **alopex-core crates.io公開**: 外部プロジェクトからも利用可能に（現行依存は `alopex-core = "0.3"`）
 
 ### Scope Clarification
 
@@ -19,7 +19,7 @@ Chirps v0.6は、v0.5で構築したRaft Consensus APIを拡張し、大規模�
 - Gossip HLC（LocalHlc）
 - スナップショット転送最適化（チャンク転送、並列化）
 - 包括的なメトリクスAPI（Prometheus形式）
-- alopex-core v0.1.0 crates.io公開
+- alopex-core v0.3 crates.io公開
 
 **v0.6 スコープ外（将来バージョン）**:
 - Durableプロファイル / IggyBackend（v0.7）
@@ -43,7 +43,7 @@ Chirps v0.6は、v0.5で構築したRaft Consensus APIを拡張し、大規模�
 |-------------|-------------|
 | **APIシグネチャ互換** | 維持 ― v0.5のRaftNode APIはそのまま動作 |
 | **クロスバージョン互換** | 非対応 ― v0.5ノードとv0.6ノードの混在クラスタは拒否 |
-| **crates.io互換** | alopex-core v0.1.xとの互換性を維持 |
+| **crates.io互換** | alopex-core v0.3.xとの互換性を維持 |
 
 ## Alignment with Product Vision
 
@@ -322,9 +322,9 @@ pub struct SnapshotTransferConfig {
 
 #### Acceptance Criteria
 
-1. WHEN alopex-core v0.1.0がリリースされる THEN システムSHALL crates.ioに公開する
+1. WHEN alopex-core v0.3がリリースされる THEN システムSHALL crates.ioに公開する
 2. WHEN 公開される THEN システムSHALL 適切なREADME、CHANGELOG、LICENSEを含める
-3. WHEN chirps-raftがalopex-coreを使用する THEN システムSHALL crates.io版への依存に切り替える
+3. WHEN `alopex-chirps::raft` の storage 実装がalopex-coreを使用する THEN システムSHALL crates.io版への依存に切り替える
 4. WHEN APIに破壊的変更がある THEN システムSHALL セマンティックバージョニングに従う
 
 **公開前チェックリスト**:

@@ -42,7 +42,7 @@ Chirps v0.5は、Alopex DBおよびAlopex Skulkの分散合意基盤として、
 - **高可用性**: リーダー選出とログ複製による障害耐性
 - **拡張性**: StateMachine traitによるアプリケーション固有ロジックの分離
 
-設計ドキュメント（`design/chirps-raft-integration-proposal.md`）で定義されているChirps Raft統合の要件を実装します。
+設計ドキュメント（`design/chirps-raft-integration-proposal.md`）で定義されているChirps Raft統合の要件を実装します。現行の公開入口は独立した crate ではなく、`alopex-chirps::raft` です。storage trait は `alopex-chirps-raft-storage` が提供します。
 
 ## Requirements
 
@@ -56,21 +56,33 @@ Chirps v0.5は、Alopex DBおよびAlopex Skulkの分散合意基盤として、
 2. WHEN `apply()`メソッドが呼び出される THEN システムSHALL ログインデックスとコマンドを引数として渡す
 3. WHEN スナップショット生成が要求される THEN システムSHALL `snapshot()`メソッドを呼び出し、現在状態のシリアライズ可能な表現を取得する
 4. WHEN スナップショットから復元が要求される THEN システムSHALL `restore()`メソッドを呼び出し、指定されたスナップショットから状態を復元する
-5. WHEN StateMachine traitが定義される THEN Command/Response/Snapshot型は`Send + Sync + Clone + Serialize + Deserialize`を要求する
+5. WHEN StateMachine traitが定義される THEN Command/Response型は`Send + Sync + Clone + Serialize + DeserializeOwned`を要求し、snapshot は非同期 reader (`Box<dyn AsyncSnapshotData>`) として受け渡す
 
-**Trait定義（参考）**:
+**Trait定義（v0.6現行契約）**:
 ```rust
+use alopex_chirps_raft_storage::traits::{AsyncSnapshotData, StateMachineResult};
+use alopex_chirps_raft_storage::types::{ChirpsNodeId, LogId};
+
 #[async_trait]
 pub trait StateMachine: Send + Sync + 'static {
     type Command: Send + Sync + Clone + serde::Serialize + serde::de::DeserializeOwned;
     type Response: Send + Sync + Clone + serde::Serialize + serde::de::DeserializeOwned;
-    type Snapshot: Send + Sync;
 
-    async fn apply(&mut self, index: LogIndex, command: Self::Command) -> Result<Self::Response>;
-    async fn snapshot(&self) -> Result<Self::Snapshot>;
-    async fn restore(&mut self, snapshot: Self::Snapshot) -> Result<()>;
+    async fn apply(
+        &mut self,
+        log_id: LogId<ChirpsNodeId>,
+        command: Self::Command,
+    ) -> StateMachineResult<Self::Response>;
+    async fn snapshot(&self) -> StateMachineResult<Box<dyn AsyncSnapshotData>>;
+    async fn restore(
+        &mut self,
+        snapshot: Box<dyn AsyncSnapshotData>,
+    ) -> StateMachineResult<()>;
 }
 ```
+
+`Snapshot` associated type を追加する互換 facade は v0.7 以降の計画であり、v0.6
+では導入しない。
 
 ### Requirement 2: RaftStorage Trait
 
@@ -78,24 +90,42 @@ pub trait StateMachine: Send + Sync + 'static {
 
 #### Acceptance Criteria
 
-1. WHEN ログエントリが追加される THEN システムSHALL `append_entries()`メソッドでエントリをバッチで永続化する
-2. WHEN ログエントリが要求される THEN システムSHALL `get_entries(start, end)`メソッドで指定範囲のエントリを取得する
-3. WHEN スナップショット適用後にログ切り詰めが要求される THEN システムSHALL `truncate_before(index)`メソッドで古いエントリを削除する
-4. WHEN HardState（term, vote, commit）の永続化が要求される THEN システムSHALL `save_hard_state()`/`get_hard_state()`メソッドで読み書きする
-5. WHEN スナップショットの永続化が要求される THEN システムSHALL `save_snapshot()`/`load_snapshot()`メソッドで読み書きする
-6. WHEN `append_entries()`が成功を返す THEN エントリはfsync相当の耐久性で永続化されている
+1. WHEN ログエントリが追加される THEN システムSHALL `append(entries, callback)` でバッチを受け取り、flush 完了を `LogFlushed` callback へ通知する
+2. WHEN ログエントリが要求される THEN システムSHALL `try_get_log_entries(range)` で `RangeBounds<u64>` の範囲を取得する
+3. WHEN ログの競合またはパージが要求される THEN システムSHALL `truncate(log_id)` または `purge(log_id)` を使用する
+4. WHEN vote または適用済み状態が永続化される THEN システムSHALL `save_vote()`/`read_vote()` と `applied_state()` を使用する（v0.5設計の HardState 型は公開しない）
+5. WHEN スナップショットの受信・適用・取得が要求される THEN システムSHALL `begin_receiving_snapshot()`、`install_snapshot()`、`get_current_snapshot()`、`get_snapshot_builder()` を使用する
+6. WHEN `append()` の callback が flush 完了を通知する THEN エントリは storage 実装が定める fsync 相当の耐久性境界を越えている
 
-**Trait定義（参考）**:
+`append_entries`、`get_entries`、`truncate_before`、`save_hard_state`、`load_snapshot`
+は v0.5 設計上の移行用語であり、v0.6 の追加メソッドではない。現行 trait は
+openraft v0.9.17 storage-v2 の形状である。
+
+**Trait定義（v0.6現行契約の要約）**:
 ```rust
 #[async_trait]
-pub trait RaftStorage: Send + Sync + 'static {
-    async fn append_entries(&mut self, entries: Vec<LogEntry>) -> Result<()>;
-    async fn get_entries(&self, start: LogIndex, end: LogIndex) -> Result<Vec<LogEntry>>;
-    async fn truncate_before(&mut self, index: LogIndex) -> Result<()>;
-    async fn get_hard_state(&self) -> Result<HardState>;
-    async fn save_hard_state(&mut self, state: HardState) -> Result<()>;
-    async fn save_snapshot(&mut self, snapshot: SnapshotMeta, data: Vec<u8>) -> Result<()>;
-    async fn load_snapshot(&self) -> Result<Option<(SnapshotMeta, Vec<u8>)>>;
+pub trait RaftStorage<C: openraft::RaftTypeConfig>: Send + Sync + 'static {
+    type LogReader: openraft::storage::RaftLogReader<C>;
+    type SnapshotBuilder: openraft::storage::RaftSnapshotBuilder<C>;
+
+    async fn get_log_state(&mut self) -> Result<openraft::LogState<C>, openraft::StorageError<C::NodeId>>;
+    async fn try_get_log_entries<RB>(&mut self, range: RB) -> Result<Vec<C::Entry>, openraft::StorageError<C::NodeId>>
+    where RB: RangeBounds<u64> + Clone + Debug + openraft::OptionalSend;
+    async fn append<I>(&mut self, entries: I, callback: openraft::storage::LogFlushed<C>)
+    where I: IntoIterator<Item = C::Entry> + Send, I::IntoIter: Send;
+    async fn truncate(&mut self, log_id: openraft::LogId<C::NodeId>) -> Result<(), openraft::StorageError<C::NodeId>>;
+    async fn purge(&mut self, log_id: openraft::LogId<C::NodeId>) -> Result<(), openraft::StorageError<C::NodeId>>;
+    async fn applied_state(&mut self) -> Result<(Option<openraft::LogId<C::NodeId>>, openraft::StoredMembership<C::NodeId, C::Node>), openraft::StorageError<C::NodeId>>;
+    async fn apply<I>(&mut self, entries: I) -> Result<Vec<C::R>, openraft::StorageError<C::NodeId>>
+    where I: IntoIterator<Item = C::Entry> + Send, I::IntoIter: Send;
+    async fn save_vote(&mut self, vote: &openraft::Vote<C::NodeId>) -> Result<(), openraft::StorageError<C::NodeId>>;
+    async fn read_vote(&mut self) -> Result<Option<openraft::Vote<C::NodeId>>, openraft::StorageError<C::NodeId>>;
+    async fn begin_receiving_snapshot(&mut self) -> Result<Box<C::SnapshotData>, openraft::StorageError<C::NodeId>>;
+    async fn install_snapshot(&mut self, meta: &openraft::SnapshotMeta<C::NodeId, C::Node>, snapshot: Box<C::SnapshotData>) -> Result<(), openraft::StorageError<C::NodeId>>;
+    async fn get_current_snapshot(&mut self) -> Result<Option<openraft::Snapshot<C>>, openraft::StorageError<C::NodeId>>;
+    fn set_purgeable_horizon(&mut self, horizon: Option<openraft::LogId<C::NodeId>>);
+    async fn get_log_reader(&mut self) -> Self::LogReader;
+    async fn get_snapshot_builder(&mut self) -> Self::SnapshotBuilder;
 }
 ```
 
@@ -223,7 +253,7 @@ pub enum MembershipChange {
 
 ### Code Architecture and Modularity
 - **Single Responsibility Principle**: RaftNode、StateMachine、RaftStorageは明確に分離
-- **Modular Design**: `chirps-raft`モジュールとして独立し、feature flagで有効/無効切り替え可能
+- **Modular Design**: `alopex-chirps::raft` module として独立し、feature flagで有効/無効切り替え可能
 - **Dependency Management**: openraftをベースとし、Chirps固有のトランスポート層を統合
 - **Clear Interfaces**: traitベースの抽象化でテスタビリティを確保
 

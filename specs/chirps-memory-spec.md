@@ -1,7 +1,7 @@
 # Chirps ノードメモリ管理仕様書
 
-> **対象バージョン**: Chirps v0.6.1
-> **ステータス**: 未着手
+> **対象バージョン**: Chirps v0.6.3以降
+> **ステータス**: 部分達成（論理メモリ管理 API は v0.6.3 実装済み、長時間実測は別契約）
 > **前提**: Chirps v0.6 Multi-Raft + TSO 完了後
 
 ## 概要
@@ -13,111 +13,115 @@ alopex-core のキャッシュ管理と連携した統合的なメモリ管理�
 
 ## メッセージバッファ管理
 
-### ファイル配置
+### 現行実装との責務境界
 
 ```
-crates/chirps/src/buffer/
-├── mod.rs
-├── message_buffer.rs
-├── priority_queue.rs
-└── backpressure.rs
+crates/alopex-chirps/src/buffer/
+├── message_buffer.rs  # MessageBuffer、profile 別 bytes、backpressure
+├── priority_queue.rs  # Control > Durable > Ephemeral
+└── backpressure.rs    # Warning → Limited → Reject
+
+crates/chirps-transport-quic/src/
+├── config.rs           # flow-control、stream、queue、QoS、接続上限
+├── lib.rs              # QUIC endpoint、接続 map、idle eviction、health check
+└── metrics.rs          # transport 単位の観測値
 ```
 
-### メッセージバッファ（`message_buffer.rs`）
+`crates/chirps/src/buffer/` は現行 workspace に存在しない。メッセージ buffer
+の責務は `alopex-chirps` の buffer module、QUIC の window・stream・接続制御の
+責務は `chirps-transport-quic` に分離されている。
+
+### メッセージバッファ（`alopex-chirps/src/buffer/message_buffer.rs`）
 
 - `MessageBuffer` 構造体
-- 受信メッセージのバッファリング
-- プロファイル別バッファサイズ（Control/Ephemeral/Durable）
-- メモリ上限設定（`max_buffer_bytes`）
-- バッファ満杯時のバックプレッシャー
+- Control / Durable / Ephemeral ごとの bytes 集計
+- `max_buffer_bytes` と Warning → Limited → Reject
+- profile-aware priority queue との接続
 
-### 優先度キュー（`priority_queue.rs`）
+### 優先度キュー（`alopex-chirps/src/buffer/priority_queue.rs`）
 
 - `PriorityQueue` 構造体
-- メッセージプロファイル別優先度
 - Control > Durable > Ephemeral の処理順序
-- 優先度別メモリ割り当て比率
+- profile ごとの受信順序制御
 
-### バックプレッシャー制御（`backpressure.rs`）
+### バックプレッシャー制御（`alopex-chirps/src/buffer/backpressure.rs`）
 
 - `BackpressureController` 構造体
-- 送信側への流量制御シグナル
-- メモリ使用量閾値でのトリガー
-- 段階的な制御（警告 → 制限 → 拒否）
+- メモリ使用量閾値での Warning → Limited → Reject
 
 ---
 
 ## Raft ログキャッシュ
 
-### ファイル配置
+### 現行実装との責務境界
 
 ```
-crates/chirps/src/raft/cache/
-├── mod.rs
-├── log_cache.rs
-├── snapshot_cache.rs
-└── state_cache.rs
+crates/chirps-raft-storage/src/wal_storage.rs
+└── log_cache / log_order  # WAL 読み出し用の現行キャッシュ（LRU）
+
+crates/alopex-chirps/src/raft/
+└── # Raft facade、node、transport、metrics
 ```
 
-### ログキャッシュ（`log_cache.rs`）
+`crates/chirps/src/raft/cache/` は存在しない。Raft log cache は storage
+crate が WAL と同じ責務として保持し、Raft の公開 facade は
+`alopex-chirps::raft` に置く。統合メモリ管理用の byte-bounded
+`RaftLogCache` は `crates/alopex-chirps/src/memory.rs` にもある。
 
-- `RaftLogCache` 構造体
-- 最近の Raft ログエントリのキャッシュ
-- インデックスベースの高速検索
-- キャッシュサイズ設定（`max_cached_entries`）
-- LRU ベースの eviction
+### WAL log cache（`chirps-raft-storage/src/wal_storage.rs`）
 
-### スナップショットキャッシュ（`snapshot_cache.rs`）
+- `BTreeMap` の `log_cache` と `VecDeque` の `log_order`
+- 最近の Raft ログエントリの index ベース検索
+- 参照時 touch を含む LRU eviction
+- 統合 manager 側は byte 上限と eviction bytes を管理
 
-- `SnapshotCache` 構造体
-- 最新スナップショットのメモリ保持
-- スナップショット転送時の参照カウント
-- 複数バージョンの部分キャッシュ
+### スナップショットキャッシュ（将来候補）
 
-### ステートキャッシュ（`state_cache.rs`）
+- `SnapshotCache` 構造体、転送時の参照カウント、複数バージョンの保持は未実装
 
-- `StateCache` 構造体
-- コミット済みステートの高速アクセス
-- 読み取り専用クエリのキャッシュヒット
-- キャッシュ一貫性保証
+### ステートキャッシュ（将来候補）
+
+- `StateCache` 構造体、read query cache、cache 一貫性保証は未実装
 
 ---
 
 ## 接続プール管理
 
-### ファイル配置
+### 現行実装との責務境界
 
 ```
-crates/chirps/src/connection/
-├── mod.rs
-├── pool.rs
-├── quic_pool.rs
-└── metrics.rs
+crates/chirps-transport-quic/src/config.rs
+crates/chirps-transport-quic/src/lib.rs
+crates/chirps-transport-quic/src/metrics.rs
 ```
 
-### 接続プール（`pool.rs`）
+`crates/chirps/src/connection/` は存在しない。connection pool、QUIC
+flow-control、connection admission、idle eviction、transport metrics は
+`chirps-transport-quic` が担当する。Raft の接続利用側と facade は
+`crates/alopex-chirps/src/raft/`、wire の型は `crates/chirps-wire/src/` に
+分離されている。
 
-- `ConnectionPool` 構造体
-- ノード間接続の再利用
-- 接続数上限設定（`max_connections_per_node`）
-- アイドル接続のタイムアウト
-- 接続ヘルスチェック
+### 接続 admission と idle eviction（`chirps-transport-quic/src/lib.rs`）
 
-### QUIC 接続プール（`quic_pool.rs`）
+- 接続 map と peer ごとの接続再利用
+- 接続数上限設定（`max_connections`）
+- idle timeout 後の map 退避と close
+- `health_check()` と定期 probe による stale connection の検出・close
 
-- `QuicConnectionPool` 構造体
-- QUIC ストリームの多重化
-- ストリーム数の動的調整
-- 0-RTT 接続の再利用
-- 証明書キャッシュ
+### QUIC 接続管理（`chirps-transport-quic/src/lib.rs`）
 
-### 接続メトリクス（`metrics.rs`）
+- QUIC 接続管理（`chirps-transport-quic/src/lib.rs`）
+- QUIC ストリームの多重化と stream 数上限
+- flow-control window の設定反映
+- 0-RTT 接続の再利用（未実装、v0.7へ繰り越し）
+- `certificate_cache_stats()` を持つ証明書・trust anchor cache
 
-- `ConnectionMetrics` 構造体
-- アクティブ接続数
-- 接続確立/切断レート
-- ストリーム使用統計
-- メモリ使用量
+### 接続メトリクス（`chirps-transport-quic/src/metrics.rs`）
+
+- active connection / stream 数
+- connection rejection / idle eviction counter
+- retransmit buffer 使用量
+- ノード全体の memory stats は `alopex-chirps/src/memory.rs` が担当
 
 ---
 
@@ -131,14 +135,20 @@ pub struct IntegratedCacheManager {
     pub message_buffer: MessageBuffer,
     /// Chirps Raft ログキャッシュ
     pub raft_cache: RaftLogCache,
-    /// alopex-core ブロックキャッシュ（参照）
-    pub block_cache: Arc<BlockCache>,
+    /// alopex-core との accounting/eviction adapter
+    pub block_cache: Arc<BlockCacheHandle>,
     /// 総メモリ予算
     pub total_budget: usize,
     /// 動的割り当て比率
     pub allocation_ratio: AllocationRatio,
 }
 ```
+
+現行の配置は `crates/alopex-chirps/src/memory.rs` であり、
+`MessageBuffer`、byte-bounded `RaftLogCache`、`BlockCacheHandle`、
+`AllocationRatio`、`rebalance`、`emergency_evict`、`get_unified_metrics` を
+同じ manager が調整する。alopex-core 0.3 は public `BlockCache` 型を公開しない
+ため、block cache は現行では usage/eviction adapter である。
 
 ### メモリ割り当て戦略
 
@@ -160,13 +170,13 @@ pub struct AllocationRatio {
 ```rust
 impl IntegratedCacheManager {
     /// ワークロードに応じた動的再配分
-    fn rebalance(&mut self, workload: WorkloadProfile);
+    pub fn rebalance(&mut self, workload: WorkloadProfile);
 
     /// メモリプレッシャー時の緊急解放
-    fn emergency_evict(&mut self, target_bytes: usize);
+    pub fn emergency_evict(&mut self, target_bytes: usize) -> usize;
 
     /// 統合メトリクス取得
-    fn get_unified_metrics(&self) -> UnifiedMemoryMetrics;
+    pub fn get_unified_metrics(&self) -> UnifiedMemoryMetrics;
 }
 ```
 
@@ -196,10 +206,10 @@ pub struct MemoryConfig {
 ### ランタイム調整 API
 
 ```rust
-impl ChirpsNode {
-    fn resize_memory_budget(&self, new_budget: usize) -> Result<()>;
-    fn get_memory_stats(&self) -> MemoryStats;
-    fn trigger_gc(&self) -> Result<()>;
+impl MeshHandle {
+    pub fn resize_memory_budget(&self, new_budget: usize) -> Result<(), MemoryError>;
+    pub fn get_memory_stats(&self) -> MemoryStats;
+    pub fn trigger_gc(&self) -> Result<(), MemoryError>;
 }
 ```
 
@@ -211,7 +221,7 @@ impl ChirpsNode {
 
 - MessageBuffer: バッファリング、バックプレッシャー
 - RaftLogCache: LRU eviction、インデックス検索
-- ConnectionPool: 接続再利用、タイムアウト
+- QUIC connection: 接続再利用、timeout、health check
 - IntegratedCacheManager: 動的再配分、緊急解放
 
 ### ベンチマーク

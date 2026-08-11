@@ -31,6 +31,8 @@ alopex-db/
     ├── Cargo.toml (workspace)
     └── crates/
         ├── alopex-chirps/     # メインクレート
+        │   ├── src/raft/      # Raft facade (`alopex-chirps::raft`)
+        ├── chirps-raft-storage/ # storage-v2 adapter / WAL storage
         ├── chirps-core/       # MessageBackend trait（alopex-core非依存）
         ├── chirps-transport-quic/
         ├── chirps-gossip-swim/
@@ -97,7 +99,7 @@ alopex-db/
 - メリット: 単一ワークスペースで管理簡素化
 - デメリット: 大規模なリファクタリング
 
-**Option D: `chirps-raft` が独自のログ永続化を持つ**
+**Option D: `alopex-chirps::raft` が独自のログ永続化を持つ**
 - メリット: `alopex-core` への依存なし
 - デメリット: WAL実装の重複
 
@@ -193,7 +195,7 @@ Phase 2 (v0.5リリース前に実施):
 │  ┌─────────────────────────────────────────────────────────┐│
 │  │                    alopex-chirps                        ││
 │  │  ┌─────────────────────────────────────────────────────┐││
-│  │  │              Raft Consensus API (chirps-raft)       │││
+│  │  │              Raft Consensus API (alopex-chirps::raft)│││
 │  │  │  - RaftNode (Multi-Raft Group管理)                 │││
 │  │  │  - StateMachine trait (アプリ側で実装)             │││
 │  │  │  - RaftStorage trait (ログ・スナップショット)       │││
@@ -265,9 +267,11 @@ alopex-core = { path = "../alopex/crates/alopex-core" }
 ### 3.1 Core Traits
 
 ```rust
-//! alopex-chirps Raft API
+//! alopex-chirps::raft API
 
 use async_trait::async_trait;
+use alopex_chirps_raft_storage::traits::{AsyncSnapshotData, StateMachineResult};
+use alopex_chirps_raft_storage::types::{ChirpsNodeId, LogId};
 
 /// アプリケーション固有のステートマシン
 /// Alopex DB と Skulk がそれぞれ実装
@@ -279,45 +283,53 @@ pub trait StateMachine: Send + Sync + 'static {
     /// レスポンスの型
     type Response: Send + Sync + Clone + serde::Serialize + serde::de::DeserializeOwned;
 
-    /// スナップショットの型
-    type Snapshot: Send + Sync;
-
     /// コマンドを適用（Raft commitされた後に呼ばれる）
-    async fn apply(&mut self, index: LogIndex, command: Self::Command) -> Result<Self::Response>;
+    async fn apply(
+        &mut self,
+        log_id: LogId<ChirpsNodeId>,
+        command: Self::Command,
+    ) -> StateMachineResult<Self::Response>;
 
-    /// スナップショット生成
-    async fn snapshot(&self) -> Result<Self::Snapshot>;
+    /// 非同期 reader としてスナップショットを生成
+    async fn snapshot(&self) -> StateMachineResult<Box<dyn AsyncSnapshotData>>;
 
-    /// スナップショットから復元
-    async fn restore(&mut self, snapshot: Self::Snapshot) -> Result<()>;
+    /// 非同期 reader から状態を復元
+    async fn restore(
+        &mut self,
+        snapshot: Box<dyn AsyncSnapshotData>,
+    ) -> StateMachineResult<()>;
 }
 
-/// Raftログとスナップショットの永続化
-/// alopex-core の WAL を利用した実装を提供
+/// openraft v0.9.17 storage-v2 の Raft ログとスナップショット永続化
 #[async_trait]
-pub trait RaftStorage: Send + Sync + 'static {
-    /// ログエントリ追加
-    async fn append_entries(&mut self, entries: Vec<LogEntry>) -> Result<()>;
+pub trait RaftStorage<C: openraft::RaftTypeConfig>: Send + Sync + 'static {
+    type LogReader: openraft::storage::RaftLogReader<C>;
+    type SnapshotBuilder: openraft::storage::RaftSnapshotBuilder<C>;
 
-    /// ログエントリ取得
-    async fn get_entries(&self, start: LogIndex, end: LogIndex) -> Result<Vec<LogEntry>>;
-
-    /// ログ切り詰め（スナップショット適用後）
-    async fn truncate_before(&mut self, index: LogIndex) -> Result<()>;
-
-    /// 永続化状態の取得
-    async fn get_hard_state(&self) -> Result<HardState>;
-
-    /// 永続化状態の保存
-    async fn save_hard_state(&mut self, state: HardState) -> Result<()>;
-
-    /// スナップショット保存
-    async fn save_snapshot(&mut self, snapshot: SnapshotMeta, data: Vec<u8>) -> Result<()>;
-
-    /// スナップショット読み込み
-    async fn load_snapshot(&self) -> Result<Option<(SnapshotMeta, Vec<u8>)>>;
+    async fn get_log_state(&mut self) -> Result<openraft::LogState<C>, openraft::StorageError<C::NodeId>>;
+    async fn try_get_log_entries<RB>(&mut self, range: RB) -> Result<Vec<C::Entry>, openraft::StorageError<C::NodeId>>
+    where RB: std::ops::RangeBounds<u64> + Clone + std::fmt::Debug + openraft::OptionalSend;
+    async fn append<I>(&mut self, entries: I, callback: openraft::storage::LogFlushed<C>)
+    where I: IntoIterator<Item = C::Entry> + Send, I::IntoIter: Send;
+    async fn truncate(&mut self, log_id: openraft::LogId<C::NodeId>) -> Result<(), openraft::StorageError<C::NodeId>>;
+    async fn purge(&mut self, log_id: openraft::LogId<C::NodeId>) -> Result<(), openraft::StorageError<C::NodeId>>;
+    async fn applied_state(&mut self) -> Result<(Option<openraft::LogId<C::NodeId>>, openraft::StoredMembership<C::NodeId, C::Node>), openraft::StorageError<C::NodeId>>;
+    async fn apply<I>(&mut self, entries: I) -> Result<Vec<C::R>, openraft::StorageError<C::NodeId>>
+    where I: IntoIterator<Item = C::Entry> + Send, I::IntoIter: Send;
+    async fn save_vote(&mut self, vote: &openraft::Vote<C::NodeId>) -> Result<(), openraft::StorageError<C::NodeId>>;
+    async fn read_vote(&mut self) -> Result<Option<openraft::Vote<C::NodeId>>, openraft::StorageError<C::NodeId>>;
+    async fn begin_receiving_snapshot(&mut self) -> Result<Box<C::SnapshotData>, openraft::StorageError<C::NodeId>>;
+    async fn install_snapshot(&mut self, meta: &openraft::SnapshotMeta<C::NodeId, C::Node>, snapshot: Box<C::SnapshotData>) -> Result<(), openraft::StorageError<C::NodeId>>;
+    async fn get_current_snapshot(&mut self) -> Result<Option<openraft::Snapshot<C>>, openraft::StorageError<C::NodeId>>;
+    fn set_purgeable_horizon(&mut self, horizon: Option<openraft::LogId<C::NodeId>>);
+    async fn get_log_reader(&mut self) -> Self::LogReader;
+    async fn get_snapshot_builder(&mut self) -> Self::SnapshotBuilder;
 }
 ```
+
+`append_entries`、`get_entries`、`truncate_before` と HardState は v0.5 設計の
+移行用語であり、v0.6 の `RaftStorage` に存在する API ではない。typed snapshot
+associated type を追加する互換 facade は v0.7 以降に延期している。
 
 ### 3.2 RaftNode API
 
@@ -456,7 +468,7 @@ Chirpsは2つのレイヤーで異なるタイムスタンプ機能を提供す�
 | レイヤー | 方式 | 用途 | 提供バージョン |
 |---------|------|------|---------------|
 | インフラ層 | Gossip HLC | ノード間イベント順序、SWIM | v0.6 (chirps-gossip-swim) |
-| アプリ層 | Raft TSO | MVCC、トランザクション | v0.6 (chirps-raft) |
+| アプリ層 | Raft TSO | MVCC、トランザクション | v0.6 (`alopex-chirps::raft`) |
 
 #### 3.4.1 Raft TSO (アプリ層向け)
 
@@ -1004,7 +1016,7 @@ Phase 1（Option B: path依存）:
 │  ┌─────────────────────────────────────────────────┐     │   │
 │  │               alopex-chirps                      │     │   │
 │  │ ┌─────────────────────────────────────────────┐ │     │   │
-│  │ │ chirps-raft (新規)                          │ │     │   │
+│  │ │ alopex-chirps::raft (既存 module)            │ │     │   │
 │  │ │  - RaftNode, MultiRaftManager               │ │     │   │
 │  │ │  - StateMachine/RaftStorage traits          │ │     │   │
 │  │ │  - WalRaftStorage ─────────────────────────────────┘   │
@@ -1022,9 +1034,9 @@ Phase 1（Option B: path依存）:
 └──────────────────────────────────────────────────────────────┘
 
 Phase 2（Option A: crates.io公開）:
-  1. alopex-core v0.1.0 を crates.io に公開
+  1. alopex-core v0.3 を crates.io に公開
   2. chirps/Cargo.toml を更新:
-     alopex-core = "0.1"  # path依存からcrates.io依存に変更
+     alopex-core = "0.3"  # path依存からcrates.io依存に変更
   3. 外部プロジェクトからも alopex-core を利用可能に
 ```
 
@@ -1091,7 +1103,7 @@ Phase 2（Option A: crates.io公開）:
 4. `chirps/Cargo.toml` を crates.io 依存に切り替え
 
 **成果物**:
-- `alopex-core` v0.1.0 公開
+- `alopex-core` v0.3 公開
 - Option B → Option A 移行完了
 
 ### 7.5 フェーズ5: Alopex DB 移行

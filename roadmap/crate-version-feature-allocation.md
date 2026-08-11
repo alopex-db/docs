@@ -124,8 +124,10 @@ Cargo.toml の description に基づく公式責務。
 
 | Chirps版 | 機能 | 状態 |
 |---|---|---|
-| 現行 | Raft(単一グループ) / QUIC / SWIM | ✅ 実装済 |
-| v0.6 | Multi-Raft 管理 / TSO / Gossip HLC | ⏳ 予定(B-4 の前提) |
+| v0.6.0 | Multi-Raft 管理 / TSO / Gossip HLC / snapshot transfer | ✅ リリース済み |
+| v0.6.1 | feature 組み合わせ compile gate と代表デモ経路 | ✅ リリース済み |
+| v0.6.2 | QUIC flow-control、connection admission、idle eviction、transport metrics | ✅ リリース済み |
+| v0.6.3 | mTLS 必須化、仕様・移行・release contract の整合 | 🟡 リリース準備済み（公開操作未実施） |
 
 ## 4. 依存グラフ (着手順の制約)
 
