@@ -1,11 +1,14 @@
 name: Publish release verification report
 
 on:
-  push:
-    branches:
-      - "report/verify-release-v*"
-    paths:
-      - "reports/release-verification/v*.md"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Published Alopex version to import (X.Y.Z); empty imports every pending report"
+        required: false
+        type: string
+  schedule:
+    - cron: "*/15 * * * *"
 
 permissions:
   contents: write
@@ -16,65 +19,96 @@ concurrency:
 
 jobs:
   publish:
-    name: Validate and publish report
+    name: Validate and publish reports
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
 
-      - name: Validate report branch contract
-        id: report
-        shell: bash
-        run: |
-          set -euo pipefail
-          branch="${GITHUB_REF_NAME}"
-          version="${branch#report/verify-release-v}"
-          [[ "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
-          report="reports/release-verification/v${version}.md"
-          test -f "${report}"
-          grep -Fq '> 総合結果: **✅ 全ステップ成功**' "${report}"
-
-          git fetch origin main --quiet
-          test "$(git rev-list --count origin/main..HEAD)" -eq 1
-          changed="$(git diff --name-only origin/main...HEAD)"
-          test "${changed}" = "${report}"
-
-          echo "path=${report}" >> "${GITHUB_OUTPUT}"
-
-      - name: Run public documentation checks
-        run: bash scripts/check-public-surface.sh
-
-      - name: Publish the verified report to main
+      - name: Import reports from Alopex CI
+        id: reports
         env:
-          REPORT_PATH: ${{ steps.report.outputs.path }}
+          REQUESTED_VERSION: ${{ github.event.inputs.version || '' }}
         shell: bash
         run: |
           set -euo pipefail
-          source_sha="${GITHUB_SHA}"
-          expected="$(git show "${source_sha}:${REPORT_PATH}" | sha256sum | awk '{print $1}')"
-          git fetch origin main --quiet
-          if git cat-file -e "origin/main:${REPORT_PATH}" 2>/dev/null; then
-            current="$(git show "origin/main:${REPORT_PATH}" | sha256sum | awk '{print $1}')"
-            if [[ "${current}" = "${expected}" ]]; then
-              echo "report already published: ${REPORT_PATH}"
-              exit 0
-            fi
+          git remote add alopex https://github.com/alopex-db/alopex.git
+
+          if [[ -n "${REQUESTED_VERSION}" ]]; then
+            [[ "${REQUESTED_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+            branch="report/verify-release-v${REQUESTED_VERSION}"
+            git fetch --force --quiet alopex \
+              "refs/heads/${branch}:refs/remotes/alopex/${branch}"
+            refs=("refs/remotes/alopex/${branch}")
+          else
+            git fetch --force --quiet alopex \
+              '+refs/heads/report/verify-release-v*:refs/remotes/alopex/report/verify-release-v*'
+            mapfile -t refs < <(git for-each-ref \
+              --format='%(refname)' 'refs/remotes/alopex/report/verify-release-v*')
           fi
 
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -B main origin/main
-          git cherry-pick "${source_sha}"
-          git push origin main
+          manifest="${RUNNER_TEMP}/release-verification-hashes"
+          : > "${manifest}"
+          if [[ "${#refs[@]}" -eq 0 ]]; then
+            echo "No pending release reports"
+            echo "changed=false" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
 
-      - name: Verify the published report
-        env:
-          REPORT_PATH: ${{ steps.report.outputs.path }}
+          for ref in "${refs[@]}"; do
+            branch="${ref#refs/remotes/alopex/}"
+            version="${branch#report/verify-release-v}"
+            [[ "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+            report="reports/release-verification/v${version}.md"
+            source_sha="$(git rev-parse "${ref}")"
+            changed="$(git diff-tree --no-commit-id --name-only -r "${source_sha}")"
+            test "${changed}" = "${report}"
+
+            incoming="${RUNNER_TEMP}/v${version}.md"
+            git show "${source_sha}:${report}" > "${incoming}"
+            grep -Fxq "# リリース確認レポート: v${version}" "${incoming}"
+            if ! grep -Fq '> 総合結果: **✅ 全ステップ成功**' "${incoming}" && \
+               ! grep -Fq '> 総合結果: **❌ 失敗あり**' "${incoming}"; then
+              echo "report has no exact overall result marker: ${report}" >&2
+              exit 1
+            fi
+            install -D -m 0644 "${incoming}" "${report}"
+            printf '%s\t%s\n' "${report}" "$(sha256sum "${incoming}" | awk '{print $1}')" \
+              >> "${manifest}"
+          done
+
+          if [[ -z "$(git status --porcelain -- reports/release-verification)" ]]; then
+            echo "changed=false" >> "${GITHUB_OUTPUT}"
+          else
+            echo "changed=true" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: Run public documentation checks
+        if: steps.reports.outputs.changed == 'true'
+        run: bash scripts/check-public-surface.sh
+
+      - name: Publish verified reports to main
+        if: steps.reports.outputs.changed == 'true'
         shell: bash
         run: |
           set -euo pipefail
-          expected="$(git show "${GITHUB_SHA}:${REPORT_PATH}" | sha256sum | awk '{print $1}')"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/release-verification
+          git commit -m "docs(release): publish verified release reports"
+          git push origin main
+
+      - name: Verify published report bytes
+        shell: bash
+        run: |
+          set -euo pipefail
           git fetch origin main --quiet
-          actual="$(git show "origin/main:${REPORT_PATH}" | sha256sum | awk '{print $1}')"
-          test "${actual}" = "${expected}"
+          while IFS=$'\t' read -r report expected; do
+            [[ -n "${report}" ]] || continue
+            actual="$(git show "origin/main:${report}" | sha256sum | awk '{print $1}')"
+            test "${actual}" = "${expected}"
+            echo "verified ${report} (${actual})"
+          done < "${RUNNER_TEMP}/release-verification-hashes"
