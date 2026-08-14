@@ -1,0 +1,80 @@
+name: Publish release verification report
+
+on:
+  push:
+    branches:
+      - "report/verify-release-v*"
+    paths:
+      - "reports/release-verification/v*.md"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-release-verification
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Validate and publish report
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate report branch contract
+        id: report
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="${GITHUB_REF_NAME}"
+          version="${branch#report/verify-release-v}"
+          [[ "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          report="reports/release-verification/v${version}.md"
+          test -f "${report}"
+          grep -Fq '> 総合結果: **✅ 全ステップ成功**' "${report}"
+
+          git fetch origin main --quiet
+          test "$(git rev-list --count origin/main..HEAD)" -eq 1
+          changed="$(git diff --name-only origin/main...HEAD)"
+          test "${changed}" = "${report}"
+
+          echo "path=${report}" >> "${GITHUB_OUTPUT}"
+
+      - name: Run public documentation checks
+        run: bash scripts/check-public-surface.sh
+
+      - name: Publish the verified report to main
+        env:
+          REPORT_PATH: ${{ steps.report.outputs.path }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_sha="${GITHUB_SHA}"
+          expected="$(git show "${source_sha}:${REPORT_PATH}" | sha256sum | awk '{print $1}')"
+          git fetch origin main --quiet
+          if git cat-file -e "origin/main:${REPORT_PATH}" 2>/dev/null; then
+            current="$(git show "origin/main:${REPORT_PATH}" | sha256sum | awk '{print $1}')"
+            if [[ "${current}" = "${expected}" ]]; then
+              echo "report already published: ${REPORT_PATH}"
+              exit 0
+            fi
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B main origin/main
+          git cherry-pick "${source_sha}"
+          git push origin main
+
+      - name: Verify the published report
+        env:
+          REPORT_PATH: ${{ steps.report.outputs.path }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected="$(git show "${GITHUB_SHA}:${REPORT_PATH}" | sha256sum | awk '{print $1}')"
+          git fetch origin main --quiet
+          actual="$(git show "origin/main:${REPORT_PATH}" | sha256sum | awk '{print $1}')"
+          test "${actual}" = "${expected}"
