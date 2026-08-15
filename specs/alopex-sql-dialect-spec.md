@@ -1,8 +1,10 @@
 # Alopex SQL 方言仕様書
 
-**バージョン**: 0.7.4-draft
-**最終更新**: 2026-07-17
-**ステータス**: v0.7.4 実装反映・公開前
+**バージョン**: 0.8.6-draft
+**最終更新**: 2026-08-15
+**ステータス**: v0.8.6 計画反映・公開前
+
+> 本書のバージョン表記はすべて **Alopex DB のバージョン**である（TDR #15）。alopex-sql クレートは Alopex DB と同一のバージョン軸で採番・公開される。
 
 ---
 
@@ -25,19 +27,22 @@ Alopex SQL は **SQLite をベースとし、PostgreSQL の一部構文を参考
 
 ### 1.2 サポートしない機能
 
-以下の機能は現行バージョンでは**サポートしない**。将来バージョンで追加を検討する。
+以下の機能は現行バージョンでは**サポートしない**。バージョン表記はすべて **Alopex DB のバージョン**である（TDR #15、12 章の注記を参照）。
 
-| 機能 | 理由 | 将来検討 |
+| 機能 | 理由 | 対応予定 |
 |------|------|----------|
-| **CTE (WITH句)** | サブクエリ依存 | v0.9+ |
-| **UNION / INTERSECT / EXCEPT** | 複数結果セットのマージ | v0.9+ |
-| **ウィンドウ関数** | 高度な集約処理 | v0.9+ |
-| **CASE WHEN 式** | 条件分岐式の AST 拡張が必要（代替: `IIF()`, `COALESCE()`） | v0.9+ |
+| **CTE (WITH句)** | サブクエリ依存 | v0.8.6 (#127) |
+| **UNION / INTERSECT / EXCEPT** | 実装済みだが右辺の結果のみ返す不具合あり | v0.8.6 (#124) |
+| **UNION ALL** | 未実装 | v0.8.6 (#126) |
+| **ウィンドウ関数** | 高度な集約処理 | v0.8.6 (#128) |
+| **CASE WHEN 式** | 条件分岐式の AST 拡張が必要（代替: `IIF()`, `COALESCE()`） | v0.8.6 (#125) |
 | **ALTER TABLE** | DDL 拡張 | v0.9+ |
 | **トリガー / ビュー** | DDL 拡張 | v0.10+ |
 | **外部キー制約** | 参照整合性チェック | 未定 |
 | **トランザクション分離レベル指定** | 現状は Snapshot Isolation 固定 | 未定 |
 | **TS 拡張** (MATCH, TIME_BUCKET, RATE) | skulk 型を `alopex-query-common` 経由で使用 | 未定 |
+
+> **v0.9+ 表記の是正 (2026-08-15, TDR #15)**: CTE・集合演算・ウィンドウ関数・CASE 式は以前「v0.9+」と記載していたが、これは alopex-sql に独自バージョン軸があるという誤った前提に基づく表記だった。いずれも**単一ノードで完結する SQL 構文**であり、v0.9.0（分散クエリ実行基盤）ではなく **v0.8 系**が対応先である。v0.7.0 / v0.8.0 で単独サーバー・ノードとして完成させるマイルストーン定義に従う。
 
 ### 1.3 サポート済みの主要機能
 
@@ -700,6 +705,7 @@ pub enum TableRef {
 | `INTEGER` | `i32` | 4 bytes | 32-bit 符号付き整数 |
 | `BIGINT` | `i64` | 8 bytes | 64-bit 符号付き整数 |
 | `FLOAT` | `f32` | 4 bytes | 32-bit IEEE 754 浮動小数点 |
+| `REAL` | `f32` | 4 bytes | `FLOAT` の別名（SQLite 互換、v0.8.6 で追加 / #123） |
 | `DOUBLE` | `f64` | 8 bytes | 64-bit IEEE 754 浮動小数点 |
 | `TEXT` | `String` | 可変 | UTF-8 文字列 |
 | `BLOB` | `Vec<u8>` | 可変 | バイナリデータ |
@@ -1510,7 +1516,7 @@ ORDER, BY, ASC, DESC, LIMIT, OFFSET, DISTINCT, AS, NULLS, FIRST, LAST
 
 ### 型関連
 ```
-INTEGER, INT, BIGINT, FLOAT, DOUBLE, TEXT, BLOB, BOOLEAN, BOOL,
+INTEGER, INT, BIGINT, FLOAT, REAL, DOUBLE, TEXT, BLOB, BOOLEAN, BOOL,
 TIMESTAMP, VECTOR
 ```
 
@@ -1619,19 +1625,22 @@ BEGIN, COMMIT, ROLLBACK, TRANSACTION, SAVEPOINT
 - [alopex-query-common 設計書](../../docs-internal/design/alopex-query-common-design.md) - 型の再エクスポート層
 - [Skulk v0.4 Query Engine 要件](../../.spec-workflow/specs/skulk-v0.4-query-engine/requirements.md) - 時系列型の定義元
 
-| バージョン | 内容 | 対応 DB |
-|------------|------|---------|
-| v0.5.0 | GROUP BY / Aggregation | **v0.7.3で出荷** |
-| v0.5.1 | ハッシュ/UUID/エンコード関数 | **v0.7.4で出荷** |
-| v0.5.2 | システム関数 / PRAGMA | **v0.7.4で出荷** |
-| v0.6.0 | JOIN Support（INNER/LEFT/RIGHT） | **v0.7.4で出荷** |
-| v0.6.0-subquery | Subquery（WHERE/FROM 句） | **v0.7.4で出荷** |
-| v1.0+-wasm | WASM Parser（Read-Only SQL、再評価） | v1.0+ |
-| v0.9.0 | Distributed Query Planner（Chirps v0.3 依存） | v0.8 |
-| v0.10.0 | Raft-aware Executor（Chirps v0.6 依存） | v0.9 |
-| v0.11.0 | Multi-Raft Query（Chirps v0.7 依存） | v0.10 |
-| v0.12.0 | Federation Query（Chirps v0.8 依存） | v1.0 |
-| v1.0.0 | Query Optimizer（コストベース最適化） | v1.0 |
+> **バージョン軸について (2026-08-15, TDR #15)**: 本表は以前「alopex-sql クレート独自版 → 対応 DB 版」の 2 軸で記述されていた。しかし alopex-sql は crates.io 初公開（0.3.0, 2025-12）以来一貫して Alopex DB と同一バージョンで採番・公開されており（公開履歴 0.3.0〜0.8.5 が本体と完全一致）、独立軸が運用された事実はない。公開済み番号は遡及変更できないため、**以後のバージョン表記はすべて Alopex DB のバージョン**とする。経緯は `.spec-workflow/steering/technical-decisions.md` §15 を参照。
+
+| バージョン | 内容 | 状態 |
+|------------|------|------|
+| v0.7.3 | GROUP BY / Aggregation | **出荷済み** |
+| v0.7.4 | ハッシュ/UUID/エンコード関数 | **出荷済み** |
+| v0.7.4 | システム関数 / PRAGMA | **出荷済み** |
+| v0.7.4 | JOIN Support（INNER/LEFT/RIGHT） | **出荷済み** |
+| v0.7.4 | Subquery（WHERE/FROM 句） | **出荷済み** |
+| v0.8.6 | 単一ノード SQL 構文の是正（CTE / 集合演算 / ウィンドウ関数 / CASE / REAL / 別名解決） | 計画 |
+| v0.8 | Distributed Query Planner（Chirps v0.3 依存） | 計画 |
+| v0.9 | Raft-aware Executor（Chirps v0.6 依存） | 計画 |
+| v0.10 | Multi-Raft Query（Chirps v0.7 依存） | 計画 |
+| v1.0 | Federation Query（Chirps v0.8 依存） | 計画 |
+| v1.0 | Query Optimizer（コストベース最適化） | 計画 |
+| v1.0+ | WASM Parser（Read-Only SQL、再評価） | 計画 |
 
 ---
 
@@ -1699,6 +1708,7 @@ PRAGMA名、不正な単位はエラーとなる。
 | 0.3.3-draft | 2025-12-16 | 依存関係の方向性修正（skulk/alopex-sql が SOURCE OF TRUTH、alopex-query-common が再エクスポート） |
 | 0.3.4-draft | 2025-12-18 | CD ワークフローによる v0.3.0 公開を反映しバージョン番号を再調整（v0.1.x→v0.3.0統合、v0.1.4→v0.4.0、後続バージョン繰り上げ） |
 | 0.7.4-draft | 2026-07-17 | レジストリ・ハッシュ/UUID/エンコード・システム関数・PRAGMA の実装仕様を反映 |
+| 0.8.6-draft | 2026-08-15 | バージョン軸を Alopex DB 版に一本化（TDR #15、alopex-sql 独自軸の対応表を廃止）。`REAL` を `FLOAT` の別名として追加（#123）。CTE / 集合演算 / ウィンドウ関数 / CASE 式の対応先を v0.9+ から v0.8.6 に是正（#124〜#128）。UNION ALL 未対応を明記（#126） |
 
 ---
 
@@ -1772,7 +1782,7 @@ PRAGMA名、不正な単位はエラーとなる。
 
 <vector_literal> ::= '[' <number> (',' <number>)* ']'
 
-<data_type> ::= INTEGER | BIGINT | FLOAT | DOUBLE
+<data_type> ::= INTEGER | BIGINT | FLOAT | REAL | DOUBLE
               | TEXT | BLOB | BOOLEAN | TIMESTAMP
               | VECTOR '(' <number> [',' <metric>] ')'
 

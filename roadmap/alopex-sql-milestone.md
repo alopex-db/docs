@@ -2,6 +2,8 @@
 
 > 詳細仕様は `.spec-workflow/specs/` 配下の各 spec ドキュメントを参照。
 
+> **Note (2026-08-15, TDR #15) — バージョン軸について**: 本書の見出しに残る `v0.4.0` / `v0.5.0` / `v0.6.0` / `v0.9.0+` 等は、**alopex-sql に独自バージョン軸があるという前提で書かれた歴史的表記**である。実際には alopex-sql は crates.io 初公開（0.3.0, 2025-12）以来一貫して Alopex DB と同一バージョンで採番・公開されており、独立軸が運用された事実はない（公開履歴 0.3.0〜0.8.5 が本体と完全一致）。公開済み番号は遡及変更できないため、**以後のバージョン表記は Alopex DB のバージョンに統一する**。各項目の「✅ vX.Y.Z で出荷」が実際の Alopex DB 版である。経緯は `.spec-workflow/steering/technical-decisions.md` §15 を参照。
+
 > **Note (2026-06-27)**: SQL パーサーを **Nim 実装に置き換える方針を決定**（C ABI FFI で統合、Rust 手書きパーサーは廃止）。あわせて JOIN/Subquery を Planner/Executor まで実装する。技術選定は steering `tech.md` / `technical-decisions.md` を参照。実装 spec: `.spec-workflow/specs/nim-sql-parser-migration/`。
 > **Note (2026-01-13)**: v0.4.0 Async/Stream 基盤実装完了（runtime-agnostic async facade, tokio adapter, streaming SELECT）。
 > **Note (2025-12-18)**: CD ワークフロー修正により v0.3.0 が crates.io に公開済み（旧 v0.1.3 Vector SQL 相当）。
@@ -1008,9 +1010,11 @@ pub fn execute_exists<S: KVStore>(
 
 ---
 
-## v0.9.0+ Distributed Query (Chirps 依存) ⏳ 予定
+## v0.8+ Distributed Query (Chirps 依存) ⏳ 予定
 
-> 旧 v0.6.0+。対応 Alopex DB: v0.8+
+> **バージョン表記の是正 (2026-08-15, TDR #15)**: 旧記述は「v0.9.0+（旧 v0.6.0+）。対応 Alopex DB: v0.8+」と alopex-sql 独自軸で書かれていたが、独自軸は存在しないため **Alopex DB v0.8+** に統一した。
+>
+> なお下記「Advanced」に列挙されていた `CASE / WHEN / THEN / ELSE / END`、`UNION / INTERSECT / EXCEPT`、`OVER / PARTITION / WINDOW`、`WITH / RECURSIVE` は、いずれも**単一ノードで完結する SQL 構文**であり分散クエリ基盤とは無関係である。これらの対応先は Alopex DB v0.8.6（issue #124〜#128）であり、v0.9.0（分散クエリ実行基盤）には含まれない。
 
 ### Version Roadmap
 
@@ -1094,11 +1098,15 @@ JOIN, LEFT, RIGHT, OUTER, FULL, CROSS, ON, NATURAL
 -- v0.6.0 Subquery
 EXISTS, ANY, SOME, ALL, WITH, RECURSIVE
 
--- v0.9.0+ Advanced
-UNION, INTERSECT, EXCEPT,
-OVER, PARTITION, WINDOW,
+-- v0.8.6 単一ノード SQL 構文の是正 (issue #123〜#128)
+UNION, INTERSECT, EXCEPT,      -- #124 (誤結果), #126 (UNION ALL 未対応)
+CASE, WHEN, THEN, ELSE, END,   -- #125
+OVER, PARTITION, WINDOW,       -- #128
+WITH, RECURSIVE,               -- #127 (CTE)
+REAL,                          -- #123 (FLOAT の別名)
+
+-- v0.9+ / 未定
 BEGIN, COMMIT, ROLLBACK, TRANSACTION, SAVEPOINT,
-CASE, WHEN, THEN, ELSE, END,
 TRIGGER, VIEW, FOREIGN, REFERENCES, CASCADE,
 RETURNING, CONFLICT
 ```
@@ -1285,7 +1293,7 @@ JULIANDAY(ts)               -- ユリウス日 (SQLite)
 UNIXEPOCH(ts)               -- Unix時刻 (SQLite 3.38+)
 ```
 
-### v0.6.0+ (Advanced Functions)
+### v0.8+ (Advanced Functions)
 
 ```
 -- JSON関数 (v0.6.1)
