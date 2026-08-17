@@ -13,6 +13,36 @@
 
 alopex-sql クエリエンジンの実装マイルストーンと、各バージョンで実装する具体的な関数・型の一覧。
 
+### SQL compatibility roadmap (2026-08-17)
+
+この表を未実装 SQL の対応版に関する正本とする。棚卸しは repository の
+`reference/` に固定した sqlparser-rs / DataFusion / DuckDB / Polars / CnosDB /
+QuestDB / TiDB / CockroachDB / YugabyteDB / InfluxDB と Alopex `main` の差分に基づく。
+総合トラッカーは [alopex#177](https://github.com/alopex-db/alopex/issues/177)。
+
+| Alopex milestone | 責任範囲 | GitHub issues |
+|------------------|----------|---------------|
+| [v0.8.7](https://github.com/alopex-db/alopex/milestone/7) | v0.8.6 correctness closure: recursive CTE、CTE 列名、window peer/frame、LAG/LEAD、aggregate との合成 | [#137](https://github.com/alopex-db/alopex/issues/137)–[#142](https://github.com/alopex-db/alopex/issues/142) |
+| [v0.8.8](https://github.com/alopex-db/alopex/milestone/8) | portable relational grammar: window/QUALIFY、VALUES、predicate、TRY_CAST、aggregate FILTER、grouping、LATERAL、pagination | [#143](https://github.com/alopex-db/alopex/issues/143)–[#152](https://github.com/alopex-db/alopex/issues/152) |
+| [v0.8.9](https://github.com/alopex-db/alopex/milestone/9) | 既存 scalar 型上の temporal/statistics/math/string/regex/bitwise 関数と GENERATE_SERIES | [#153](https://github.com/alopex-db/alopex/issues/153)–[#157](https://github.com/alopex-db/alopex/issues/157) |
+| [v0.8.10](https://github.com/alopex-db/alopex/milestone/10) | DECIMAL、DATE/TIME/INTERVAL、JSON/JSONB、nested types、FTS と全境界の互換 gate | [#158](https://github.com/alopex-db/alopex/issues/158)–[#164](https://github.com/alopex-db/alopex/issues/164) |
+| [v0.8.11](https://github.com/alopex-db/alopex/milestone/11) | transaction、bind、introspection、schema evolution、constraint、advanced DML、COPY、identity | [#165](https://github.com/alopex-db/alopex/issues/165)–[#173](https://github.com/alopex-db/alopex/issues/173) |
+| [v0.9.0](https://github.com/alopex-db/alopex/milestone/12) | **v0.8 SQL surface の distributed capability/parity**。未実装の単一 node 構文は受け入れない | [#174](https://github.com/alopex-db/alopex/issues/174) |
+| [v1.0-SQL](https://github.com/alopex-db/alopex/milestone/13) | native INET と、PIVOT/UNPIVOT/UNION BY NAME の互換性評価・実装 | [#175](https://github.com/alopex-db/alopex/issues/175)–[#176](https://github.com/alopex-db/alopex/issues/176) |
+
+SQL-TS の意味論は Alopex core ではなく Skulk が所有する。Skulk
+[v0.4](https://github.com/alopex-db/alopex-skulk/milestone/1) で
+TIME_BUCKET/RATE/DELTA/DERIVATIVE/FIRST/LAST
+([alopex-skulk#6](https://github.com/alopex-db/alopex-skulk/issues/6))、
+[v0.5](https://github.com/alopex-db/alopex-skulk/milestone/2) で gap-fill/LOCF/interpolate と
+ASOF/LATEST/SAMPLE 系 relation 構文
+([#7](https://github.com/alopex-db/alopex-skulk/issues/7),
+[#8](https://github.com/alopex-db/alopex-skulk/issues/8)) を扱う。
+
+Hive/ClickHouse/MSSQL 固有 clause、PostgreSQL の server administration object、
+DuckDB の INSTALL/LOAD/SECRET、stored procedure/cursor、XMLTABLE/MATCH_RECOGNIZE、
+FOR XML/JSON は、利用者要件が生じるまで意図的な非対象とする。
+
 ### v0.3.0 SQL Frontend ✅ crates.io 公開済
 
 | コンポーネント | 内容 | 状態 |
@@ -1010,11 +1040,11 @@ pub fn execute_exists<S: KVStore>(
 
 ---
 
-## v0.8+ Distributed Query (Chirps 依存) ⏳ 予定
+## v0.9.0+ Distributed Query (Chirps 依存) ⏳ 予定
 
-> **バージョン表記の是正 (2026-08-15, TDR #15)**: 旧記述は「v0.9.0+（旧 v0.6.0+）。対応 Alopex DB: v0.8+」と alopex-sql 独自軸で書かれていたが、独自軸は存在しないため **Alopex DB v0.8+** に統一した。
+> **バージョン表記の是正 (2026-08-17, TDR #15)**: 分散 query planner の開始版は **Alopex DB v0.9.0**。v0.8.x は単一 node SQL の完結に使用する。
 >
-> なお下記「Advanced」に列挙されていた `CASE / WHEN / THEN / ELSE / END`、`UNION / INTERSECT / EXCEPT`、`OVER / PARTITION / WINDOW`、`WITH / RECURSIVE` は、いずれも**単一ノードで完結する SQL 構文**であり分散クエリ基盤とは無関係である。これらの対応先は Alopex DB v0.8.6（issue #124〜#128）であり、v0.9.0（分散クエリ実行基盤）には含まれない。
+> `CASE`、集合演算、非再帰 CTE、基本 window は v0.8.6 で出荷済み。再帰 CTE と window correctness は v0.8.7、その他の単一 node SQL は上記 v0.8.8〜v0.8.11 で扱い、v0.9.0 には含めない。
 
 ### Version Roadmap
 
@@ -1086,29 +1116,28 @@ BTREE, HNSW, COSINE, L2, INNER
 CAST, NOW
 ```
 
-### Reserved for Future (Not Yet Implemented)
+### v0.8.6 までに追加済み
 
 ```
--- v0.5.0 Aggregation
 GROUP, HAVING, COUNT, SUM, AVG, MIN, MAX
-
--- v0.6.0 JOIN
 JOIN, LEFT, RIGHT, OUTER, FULL, CROSS, ON, NATURAL
+EXISTS, ANY, SOME, ALL
+UNION, INTERSECT, EXCEPT, ALL
+CASE, WHEN, THEN, ELSE, END
+OVER, PARTITION
+WITH                            -- non-recursive CTE
+REAL
+```
 
--- v0.6.0 Subquery
-EXISTS, ANY, SOME, ALL, WITH, RECURSIVE
+### Roadmap で追跡する予約語
 
--- v0.8.6 単一ノード SQL 構文の是正 (issue #123〜#128)
-UNION, INTERSECT, EXCEPT,      -- #124 (誤結果), #126 (UNION ALL 未対応)
-CASE, WHEN, THEN, ELSE, END,   -- #125
-OVER, PARTITION, WINDOW,       -- #128
-WITH, RECURSIVE,               -- #127 (CTE)
-REAL,                          -- #123 (FLOAT の別名)
-
--- v0.9+ / 未定
+```
+-- v0.8.7-v0.8.11: #137-#173
+RECURSIVE, ROWS, RANGE, WINDOW, QUALIFY, FILTER, LATERAL,
+GROUPING, ROLLUP, CUBE, FETCH, TIES,
 BEGIN, COMMIT, ROLLBACK, TRANSACTION, SAVEPOINT,
-TRIGGER, VIEW, FOREIGN, REFERENCES, CASCADE,
-RETURNING, CONFLICT
+VIEW, ALTER, TRUNCATE, FOREIGN, REFERENCES, CASCADE,
+RETURNING, CONFLICT, MERGE, COPY
 ```
 
 ---
@@ -1256,7 +1285,7 @@ PG_TYPEOF(x)                -- 型名 (PostgreSQL)
 QUOTE(x)                    -- SQLリテラル形式 (SQLite)
 ```
 
-### v0.5.4 (Date/Time Functions)
+### v0.8.9 / v0.8.10 (Date/Time Functions: #153, #159)
 
 ```
 -- 現在日時 (SQLite/PostgreSQL共通)
@@ -1293,10 +1322,10 @@ JULIANDAY(ts)               -- ユリウス日 (SQLite)
 UNIXEPOCH(ts)               -- Unix時刻 (SQLite 3.38+)
 ```
 
-### v0.8+ (Advanced Functions)
+### v0.8.9 / v0.8.10 / v1.0-SQL (Advanced Functions)
 
 ```
--- JSON関数 (v0.6.1)
+-- JSON関数 (v0.8.10: #160, #161)
 -- SQLite互換
 JSON(text)                  -- JSON検証・正規化
 JSON_VALID(text)            -- JSON有効性チェック
@@ -1326,7 +1355,7 @@ JSONB_BUILD_ARRAY(...)
 JSONB_AGG(expr)
 JSONB_OBJECT_AGG(key, val)
 
--- 配列関数 (PostgreSQL, v0.6.2)
+-- 配列関数 (v0.8.10: #162)
 ARRAY[...]                  -- 配列リテラル
 ARRAY_AGG(expr)             -- 配列集約
 ARRAY_APPEND(arr, elem)     -- 末尾追加
@@ -1341,12 +1370,12 @@ UNNEST(arr)                 -- 行展開
 STRING_TO_ARRAY(s, delim)   -- 文字列→配列
 ARRAY_TO_STRING(arr, delim) -- 配列→文字列
 
--- 集合生成関数 (PostgreSQL, v0.6.2)
+-- 集合生成関数 (v0.8.9: #157。timestamp overload は #159 に依存)
 GENERATE_SERIES(start, stop)         -- 数列生成
 GENERATE_SERIES(start, stop, step)   -- ステップ付き
 GENERATE_SERIES(start, stop, interval) -- 日時系列
 
--- 統計集約関数 (PostgreSQL, v0.7.0)
+-- 統計集約関数 (v0.8.9: #154)
 VARIANCE(expr) / VAR_SAMP(expr)   -- 標本分散
 VAR_POP(expr)                      -- 母分散
 STDDEV(expr) / STDDEV_SAMP(expr)  -- 標本標準偏差
@@ -1358,7 +1387,7 @@ PERCENTILE_CONT(fraction) WITHIN GROUP (ORDER BY expr)  -- 連続パーセンタ
 PERCENTILE_DISC(fraction) WITHIN GROUP (ORDER BY expr)  -- 離散パーセンタイル
 MODE() WITHIN GROUP (ORDER BY expr)  -- 最頻値
 
--- 全文検索関数 (PostgreSQL, v0.8.0+)
+-- 全文検索関数 (v0.8.10: #163)
 TO_TSVECTOR(config, document)   -- 文書→tsvector
 TO_TSQUERY(config, query)       -- クエリ→tsquery
 PLAINTO_TSQUERY(config, query)  -- プレーンテキスト→tsquery
@@ -1366,7 +1395,7 @@ WEBSEARCH_TO_TSQUERY(config, query)  -- Web検索形式
 TS_RANK(tsvector, tsquery)      -- 関連度スコア
 TS_HEADLINE(config, document, query)  -- ハイライト
 
--- ネットワークアドレス関数 (PostgreSQL, v0.9.0+)
+-- ネットワークアドレス関数 (v1.0-SQL: #175)
 HOST(inet)                  -- ホスト部分
 NETWORK(inet)               -- ネットワーク部
 NETMASK(inet)               -- ネットマスク
@@ -1382,14 +1411,14 @@ BROADCAST(inet)             -- ブロードキャスト
 | 三角関数 | ✅ (3.35+) | ✅ | v0.5.3 |
 | 文字列 | ✅ | ✅ | v0.5.3 |
 | 正規表現 | ❌ | ✅ | v0.5.3 (PostgreSQL互換) |
-| 日付・時刻 | ✅ | ✅ | v0.5.4 |
+| 日付・時刻 | ✅ | ✅ | v0.8.9 (#153) / v0.8.10 (#159) |
 | 条件 | ✅ | ✅ | v0.5.3 |
 | 集約 | ✅ | ✅ | v0.5.0 |
-| ウィンドウ | ✅ | ✅ | v0.9+ |
-| JSON | ✅ | ✅ | v0.6.1 |
-| 配列 | ❌ | ✅ | v0.6.2 (PostgreSQL互換) |
-| 集合生成 | ❌ | ✅ | v0.6.2 (PostgreSQL互換) |
-| 全文検索 | FTS5拡張 | ✅ | v0.8.0+ (PostgreSQL互換) |
+| ウィンドウ | ✅ | ✅ | v0.8.6 出荷済み（基本）/ v0.8.7-v0.8.8 (#139-#144) |
+| JSON | ✅ | ✅ | v0.8.10 (#160, #161) |
+| 配列 | ❌ | ✅ | v0.8.10 (#162) |
+| 集合生成 | ❌ | ✅ | v0.8.9 (#157) |
+| 全文検索 | FTS5拡張 | ✅ | v0.8.10 (#163) |
 | UUID | 拡張 | ✅ | v0.5.1 |
 | ハッシュ | ❌ | ✅ | v0.5.1 |
 | ベクトル | ❌ | 拡張 | v0.3.0 (独自・crates.io 公開済み) |

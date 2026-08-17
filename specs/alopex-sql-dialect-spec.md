@@ -1,8 +1,8 @@
 # Alopex SQL 方言仕様書
 
-**バージョン**: 0.8.6-draft
-**最終更新**: 2026-08-15
-**ステータス**: v0.8.6 計画反映・公開前
+**バージョン**: 0.8.6
+**最終更新**: 2026-08-17
+**ステータス**: v0.8.6 実装済み・後続 SQL roadmap 反映
 
 > 本書のバージョン表記はすべて **Alopex DB のバージョン**である（TDR #15）。alopex-sql クレートは Alopex DB と同一のバージョン軸で採番・公開される。
 
@@ -31,18 +31,15 @@ Alopex SQL は **SQLite をベースとし、PostgreSQL の一部構文を参考
 
 | 機能 | 理由 | 対応予定 |
 |------|------|----------|
-| **CTE (WITH句)** | サブクエリ依存 | v0.8.6 (#127) |
-| **UNION / INTERSECT / EXCEPT** | 実装済みだが右辺の結果のみ返す不具合あり | v0.8.6 (#124) |
-| **UNION ALL** | 未実装 | v0.8.6 (#126) |
-| **ウィンドウ関数** | 高度な集約処理 | v0.8.6 (#128) |
-| **CASE WHEN 式** | 条件分岐式の AST 拡張が必要（代替: `IIF()`, `COALESCE()`） | v0.8.6 (#125) |
-| **ALTER TABLE** | DDL 拡張 | v0.9+ |
-| **トリガー / ビュー** | DDL 拡張 | v0.10+ |
-| **外部キー制約** | 参照整合性チェック | 未定 |
+| **再帰 CTE / CTE 列名リスト** | 非再帰 CTE は v0.8.6 で出荷済み | v0.8.7 ([#137](https://github.com/alopex-db/alopex/issues/137), [#138](https://github.com/alopex-db/alopex/issues/138)) |
+| **window frame / LAG / LEAD / QUALIFY** | 基本 window は v0.8.6 で出荷済み | v0.8.7-v0.8.8 ([#139](https://github.com/alopex-db/alopex/issues/139)-[#144](https://github.com/alopex-db/alopex/issues/144)) |
+| **portable relational grammar** | VALUES、predicate、grouping、LATERAL 等 | v0.8.8 ([#145](https://github.com/alopex-db/alopex/issues/145)-[#152](https://github.com/alopex-db/alopex/issues/152)) |
+| **新 scalar/nested 型と関数** | storage/FFI/public API の同時拡張が必要 | v0.8.9-v0.8.10 ([#153](https://github.com/alopex-db/alopex/issues/153)-[#164](https://github.com/alopex-db/alopex/issues/164)) |
+| **application/admin SQL** | transaction、bind、DDL/DML 拡張 | v0.8.11 ([#165](https://github.com/alopex-db/alopex/issues/165)-[#173](https://github.com/alopex-db/alopex/issues/173)) |
 | **トランザクション分離レベル指定** | 現状は Snapshot Isolation 固定 | 未定 |
-| **TS 拡張** (MATCH, TIME_BUCKET, RATE) | skulk 型を `alopex-query-common` 経由で使用 | 未定 |
+| **TS 拡張** | shared parser、Skulk 所有の時系列意味論 | Skulk v0.4-v0.5 ([#6](https://github.com/alopex-db/alopex-skulk/issues/6)-[#8](https://github.com/alopex-db/alopex-skulk/issues/8)) |
 
-> **v0.9+ 表記の是正 (2026-08-15, TDR #15)**: CTE・集合演算・ウィンドウ関数・CASE 式は以前「v0.9+」と記載していたが、これは alopex-sql に独自バージョン軸があるという誤った前提に基づく表記だった。いずれも**単一ノードで完結する SQL 構文**であり、v0.9.0（分散クエリ実行基盤）ではなく **v0.8 系**が対応先である。v0.7.0 / v0.8.0 で単独サーバー・ノードとして完成させるマイルストーン定義に従う。
+> **v0.9 の境界 (2026-08-17, TDR #15)**: 単一 node SQL の未実装項目は v0.8.7-v0.8.11 で完結させる。v0.9.0 は [#174](https://github.com/alopex-db/alopex/issues/174) の distributed capability/parity であり、新構文の受け皿ではない。全体は [#177](https://github.com/alopex-db/alopex/issues/177) を参照。
 
 ### 1.3 サポート済みの主要機能
 
@@ -60,6 +57,12 @@ Alopex SQL は **SQLite をベースとし、PostgreSQL の一部構文を参考
 | **INSERT INTO ... SELECT** | v0.8.2 | 6.2 INSERT |
 | **テーブル修飾ワイルドカード** (`t.*`) | v0.8.2 | 6.1 SELECT 構文 |
 | **パラメータバインド** (`?`) | v0.8.2 | 6.6 パラメータバインド |
+| **projection alias 解決** (ORDER BY / HAVING、base列との衝突規則) | v0.8.6 | 6.1 SELECT 構文 |
+| **REAL 型** | v0.8.6 | 4.1 データ型 |
+| **CASE 式** (searched/simple、共通型、implicit NULL) | v0.8.6 | 5 式 |
+| **集合演算** (UNION/ALL、INTERSECT、EXCEPT と優先順位) | v0.8.6 | 6.1 SELECT 構文 |
+| **非再帰 CTE** | v0.8.6 | 6.1 SELECT 構文 |
+| **基本 window** (ROW_NUMBER/RANK/DENSE_RANK、aggregate OVER) | v0.8.6 | 6.1 SELECT 構文 |
 
 ### 1.3 Vector 拡張構文の設計根拠
 
@@ -1634,10 +1637,15 @@ BEGIN, COMMIT, ROLLBACK, TRANSACTION, SAVEPOINT
 | v0.7.4 | システム関数 / PRAGMA | **出荷済み** |
 | v0.7.4 | JOIN Support（INNER/LEFT/RIGHT） | **出荷済み** |
 | v0.7.4 | Subquery（WHERE/FROM 句） | **出荷済み** |
-| v0.8.6 | 単一ノード SQL 構文の是正（CTE / 集合演算 / ウィンドウ関数 / CASE / REAL / 別名解決） | 計画 |
-| v0.8 | Distributed Query Planner（Chirps v0.3 依存） | 計画 |
-| v0.9 | Raft-aware Executor（Chirps v0.6 依存） | 計画 |
-| v0.10 | Multi-Raft Query（Chirps v0.7 依存） | 計画 |
+| v0.8.6 | 単一ノード SQL 構文の是正（非再帰 CTE / 集合演算 / 基本 window / CASE / REAL / 別名解決） | **実装済み** |
+| v0.8.7 | recursive CTE と v0.8.6 window correctness closure | [#137-#142](https://github.com/alopex-db/alopex/issues/177) |
+| v0.8.8 | portable relational grammar | [#143-#152](https://github.com/alopex-db/alopex/issues/177) |
+| v0.8.9 | 既存型上の portable functions | [#153-#157](https://github.com/alopex-db/alopex/issues/177) |
+| v0.8.10 | DECIMAL/temporal/JSON/nested/FTS 型基盤 | [#158-#164](https://github.com/alopex-db/alopex/issues/177) |
+| v0.8.11 | application/admin SQL surface | [#165-#173](https://github.com/alopex-db/alopex/issues/177) |
+| v0.9.0 | Distributed Query Planner と v0.8 SQL parity（Chirps v0.3 依存） | [#174](https://github.com/alopex-db/alopex/issues/174) |
+| v0.10 | Raft-aware Executor（Chirps v0.6 依存） | 計画 |
+| v0.11 | Multi-Raft Query（Chirps v0.7 依存） | 計画 |
 | v1.0 | Federation Query（Chirps v0.8 依存） | 計画 |
 | v1.0 | Query Optimizer（コストベース最適化） | 計画 |
 | v1.0+ | WASM Parser（Read-Only SQL、再評価） | 計画 |
