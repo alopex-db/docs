@@ -1,6 +1,6 @@
 # クレート × バージョン × 機能 割り付け表 (Feature Allocation Matrix)
 
-> Status: **実装・公開状況の記録** / 2026-07-18 (v0.7.4公開後に更新)
+> Status: **実装・公開状況の記録** / 2026-08-18 (v0.8.6公開後に更新)
 > 目的: 実装漏れ債務と今後の機能を、担当クレートと着手バージョンに **1つずつ明示配置** する。
 > 「全部いっぺんに」を禁じ、各機能に責任クレートと期日を持たせることで実装漏れの再発を防ぐ。
 > 関連: [distributed-implementation-gap-audit.md](../design/distributed-implementation-gap-audit.md)（漏れの棚卸し）,
@@ -16,26 +16,32 @@
 
 ## 1. クレート責務とリリース実態 (割り付けの前提)
 
-### 1.1 実リリース状況 (2026-07-18、crates.io/PyPI/git を観測で確定)
+### 1.1 実リリース状況 (2026-08-18、git tag / manifests を観測で確定)
 
-**v0.7.0・v0.7.1 は crates.io・PyPI 両方で公開済み。** その後、v0.7.2（rpath/Nim vendoring）、v0.7.3（集約器/DISTINCT）、v0.7.4（スカラー関数群）まで公開済みである。v0.7.0のcluster-aware foundationとDataFrame P3の実装範囲、およびv0.7.xパッチで解消した債務を、将来の分散実装と混同しない。
+**Alopex v0.8.6 は公開済みで、全公開 Rust crate と Python package は同じ
+バージョンを使う。** v0.8.4 で parser contract `0.4.0`、v0.8.5 で release
+surface hardening、v0.8.6 で単一 node SQL correctness を出荷した。次の公開順は
+v0.8.7〜v0.8.11 であり、v0.9.0 はその完了まで凍結する。
 
 | クレート | 実公開版 (crates.io/PyPI) | Cargo.toml 版定義 | 版定義の種別 |
 |---|---|---|---|
-| alopex-core | crates.io **0.7.4** | `0.7.4` | workspace 継承 |
-| alopex-sql | crates.io **0.7.4** | `0.7.4` | **独立指定** |
-| alopex-dataframe | crates.io **0.7.4** | `0.7.4` | **独立指定** |
-| alopex-embedded | crates.io **0.7.4** | `0.7.4` | workspace 継承 |
-| alopex-server | crates.io **0.7.4** | `0.7.4` | workspace 継承 |
-| alopex-cli | crates.io **0.7.4** | `0.7.4` | workspace 継承 |
-| alopex-cluster | crates.io **0.7.4** | `0.7.4` | workspace 継承 |
+| alopex-core | crates.io **0.8.6** | `version.workspace = true` | workspace 継承 |
+| alopex-sql | crates.io **0.8.6** | `version.workspace = true` | workspace 継承 |
+| alopex-dataframe | crates.io **0.8.6** | `version.workspace = true` | workspace 継承 |
+| alopex-embedded | crates.io **0.8.6** | `version.workspace = true` | workspace 継承 |
+| alopex-server | crates.io **0.8.6** | `version.workspace = true` | workspace 継承 |
+| alopex-cli | crates.io **0.8.6** | `version.workspace = true` | workspace 継承 |
+| alopex-cluster | crates.io **0.8.6** | `version.workspace = true` | workspace 継承 |
 | alopex-tools | crates.io **未公開** | `0.0.0` | 独立ワークスペース (issue #45 是正済み)。crates.io 公開版 alopex-embedded/alopex-sql に依存し、リリース確認コンテナの `verify-release-embedded` バイナリ等を提供。publish=false (内部ツール) |
-| alopex (=alopex-py) | PyPI **0.7.4** | `0.7.4` | **独立指定** |
+| alopex (=alopex-py) | PyPI **0.8.6** | `version.workspace = true` | workspace 継承 |
 
-**★バージョンはクレートごとに独立管理。「ワークスペース統一」は誤り★**:
-- workspace 継承 (`version.workspace = true`): core / cluster / embedded / server / cli
-- **独立指定** (Cargo.toml に `version = "..."`): **alopex-sql / alopex-dataframe / alopex-py**
-- 公開クレートで独自にバージョン進捗するものがある (例: dataframe は 0.2.0 → 0.6.0 に飛んだ)。「全部を同一版で揃える」前提は禁止。**どのクレートがどの版でどの機能を持つべきかを本表で個別管理する**。
+**現行 invariant**:
+
+- 公開 crate/package は workspace version と同じ `vX.Y.Z` tag から出荷する。
+- parser contract version は wire/ABI compatibility metadata であり、独立した
+  feature version や release lane ではない。
+- crate ごとの責任分解は維持するが、公開バージョンを別々に進めない。
+- GitHub milestone が実行 scope の正本で、本表はその責任クレート対応を写す。
 
 **過去の不整合 (v0.7.1 で是正済み)**:
 - crates.io は全 Rust クレート 0.7.0 公開済みなのに、リポジトリの Cargo.toml が 0.6.0 のままだった不整合 (債務 D1) は v0.7.1 で解消済み。全クレート Cargo.toml が実公開版 0.7.1 と一致している。
@@ -132,22 +138,22 @@ Cargo.toml の description に基づく公式責務。
 ## 4. 依存グラフ (着手順の制約)
 
 ```
-債務完済 (v0.7.x パッチ系列):
-  v0.7.0 ✅ ─► v0.7.1 ✅(依存/セキュリティ + D1) ─► v0.7.2 ✅(D2: rpath伝播+Nim vendoring 緊急パッチ) ─► v0.7.3 ✅(#3/#4 +B-1) ─► [v0.7.4 ✅ #5(+#6a/#6b 内包): レジストリ→数値/文字列/条件/型→ハッシュ→システム関数]
-                                                                                                                                                    │
-本来予定 (温存・繰り越さない):                                                                                                                      ▼
-  v0.8.0 (Metadata Raft + 分散クエリ本実装 = B-4/#10b) ─► v0.9.0 (#9 分散プラン B-2) ─► v0.10+ (B-5)
-                          ▲
-       Chirps v0.6 (Multi-Raft/TSO) ┘
+公開済み:
+  v0.7.x ✅ ─► v0.8.0〜v0.8.6 ✅
+                         │
+現行 release train:      ▼
+  v0.8.7 ─► v0.8.8 ─► v0.8.9 ─► v0.8.10 ─► v0.8.11
+                                                    │
+凍結中:                                            ▼
+  v0.9.0 distributed capability / parity（v0.8.11 公開後に再起動判断）
 ```
 
 **着手順の絶対制約**:
-- **債務は v0.7.x で完済し、v0.8.0 に繰り越さない。** v0.8.0 の予定（分散クエリ本実装）は動かさない。
-- **v0.7.2（D2: rpath 伝播バグ + Nim vendoring）を先に完結させる。** 新機能を含まない緊急修正のみ。ここに機能を混ぜない。
-- **#3（v0.7.3）が系統B（B-1/B-2）の前提。** これを飛ばして #9 に進んではならない。
-- **#5（レジストリ）を #6a/#6b より先に**（順序制約は 3 spec の順序 A→B/C と各 tasks 内 Phase で担保。公開バージョンは分けず v0.7.4 の 1 回）。
-- **B-4（v0.8.0 本来予定）は Chirps v0.6 が出るまで着手不可。** それまでに v0.7.x 債務を完済しておく。
-- #6a/#6b は v0.7.4のspec分割（hash-encode / system-pragma）として実装・公開済み。
+- v0.8.7〜v0.8.11 は milestone 番号順に実装・検証・公開する。
+- 後続 milestone の実装は、直前版の公開と post-publish verification が完了するまで開始しない。
+- v0.9.0 の開発・release 操作は v0.8.11 公開まで凍結する。
+- parser source / ABI asset は独立公開せず、該当 Alopex tag の release gate で全 target を再生成・検証する。
+- v0.7.x の詳細は完了履歴であり、現在のスケジュール判断には使わない。
 
 ## 5. 完了済み債務と今後の境界 (実装漏れ防止の核心)
 

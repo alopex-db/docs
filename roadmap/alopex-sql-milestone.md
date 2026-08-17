@@ -2,7 +2,7 @@
 
 > 詳細仕様は `.spec-workflow/specs/` 配下の各 spec ドキュメントを参照。
 
-> **Note (2026-08-15, TDR #15) — バージョン軸について**: 本書の見出しに残る `v0.4.0` / `v0.5.0` / `v0.6.0` / `v0.9.0+` 等は、**alopex-sql に独自バージョン軸があるという前提で書かれた歴史的表記**である。実際には alopex-sql は crates.io 初公開（0.3.0, 2025-12）以来一貫して Alopex DB と同一バージョンで採番・公開されており、独立軸が運用された事実はない（公開履歴 0.3.0〜0.8.5 が本体と完全一致）。公開済み番号は遡及変更できないため、**以後のバージョン表記は Alopex DB のバージョンに統一する**。各項目の「✅ vX.Y.Z で出荷」が実際の Alopex DB 版である。経緯は `.spec-workflow/steering/technical-decisions.md` §15 を参照。
+> **Note (2026-08-18, TDR #15) — バージョン軸について**: 本書の見出しに残る `v0.4.0` / `v0.5.0` / `v0.6.0` / `v0.9.0+` 等は、**alopex-sql に独自バージョン軸があるという前提で書かれた歴史的表記**である。alopex-sql は Alopex DB と同一バージョン・同一 tag で公開され、現在の公開版は v0.8.6。parser contract version は FFI 互換性メタデータで、独立 release lane ではない。次の公開順は v0.8.7〜v0.8.11、v0.9.0 はその完了まで凍結する。経緯は `.spec-workflow/steering/technical-decisions.md` §15 を参照。
 
 > **Note (2026-06-27)**: SQL パーサーを **Nim 実装に置き換える方針を決定**（C ABI FFI で統合、Rust 手書きパーサーは廃止）。あわせて JOIN/Subquery を Planner/Executor まで実装する。技術選定は steering `tech.md` / `technical-decisions.md` を参照。実装 spec: `.spec-workflow/specs/nim-sql-parser-migration/`。
 > **Note (2026-01-13)**: v0.4.0 Async/Stream 基盤実装完了（runtime-agnostic async facade, tokio adapter, streaming SELECT）。
@@ -27,7 +27,7 @@ QuestDB / TiDB / CockroachDB / YugabyteDB / InfluxDB と Alopex `main` の差分
 | [v0.8.9](https://github.com/alopex-db/alopex/milestone/9) | 既存 scalar 型上の temporal/statistics/math/string/regex/bitwise 関数と GENERATE_SERIES | [#153](https://github.com/alopex-db/alopex/issues/153)–[#157](https://github.com/alopex-db/alopex/issues/157) |
 | [v0.8.10](https://github.com/alopex-db/alopex/milestone/10) | DECIMAL、DATE/TIME/INTERVAL、JSON/JSONB、nested types、FTS と全境界の互換 gate | [#158](https://github.com/alopex-db/alopex/issues/158)–[#164](https://github.com/alopex-db/alopex/issues/164) |
 | [v0.8.11](https://github.com/alopex-db/alopex/milestone/11) | transaction、bind、introspection、schema evolution、constraint、advanced DML、COPY、identity | [#165](https://github.com/alopex-db/alopex/issues/165)–[#173](https://github.com/alopex-db/alopex/issues/173) |
-| [v0.9.0](https://github.com/alopex-db/alopex/milestone/12) | **v0.8 SQL surface の distributed capability/parity**。未実装の単一 node 構文は受け入れない | [#174](https://github.com/alopex-db/alopex/issues/174) |
+| [v0.9.0](https://github.com/alopex-db/alopex/milestone/12) | 🧊 **凍結中**。v0.8 SQL surface の distributed capability/parity。未実装の単一 node 構文は受け入れない | [#174](https://github.com/alopex-db/alopex/issues/174) |
 | [v1.0-SQL](https://github.com/alopex-db/alopex/milestone/13) | native INET と、PIVOT/UNPIVOT/UNION BY NAME の互換性評価・実装 | [#175](https://github.com/alopex-db/alopex/issues/175)–[#176](https://github.com/alopex-db/alopex/issues/176) |
 
 SQL-TS の意味論は Alopex core ではなく Skulk が所有する。Skulk
@@ -1452,7 +1452,7 @@ v0.6.0 JOIN Support ────────────────────
     ↓
 v0.6.0 Subquery ────────────────────────────────→ Alopex DB v0.6
     ↓
-v0.9.0 Distributed Query Planner ───────────────→ Alopex DB v0.8 (Chirps v0.3)
+v0.9.0 Distributed Query Parity ─────────────────→ Alopex DB v0.9（v0.8.11 公開まで凍結）
     ↓
 v0.10.0 Raft-aware Executor ────────────────────→ Alopex DB v0.9 (Chirps v0.6)
     ↓

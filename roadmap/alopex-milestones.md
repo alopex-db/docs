@@ -4,7 +4,18 @@
 
 ## クレート間バージョン対応
 
-> **Note (2026-08-03)**: **Alopex DB v0.8.1〜v0.8.3 はリリース済み**。v0.8.2 と v0.8.3 は parser contract `0.3.0` を出荷したが、Skulk v0.5 に必要な `CREATE CONTINUOUS AGGREGATE` は含まない。この statement と wire contract `0.4.0` は Alopex v0.8.4 の parser prerequisite とし、Nim test harness の失敗伝播、Ubuntu/Windows gate、target-qualified assets、checksum manifest を含めて先行リリースする。詳細は [Skulk v0.5 SQL パーサー準備状況](../reports/skulk-v0.5-sql-parser-readiness.md) を参照。
+> **Current policy (2026-08-18)**: Alopex の全公開 Rust crate と Python
+> package は、Alopex DB と同じバージョンを同じ `vX.Y.Z` release lane で
+> 出荷する。`alopex-sql` / Nim parser に独立した feature version や release
+> lane はない。parser contract version は FFI 互換性を検査するメタデータで
+> あり、Alopex の release version を置き換えない。現在の公開版は v0.8.6。
+> 実装・公開順は **v0.8.7 → v0.8.8 → v0.8.9 → v0.8.10 → v0.8.11**。
+> **v0.9.0 はこの列がすべて公開されるまで凍結**し、`release/v0.9.0` を
+> release candidate として扱わない。実行状況の正本は GitHub milestones
+> [v0.8.7](https://github.com/alopex-db/alopex/milestone/7)〜
+> [v0.9.0](https://github.com/alopex-db/alopex/milestone/12)。
+
+> **Historical note (2026-08-03)**: 当時、Alopex DB v0.8.1〜v0.8.3 はリリース済みで、`CREATE CONTINUOUS AGGREGATE` と parser contract `0.4.0` を v0.8.4 の prerequisite としていた。この prerequisite はその後 v0.8.4 で出荷済み。経緯は [Skulk v0.5 SQL パーサー準備状況](../reports/skulk-v0.5-sql-parser-readiness.md) を参照。
 > **Note (2026-07-18)**: **Alopex DB v0.7.0 はリリース済み**。v0.7のクラスタ機能は single-node compatible な cluster-aware foundation（status、join/leave lifecycle、routing diagnostics、simulation）までで、ノード跨ぎの実行・Raft・分散トランザクションは未実装。これらは v0.8 以降の計画である。DataFrame P3（`str`/`dt`/`list`、`explode`/`implode`）も v0.7.0 で出荷済み。
 > **Note (2026-06-27)**: alopex-sql の SQL パーサーを **Nim 実装に置き換える方針を決定**（C ABI FFI で統合、Rust 手書きパーサーは廃止）。あわせて JOIN/Subquery を Planner/Executor まで実装する（対応 DB v0.6）。技術選定は steering `tech.md` / `technical-decisions.md`、実装 spec は `.spec-workflow/specs/nim-sql-parser-migration/` を参照。詳細な機能対応は `alopex-sql-milestone.md` を参照。
 > **Note (2026-01-14)**: **Alopex DB v0.4.0 リリース完了**。GitHub Release + crates.io 公開済み。
@@ -22,18 +33,23 @@
 | v0.5 | v0.5 | v0.5 | v0.5 | - | Durability + GROUP BY |
 | v0.6 | v0.6 | v0.6 | v0.6 | - | Embedded/Server 実用化 + Nim SQL パーサー移行 + JOIN/Subquery + DataFrame/Python 強化 |
 | **v0.7.0** | **v0.7** | **v0.7.4** | **v0.7** | **v0.3** | **Cluster-aware foundation + routing simulation** ✅ リリース済（single-node compatible、分散実行なし） |
-| **v0.8.0** | **v0.8.0** | **v0.8.0** | **v0.8.0** | v0.6 | Cluster-aware / streaming / Python surfaces ✅ **リリース済** |
-| **v0.8.1** | **v0.8.1** | **v0.8.1** | **v0.8.1** | v0.6 | Parser contract `0.2.0` + Ubuntu/Windows release gate ✅ **リリース済** |
-| **v0.8.2** | **v0.8.2** | **v0.8.2** | **v0.8.2** | v0.6 | 不具合対応 + parser contract `0.3.0` ✅ **リリース済** |
-| **v0.8.3** | **v0.8.3** | **v0.8.3** | **v0.8.3** | v0.6 | 不具合対応・安定化（Continuous Aggregate なし）✅ **リリース済** |
-| **v0.8.4** | **v0.8.4** | **v0.8.4** | **v0.8.4** | v0.6 | Skulk v0.5 prerequisite: Continuous Aggregate parser contract `0.4.0` ⏳ **予定** |
-| v0.9 | v0.9 | v0.10 | v0.9 | v0.7 | Raft Metadata + Raft DDL |
-| v0.10 | v0.10 | v0.11 | v0.10 | v0.7 | Multi-Raft + 分散 Txn |
-| v1.0 | v1.0 | v0.12-v1.0 | v1.0 | v0.8 | Federation + Optimizer |
+| **v0.8.0** | **v0.8.0** | **v0.8.0** | **v0.8.0** | v0.5.1 | Cluster-aware / streaming / Python surfaces ✅ **リリース済** |
+| **v0.8.1** | **v0.8.1** | **v0.8.1** | **v0.8.1** | v0.5.1 | Parser contract `0.2.0` + Ubuntu/Windows release gate ✅ **リリース済** |
+| **v0.8.2** | **v0.8.2** | **v0.8.2** | **v0.8.2** | v0.5.1 | 不具合対応 + parser contract `0.3.0` ✅ **リリース済** |
+| **v0.8.3** | **v0.8.3** | **v0.8.3** | **v0.8.3** | v0.5.1 | 不具合対応・安定化（Continuous Aggregate なし）✅ **リリース済** |
+| **v0.8.4** | **v0.8.4** | **v0.8.4** | **v0.8.4** | v0.5.1 | Continuous Aggregate parser contract `0.4.0` ✅ **リリース済** |
+| **v0.8.5** | **v0.8.5** | **v0.8.5** | **v0.8.5** | v0.5.2 | 公開 surface / release packaging hardening ✅ **リリース済** |
+| **v0.8.6** | **v0.8.6** | **v0.8.6** | **v0.8.6** | v0.5.2 | 単一 node SQL correctness（alias / REAL / set operations / CASE / CTE / basic window）✅ **リリース済** |
+| **v0.8.7〜v0.8.11** | **同一版** | **同一版** | **同一版** | v0.5.2 | 単一 node SQL compatibility closure 🚧 **順次実装・公開** |
+| **v0.9.0** | **v0.9.0** | **v0.9.0** | **v0.9.0** | v0.7+ | Distributed query parity 🧊 **v0.8.11 公開まで凍結** |
+| v1.0 | v1.0 | v1.0 | v1.0 | v0.8+ | Federation + Optimizer |
 
 ---
 
-## alopex-sql マイルストーン
+## Alopex DB SQL マイルストーン
+
+> v0.8.6 以後は Alopex DB の統一 release train。表中の古い個別版は公開履歴・
+> feature allocation の記録であり、独立した `alopex-sql` release lane ではない。
 
 > **Note (2025-12-18)**: CD ワークフロー修正により v0.3.0 が crates.io に公開済み（旧 v0.1.3 Vector SQL 相当）。
 > 旧 v0.1.0~v0.1.3 は v0.3.0 に統合、v0.1.4 以降は v0.4.0 以降に再番号付け。
@@ -56,15 +72,17 @@
 | **v0.8.1** | **Parser / release gate reliability** | alopex-sql v0.8.0 | SQL-TS/PromQL contract `0.2.0`、Ubuntu/Windows full gate | v0.8.1 | ✅ **リリース済** |
 | **v0.8.2** | **Bugfix release** | alopex-sql v0.8.1 | 不具合修正 + parser contract `0.3.0` | v0.8.2 | ✅ **リリース済** |
 | **v0.8.3** | **Bugfix / stabilization release** | alopex-sql v0.8.2 | 安定化（Continuous Aggregate なし） | v0.8.3 | ✅ **リリース済** |
-| **v0.8.4** | **Skulk v0.5 parser prerequisite** | alopex-sql v0.8.3 | `CREATE CONTINUOUS AGGREGATE`、wire contract `0.4.0`、target 別 parser assets、checksum manifest | Skulk v0.5 | ⏳ **予定** |
-| v1.0+-wasm | WASM Parser (再評価) | alopex-sql v1.0+ | Read-Only SQL (wasm32) | v1.0+ | ⏳ 再評価 |
-| v0.9.0 | Distributed Query Planner | Chirps v0.3 | シャード対応クエリ計画 | v0.8 | ⏳ 予定 |
-| v0.9.0-index | TSO 統合分散インデックス | Chirps v0.6 (TSO) | Point-in-Time/整合性チェック | v0.8 | ⏳ 予定 |
-| v0.10.0 | Raft-aware Executor | Chirps v0.6 | Raft 合意付き DDL/DML | v0.9 | ⏳ 予定 |
-| v0.11.0 | Multi-Raft Query | Chirps v0.7 | 分散トランザクション | v0.10 | ⏳ 予定 |
-| v0.12.0 | Federation Query | Chirps v0.8 | クロスクラスタクエリ | v1.0 | ⏳ 予定 |
-| v0.12.0-index | クロスクラスタインデックス同期 | Chirps v0.8-v0.9 (HLC) | フェデレーションインデックス | v1.0 | ⏳ 予定 |
+| **v0.8.4** | **Skulk v0.5 parser prerequisite** | Alopex v0.8.3 | `CREATE CONTINUOUS AGGREGATE`、wire contract `0.4.0`、target 別 parser assets、checksum manifest | Skulk v0.5 | ✅ **リリース済** |
+| **v0.8.5** | **Release surface hardening** | Alopex v0.8.4 | packaging / verifier / public surface の安定化 | v0.8.5 | ✅ **リリース済** |
+| **v0.8.6** | **Single-node SQL correctness** | Alopex v0.8.5 | alias、REAL、set operations、CASE、非再帰 CTE、basic window | v0.8.6 | ✅ **リリース済** |
+| **v0.8.7** | **CTE / window correctness closure** | Alopex v0.8.6 | recursive CTE、CTE column list、peer/frame、LAG/LEAD、aggregate composition | v0.8.7 | 🚧 **実装中** |
+| **v0.8.8** | **Portable relational grammar** | Alopex v0.8.7 | predicates、VALUES、window/aggregate/grouping/table expressions | v0.8.8 | ⏳ **待機** |
+| **v0.8.9** | **Portable functions** | Alopex v0.8.8 | temporal/statistics/math/string/regex/bitwise/boolean aggregate、GENERATE_SERIES | v0.8.9 | ⏳ **待機** |
+| **v0.8.10** | **Type / nested / search foundation** | Alopex v0.8.9 | DECIMAL、DATE/TIME/INTERVAL、JSON、nested types、FTS | v0.8.10 | ⏳ **待機** |
+| **v0.8.11** | **Application / administration SQL** | Alopex v0.8.10 | transaction、bind、introspection、schema/DML/COPY/identity | v0.8.11 | ⏳ **待機** |
+| **v0.9.0** | **Distributed query parity** | Chirps v0.7+ | v0.8 SQL surface の capability classification / deterministic rejection / parity | v0.9.0 | 🧊 **凍結** |
 | v1.0.0 | Query Optimizer | - | コストベース最適化、統計情報 | v1.0 | ⏳ 予定 |
+| v1.0+-wasm | WASM Parser (再評価) | Alopex v1.0+ | Read-Only SQL (wasm32) | v1.0+ | ⏳ 再評価 |
 
 ---
 
@@ -81,10 +99,12 @@
 | v0.8.1 | Parser contract `0.2.0` + release gate reliability | **v0.8.1** |
 | v0.8.2 | 不具合対応 + parser contract `0.3.0` | **v0.8.2（リリース済）** |
 | v0.8.3 | 不具合対応・安定化（Continuous Aggregate なし） | **v0.8.3（リリース済）** |
-| Skulk v0.5 prerequisite | Continuous Aggregate parser contract `0.4.0` | **v0.8.4（先行リリース予定）** |
-| v0.9 | Multi-Raft クエリ | v0.11.0 |
-| v0.10 | Hardening/安定化 | v0.11.0+ |
-| v1.0 | Federation クエリ、オプティマイザ | v0.12.0 - v1.0.0 |
+| v0.8.4 | Continuous Aggregate parser contract `0.4.0` | **v0.8.4（リリース済）** |
+| v0.8.5 | Release surface hardening | **v0.8.5（リリース済）** |
+| v0.8.6 | Alias / REAL / set operations / CASE / CTE / basic window | **v0.8.6（リリース済）** |
+| v0.8.7〜v0.8.11 | Single-node SQL compatibility closure | **Alopex DB と同一版** |
+| v0.9.0 | Distributed query parity | **v0.9.0（凍結）** |
+| v1.0 | Federation クエリ、オプティマイザ | **v1.0** |
 
 ---
 
