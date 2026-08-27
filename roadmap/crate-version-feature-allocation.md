@@ -1,6 +1,6 @@
 # クレート × バージョン × 機能 割り付け表 (Feature Allocation Matrix)
 
-> Status: **実装・公開状況の記録** / 2026-08-18 (v0.8.6公開後に更新)
+> Status: **実装・公開状況の記録** / 2026-08-27 (v0.8.9公開後に更新)
 > 目的: 実装漏れ債務と今後の機能を、担当クレートと着手バージョンに **1つずつ明示配置** する。
 > 「全部いっぺんに」を禁じ、各機能に責任クレートと期日を持たせることで実装漏れの再発を防ぐ。
 > 関連: [distributed-implementation-gap-audit.md](../design/distributed-implementation-gap-audit.md)（漏れの棚卸し）,
@@ -18,22 +18,22 @@
 
 ### 1.1 実リリース状況 (2026-08-18、git tag / manifests を観測で確定)
 
-**Alopex v0.8.6 は公開済みで、全公開 Rust crate と Python package は同じ
+**Alopex v0.8.9 は公開済みで、全公開 Rust crate と Python package は同じ
 バージョンを使う。** v0.8.4 で parser contract `0.4.0`、v0.8.5 で release
-surface hardening、v0.8.6 で単一 node SQL correctness を出荷した。次の公開順は
-v0.8.7〜v0.8.11 であり、v0.9.0 はその完了まで凍結する。
+surface hardening、v0.8.6〜v0.8.9 で単一 node SQL correctness、portable grammar、portable functionsを出荷した。次の公開順は
+v0.8.10〜v0.8.11 であり、v0.9.0 はその完了まで凍結する。
 
 | クレート | 実公開版 (crates.io/PyPI) | Cargo.toml 版定義 | 版定義の種別 |
 |---|---|---|---|
-| alopex-core | crates.io **0.8.6** | `version.workspace = true` | workspace 継承 |
-| alopex-sql | crates.io **0.8.6** | `version.workspace = true` | workspace 継承 |
-| alopex-dataframe | crates.io **0.8.6** | `version.workspace = true` | workspace 継承 |
-| alopex-embedded | crates.io **0.8.6** | `version.workspace = true` | workspace 継承 |
-| alopex-server | crates.io **0.8.6** | `version.workspace = true` | workspace 継承 |
-| alopex-cli | crates.io **0.8.6** | `version.workspace = true` | workspace 継承 |
-| alopex-cluster | crates.io **0.8.6** | `version.workspace = true` | workspace 継承 |
+| alopex-core | crates.io **0.8.9** | `version.workspace = true` | workspace 継承 |
+| alopex-sql | crates.io **0.8.9** | `version.workspace = true` | workspace 継承 |
+| alopex-dataframe | crates.io **0.8.9** | `version.workspace = true` | workspace 継承 |
+| alopex-embedded | crates.io **0.8.9** | `version.workspace = true` | workspace 継承 |
+| alopex-server | crates.io **0.8.9** | `version.workspace = true` | workspace 継承 |
+| alopex-cli | crates.io **0.8.9** | `version.workspace = true` | workspace 継承 |
+| alopex-cluster | crates.io **0.8.9** | `version.workspace = true` | workspace 継承 |
 | alopex-tools | crates.io **未公開** | `0.0.0` | 独立ワークスペース (issue #45 是正済み)。crates.io 公開版 alopex-embedded/alopex-sql に依存し、リリース確認コンテナの `verify-release-embedded` バイナリ等を提供。publish=false (内部ツール) |
-| alopex (=alopex-py) | PyPI **0.8.6** | `version.workspace = true` | workspace 継承 |
+| alopex (=alopex-py) | PyPI **0.8.9** | `version.workspace = true` | workspace 継承 |
 
 **現行 invariant**:
 
@@ -139,17 +139,17 @@ Cargo.toml の description に基づく公式責務。
 
 ```
 公開済み:
-  v0.7.x ✅ ─► v0.8.0〜v0.8.6 ✅
+  v0.7.x ✅ ─► v0.8.0〜v0.8.9 ✅
                          │
 現行 release train:      ▼
-  v0.8.7 ─► v0.8.8 ─► v0.8.9 ─► v0.8.10 ─► v0.8.11
+  v0.8.10 ─► v0.8.11
                                                     │
 凍結中:                                            ▼
   v0.9.0 distributed capability / parity（v0.8.11 公開後に再起動判断）
 ```
 
 **着手順の絶対制約**:
-- v0.8.7〜v0.8.11 は milestone 番号順に実装・検証・公開する。
+- v0.8.7〜v0.8.9 は公開済み。v0.8.10〜v0.8.11 は milestone 番号順に実装・検証・公開する。
 - 後続 milestone の実装は、直前版の公開と post-publish verification が完了するまで開始しない。
 - v0.9.0 の開発・release 操作は v0.8.11 公開まで凍結する。
 - parser source / ABI asset は独立公開せず、該当 Alopex tag の release gate で全 target を再生成・検証する。

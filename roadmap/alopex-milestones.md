@@ -4,12 +4,12 @@
 
 ## クレート間バージョン対応
 
-> **Current policy (2026-08-18)**: Alopex の全公開 Rust crate と Python
+> **Current policy (2026-08-27)**: Alopex の全公開 Rust crate と Python
 > package は、Alopex DB と同じバージョンを同じ `vX.Y.Z` release lane で
 > 出荷する。`alopex-sql` / Nim parser に独立した feature version や release
 > lane はない。parser contract version は FFI 互換性を検査するメタデータで
-> あり、Alopex の release version を置き換えない。現在の公開版は v0.8.6。
-> 実装・公開順は **v0.8.7 → v0.8.8 → v0.8.9 → v0.8.10 → v0.8.11**。
+> あり、Alopex の release version を置き換えない。現在の公開版は v0.8.9。
+> v0.8.7〜v0.8.9は公開済みで、次の実装・公開順は **v0.8.10 → v0.8.11**。
 > **v0.9.0 はこの列がすべて公開されるまで凍結**し、`release/v0.9.0` を
 > release candidate として扱わない。実行状況の正本は GitHub milestones
 > [v0.8.7](https://github.com/alopex-db/alopex/milestone/7)〜
@@ -40,7 +40,10 @@
 | **v0.8.4** | **v0.8.4** | **v0.8.4** | **v0.8.4** | v0.5.1 | Continuous Aggregate parser contract `0.4.0` ✅ **リリース済** |
 | **v0.8.5** | **v0.8.5** | **v0.8.5** | **v0.8.5** | v0.5.2 | 公開 surface / release packaging hardening ✅ **リリース済** |
 | **v0.8.6** | **v0.8.6** | **v0.8.6** | **v0.8.6** | v0.5.2 | 単一 node SQL correctness（alias / REAL / set operations / CASE / CTE / basic window）✅ **リリース済** |
-| **v0.8.7〜v0.8.11** | **同一版** | **同一版** | **同一版** | v0.5.2 | 単一 node SQL compatibility closure 🚧 **順次実装・公開** |
+| **v0.8.7** | **v0.8.7** | **v0.8.7** | **v0.8.7** | v0.5.2 | CTE / window correctness closure ✅ **リリース済** |
+| **v0.8.8** | **v0.8.8** | **v0.8.8** | **v0.8.8** | v0.5.2 | Portable relational grammar ✅ **リリース済** |
+| **v0.8.9** | **v0.8.9** | **v0.8.9** | **v0.8.9** | v0.5.2 | Portable functions + KV glob/regex search ✅ **リリース済** |
+| **v0.8.10〜v0.8.11** | **同一版** | **同一版** | **同一版** | v0.5.2 | 単一 node SQL compatibility closure 🚧 **順次実装・公開** |
 | **v0.9.0** | **v0.9.0** | **v0.9.0** | **v0.9.0** | v0.7+ | Distributed query parity 🧊 **v0.8.11 公開まで凍結** |
 | v1.0 | v1.0 | v1.0 | v1.0 | v0.8+ | Federation + Optimizer |
 
@@ -75,9 +78,9 @@
 | **v0.8.4** | **Skulk v0.5 parser prerequisite** | Alopex v0.8.3 | `CREATE CONTINUOUS AGGREGATE`、wire contract `0.4.0`、target 別 parser assets、checksum manifest | Skulk v0.5 | ✅ **リリース済** |
 | **v0.8.5** | **Release surface hardening** | Alopex v0.8.4 | packaging / verifier / public surface の安定化 | v0.8.5 | ✅ **リリース済** |
 | **v0.8.6** | **Single-node SQL correctness** | Alopex v0.8.5 | alias、REAL、set operations、CASE、非再帰 CTE、basic window | v0.8.6 | ✅ **リリース済** |
-| **v0.8.7** | **CTE / window correctness closure** | Alopex v0.8.6 | recursive CTE、CTE column list、peer/frame、LAG/LEAD、aggregate composition | v0.8.7 | 🚧 **実装中** |
-| **v0.8.8** | **Portable relational grammar** | Alopex v0.8.7 | predicates、VALUES、window/aggregate/grouping/table expressions | v0.8.8 | ⏳ **待機** |
-| **v0.8.9** | **Portable functions** | Alopex v0.8.8 | temporal/statistics/math/string/regex/bitwise/boolean aggregate、GENERATE_SERIES | v0.8.9 | ⏳ **待機** |
+| **v0.8.7** | **CTE / window correctness closure** | Alopex v0.8.6 | recursive CTE、CTE column list、peer/frame、LAG/LEAD、aggregate composition | v0.8.7 | ✅ **リリース済** |
+| **v0.8.8** | **Portable relational grammar** | Alopex v0.8.7 | predicates、VALUES、window/aggregate/grouping/table expressions | v0.8.8 | ✅ **リリース済** |
+| **v0.8.9** | **Portable functions** | Alopex v0.8.8 | temporal/statistics/math/string/regex/bitwise/boolean aggregate、KV glob/regex search | v0.8.9 | ✅ **リリース済** |
 | **v0.8.10** | **Type / nested / search foundation** | Alopex v0.8.9 | DECIMAL、DATE/TIME/INTERVAL、JSON、nested types、FTS | v0.8.10 | ⏳ **待機** |
 | **v0.8.11** | **Application / administration SQL** | Alopex v0.8.10 | transaction、bind、introspection、schema/DML/COPY/identity | v0.8.11 | ⏳ **待機** |
 | **v0.9.0** | **Distributed query parity** | Chirps v0.7+ | v0.8 SQL surface の capability classification / deterministic rejection / parity | v0.9.0 | 🧊 **凍結** |

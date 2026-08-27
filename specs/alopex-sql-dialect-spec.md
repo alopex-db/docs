@@ -1,8 +1,8 @@
 # Alopex SQL 方言仕様書
 
-**バージョン**: 0.8.6
-**最終更新**: 2026-08-17
-**ステータス**: v0.8.6 実装済み・後続 SQL roadmap 反映
+**バージョン**: 0.8.9
+**最終更新**: 2026-08-27
+**ステータス**: v0.8.9 実装済み・後続 SQL roadmap 反映
 
 > 本書のバージョン表記はすべて **Alopex DB のバージョン**である（TDR #15）。alopex-sql クレートは Alopex DB と同一のバージョン軸で採番・公開される。
 
@@ -31,10 +31,8 @@ Alopex SQL は **SQLite をベースとし、PostgreSQL の一部構文を参考
 
 | 機能 | 理由 | 対応予定 |
 |------|------|----------|
-| **再帰 CTE / CTE 列名リスト** | 非再帰 CTE は v0.8.6 で出荷済み | v0.8.7 ([#137](https://github.com/alopex-db/alopex/issues/137), [#138](https://github.com/alopex-db/alopex/issues/138)) |
-| **window frame / LAG / LEAD / QUALIFY** | 基本 window は v0.8.6 で出荷済み | v0.8.7-v0.8.8 ([#139](https://github.com/alopex-db/alopex/issues/139)-[#144](https://github.com/alopex-db/alopex/issues/144)) |
-| **portable relational grammar** | VALUES、predicate、grouping、LATERAL 等 | v0.8.8 ([#145](https://github.com/alopex-db/alopex/issues/145)-[#152](https://github.com/alopex-db/alopex/issues/152)) |
-| **新 scalar/nested 型と関数** | storage/FFI/public API の同時拡張が必要 | v0.8.9-v0.8.10 ([#153](https://github.com/alopex-db/alopex/issues/153)-[#164](https://github.com/alopex-db/alopex/issues/164)) |
+| **GENERATE_SERIES** | 名前は予約済み。実装は後続 issue | [#157](https://github.com/alopex-db/alopex/issues/157) |
+| **新 scalar/nested 型** | storage/FFI/public API の同時拡張が必要 | v0.8.10 ([#158](https://github.com/alopex-db/alopex/issues/158)-[#164](https://github.com/alopex-db/alopex/issues/164)) |
 | **application/admin SQL** | transaction、bind、DDL/DML 拡張 | v0.8.11 ([#165](https://github.com/alopex-db/alopex/issues/165)-[#173](https://github.com/alopex-db/alopex/issues/173)) |
 | **トランザクション分離レベル指定** | 現状は Snapshot Isolation 固定 | 未定 |
 | **TS 拡張** | shared parser、Skulk 所有の時系列意味論 | Skulk v0.4-v0.5 ([#6](https://github.com/alopex-db/alopex-skulk/issues/6)-[#8](https://github.com/alopex-db/alopex-skulk/issues/8)) |
@@ -63,6 +61,9 @@ Alopex SQL は **SQLite をベースとし、PostgreSQL の一部構文を参考
 | **集合演算** (UNION/ALL、INTERSECT、EXCEPT と優先順位) | v0.8.6 | 6.1 SELECT 構文 |
 | **非再帰 CTE** | v0.8.6 | 6.1 SELECT 構文 |
 | **基本 window** (ROW_NUMBER/RANK/DENSE_RANK、aggregate OVER) | v0.8.6 | 6.1 SELECT 構文 |
+| **再帰 CTE / CTE 列名リスト / window frame / LAG / LEAD** | v0.8.7 | 6.1 SELECT 構文 |
+| **QUALIFY / VALUES / predicates / grouping sets / LATERAL / pagination** | v0.8.8 | 6.1 SELECT 構文 |
+| **UTC時刻・数学・文字列・正規表現関数、統計・回帰・bitwise・boolean集約** | v0.8.9 | 13 Built-in Functions |
 
 ### 1.3 Vector 拡張構文の設計根拠
 
@@ -1638,9 +1639,9 @@ BEGIN, COMMIT, ROLLBACK, TRANSACTION, SAVEPOINT
 | v0.7.4 | JOIN Support（INNER/LEFT/RIGHT） | **出荷済み** |
 | v0.7.4 | Subquery（WHERE/FROM 句） | **出荷済み** |
 | v0.8.6 | 単一ノード SQL 構文の是正（非再帰 CTE / 集合演算 / 基本 window / CASE / REAL / 別名解決） | **実装済み** |
-| v0.8.7 | recursive CTE と v0.8.6 window correctness closure | [#137-#142](https://github.com/alopex-db/alopex/issues/177) |
-| v0.8.8 | portable relational grammar | [#143-#152](https://github.com/alopex-db/alopex/issues/177) |
-| v0.8.9 | 既存型上の portable functions | [#153-#157](https://github.com/alopex-db/alopex/issues/177) |
+| v0.8.7 | recursive CTE と v0.8.6 window correctness closure | **実装・公開済み** |
+| v0.8.8 | portable relational grammar | **実装・公開済み** |
+| v0.8.9 | 既存型上の portable functions | **実装・公開済み（GENERATE_SERIESを除く）** |
 | v0.8.10 | DECIMAL/temporal/JSON/nested/FTS 型基盤 | [#158-#164](https://github.com/alopex-db/alopex/issues/177) |
 | v0.8.11 | application/admin SQL surface | [#165-#173](https://github.com/alopex-db/alopex/issues/177) |
 | v0.9.0 | Distributed Query Planner と v0.8 SQL parity（Chirps v0.3 依存） | [#174](https://github.com/alopex-db/alopex/issues/174) |
@@ -1717,6 +1718,7 @@ PRAGMA名、不正な単位はエラーとなる。
 | 0.3.4-draft | 2025-12-18 | CD ワークフローによる v0.3.0 公開を反映しバージョン番号を再調整（v0.1.x→v0.3.0統合、v0.1.4→v0.4.0、後続バージョン繰り上げ） |
 | 0.7.4-draft | 2026-07-17 | レジストリ・ハッシュ/UUID/エンコード・システム関数・PRAGMA の実装仕様を反映 |
 | 0.8.6-draft | 2026-08-15 | バージョン軸を Alopex DB 版に一本化（TDR #15、alopex-sql 独自軸の対応表を廃止）。`REAL` を `FLOAT` の別名として追加（#123）。CTE / 集合演算 / ウィンドウ関数 / CASE 式の対応先を v0.9+ から v0.8.6 に是正（#124〜#128）。UNION ALL 未対応を明記（#126） |
+| 0.8.9 | 2026-08-27 | v0.8.7〜v0.8.9の公開状況を反映。再帰CTE、window correctness、portable relational grammar、portable functionsを出荷済みへ移動 |
 
 ---
 

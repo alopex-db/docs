@@ -2,7 +2,7 @@
 
 > 詳細仕様は `.spec-workflow/specs/` 配下の各 spec ドキュメントを参照。
 
-> **Note (2026-08-18, TDR #15) — バージョン軸について**: 本書の見出しに残る `v0.4.0` / `v0.5.0` / `v0.6.0` / `v0.9.0+` 等は、**alopex-sql に独自バージョン軸があるという前提で書かれた歴史的表記**である。alopex-sql は Alopex DB と同一バージョン・同一 tag で公開され、現在の公開版は v0.8.6。parser contract version は FFI 互換性メタデータで、独立 release lane ではない。次の公開順は v0.8.7〜v0.8.11、v0.9.0 はその完了まで凍結する。経緯は `.spec-workflow/steering/technical-decisions.md` §15 を参照。
+> **Note (2026-08-27, TDR #15) — バージョン軸について**: 本書の見出しに残る `v0.4.0` / `v0.5.0` / `v0.6.0` / `v0.9.0+` 等は、**alopex-sql に独自バージョン軸があるという前提で書かれた歴史的表記**である。alopex-sql は Alopex DB と同一バージョン・同一 tag で公開され、現在の公開版は v0.8.9。parser contract version は FFI 互換性メタデータで、独立 release lane ではない。次の公開順は v0.8.10〜v0.8.11、v0.9.0 はその完了まで凍結する。経緯は `.spec-workflow/steering/technical-decisions.md` §15 を参照。
 
 > **Note (2026-06-27)**: SQL パーサーを **Nim 実装に置き換える方針を決定**（C ABI FFI で統合、Rust 手書きパーサーは廃止）。あわせて JOIN/Subquery を Planner/Executor まで実装する。技術選定は steering `tech.md` / `technical-decisions.md` を参照。実装 spec: `.spec-workflow/specs/nim-sql-parser-migration/`。
 > **Note (2026-01-13)**: v0.4.0 Async/Stream 基盤実装完了（runtime-agnostic async facade, tokio adapter, streaming SELECT）。
