@@ -5,6 +5,7 @@ AlopexDB concepts, design documents, and specifications
 
 - [v0.7 公開サーフェス](guides/v0.7-surfaces.md): 実在するcluster-aware、CLI、Python、DataFrame、SQL parser/WASMの境界
 - [Skulk v0.3 公開サーフェス](guides/skulk-v0.3-surfaces.md): Skulk の現行ストレージ形式、3つのingestプロトコル、未達項目の境界
+- [Vector benchmark reports](reports/vector-benchmarks/README.md): リリース版wheelから生成した再現可能なJSON・Markdown性能証拠
 - 公開情報の回帰チェック: `bash scripts/check-public-surface.sh`
 
 ## Product Lines

@@ -1,0 +1,141 @@
+name: Publish vector benchmark reports
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Published Alopex version to import (X.Y.Z); empty imports all pending reports"
+        required: false
+        type: string
+  schedule:
+    - cron: "7,22,37,52 * * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-vector-benchmarks
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Import verified benchmark pairs
+        id: reports
+        env:
+          REQUESTED_VERSION: ${{ github.event.inputs.version || '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git remote add alopex https://github.com/alopex-db/alopex.git
+          if [[ -n "${REQUESTED_VERSION}" ]]; then
+            [[ "${REQUESTED_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+            branch="report/vector-benchmark-v${REQUESTED_VERSION}"
+            git fetch --force --quiet alopex \
+              "refs/heads/${branch}:refs/remotes/alopex/${branch}"
+            refs=("refs/remotes/alopex/${branch}")
+          else
+            git fetch --force --quiet alopex \
+              '+refs/heads/report/vector-benchmark-v*:refs/remotes/alopex/report/vector-benchmark-v*'
+            mapfile -t refs < <(git for-each-ref --format='%(refname)' \
+              'refs/remotes/alopex/report/vector-benchmark-v*')
+          fi
+
+          manifest="${RUNNER_TEMP}/vector-benchmark-hashes"
+          : > "${manifest}"
+          if [[ "${#refs[@]}" -eq 0 ]]; then
+            echo "changed=false" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          for ref in "${refs[@]}"; do
+            branch="${ref#refs/remotes/alopex/}"
+            version="${branch#report/vector-benchmark-v}"
+            [[ "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+            json="reports/vector-benchmarks/v${version}.json"
+            markdown="reports/vector-benchmarks/v${version}.md"
+            source_sha="$(git rev-parse "${ref}")"
+            mapfile -t changed < <(git diff-tree --no-commit-id --name-only -r "${source_sha}")
+            test "${#changed[@]}" -eq 2
+            printf '%s\n' "${changed[@]}" | grep -Fxq "${json}"
+            printf '%s\n' "${changed[@]}" | grep -Fxq "${markdown}"
+
+            incoming="${RUNNER_TEMP}/vector-v${version}"
+            mkdir -p "${incoming}"
+            git show "${source_sha}:${json}" > "${incoming}/report.json"
+            git show "${source_sha}:${markdown}" > "${incoming}/report.md"
+            python3 - "${incoming}/report.json" "${incoming}/report.md" "${version}" <<'PY'
+          import hashlib
+          import json
+          import pathlib
+          import sys
+
+          data_path, markdown_path, version = map(pathlib.Path, sys.argv[1:])
+          payload = json.loads(data_path.read_text(encoding="utf-8"))
+          if payload.get("schema") != "alopex.hnsw-diagnostic/v3":
+              raise SystemExit("unexpected benchmark schema")
+          if str(payload.get("release_version")) != str(version):
+              raise SystemExit("benchmark version mismatch")
+          if hashlib.sha256(markdown_path.read_bytes()).hexdigest() != payload["markdown_sha256"]:
+              raise SystemExit("benchmark Markdown hash mismatch")
+          PY
+            install -D -m 0644 "${incoming}/report.json" "${json}"
+            install -D -m 0644 "${incoming}/report.md" "${markdown}"
+            printf '%s\t%s\n' "${json}" "$(sha256sum "${json}" | awk '{print $1}')" >> "${manifest}"
+            printf '%s\t%s\n' "${markdown}" "$(sha256sum "${markdown}" | awk '{print $1}')" >> "${manifest}"
+          done
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          root = Path("reports/vector-benchmarks")
+          lines = [
+              "# Vector benchmark reports",
+              "",
+              "Each Markdown report is generated from the adjacent canonical JSON artifact.",
+              "",
+          ]
+          for report in sorted(root.glob("v*.md"), reverse=True):
+              version = report.stem
+              lines.append(f"- [{version}]({report.name}) ([JSON]({version}.json))")
+          (root / "README.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+          PY
+
+          if [[ -z "$(git status --porcelain -- reports/vector-benchmarks)" ]]; then
+            echo "changed=false" >> "${GITHUB_OUTPUT}"
+          else
+            echo "changed=true" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: Run public documentation checks
+        if: steps.reports.outputs.changed == 'true'
+        run: bash scripts/check-public-surface.sh
+
+      - name: Publish verified reports to main
+        if: steps.reports.outputs.changed == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/vector-benchmarks
+          git commit -m "docs(vector): publish verified benchmark reports"
+          git push origin main
+
+      - name: Verify published bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --quiet
+          while IFS=$'\t' read -r report expected; do
+            [[ -n "${report}" ]] || continue
+            actual="$(git show "origin/main:${report}" | sha256sum | awk '{print $1}')"
+            test "${actual}" = "${expected}"
+          done < "${RUNNER_TEMP}/vector-benchmark-hashes"

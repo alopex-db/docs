@@ -22,6 +22,26 @@ for needle in "${required[@]}"; do
   fi
 done
 
+test -f "$root/reports/vector-benchmarks/README.md"
+python3 - "$root/reports/vector-benchmarks" <<'PY'
+import hashlib
+import json
+import pathlib
+import sys
+
+root = pathlib.Path(sys.argv[1])
+for data_path in root.glob("v*.json"):
+    markdown_path = data_path.with_suffix(".md")
+    payload = json.loads(data_path.read_text(encoding="utf-8"))
+    if payload.get("schema") != "alopex.hnsw-diagnostic/v3":
+        raise SystemExit(f"unexpected benchmark schema: {data_path}")
+    if str(payload.get("release_version")) != data_path.stem.removeprefix("v"):
+        raise SystemExit(f"benchmark version/path mismatch: {data_path}")
+    digest = hashlib.sha256(markdown_path.read_bytes()).hexdigest()
+    if digest != payload.get("markdown_sha256"):
+        raise SystemExit(f"benchmark Markdown hash mismatch: {markdown_path}")
+PY
+
 # These were historical claims that must not return to the public roadmap.
 if grep -RnE 'v0\.7\.0[[:space:]]*\|[[:space:]]*WASM|WASM[^[:cntrl:]]*v0\.7\.0' \
   "$root/roadmap" "$root/specs/alopex-sql-dialect-spec.md"; then
