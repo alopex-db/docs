@@ -1,0 +1,96 @@
+# リリース確認レポート: v0.8.11
+
+> 総合結果: **❌ 失敗あり**
+
+v0.8.11 の確認中に失敗したステップがある。詳細は下記を参照。
+
+## ステップ
+
+### 1. コンテナイメージビルド ✅
+
+検証専用の Docker イメージをビルドする。alopex-cli/alopex-server は `cargo install`、alopex(Python) は `pip install` で crates.io/PyPI から取得する(このイメージには alopex のソースコードを一切 COPY しない)。
+
+```
+[2/2] STEP 8/26: ARG VERIFY_GID=1000
+--> Using cache 27221a6ed1028c04b3905cd469fa36f1fe764c6d0cc5f3184e4cee8258c48e8d
+--> 27221a6ed102
+[2/2] STEP 9/26: RUN groupadd -g "${VERIFY_GID}" verify  && useradd -m -u "${VERIFY_UID}" -g "${VERIFY_GID}" verify
+--> Using cache d20d66050c7cfe443204f49bf42eaa2a64764582e235b41a0b23f9402bfb658e
+--> d20d66050c7c
+[2/2] STEP 10/26: ARG ALOPEX_VERSION
+--> Using cache 0847aeeded70833d8884bff6d5bd2546def31c3ca9512842ba24309ded2758f9
+--> 0847aeeded70
+[2/2] STEP 11/26: COPY requirements.txt /opt/verify/requirements.txt
+--> Using cache 53a65590d9c9f4170dad7387513ec7af9882ddc5e9259d4c18877ad41293e5ae
+--> 53a65590d9c9
+[2/2] STEP 12/26: RUN python3 -m venv /opt/verify/venv  && /opt/verify/venv/bin/pip install --no-cache-dir -r /opt/verify/requirements.txt  && /opt/verify/venv/bin/pip install --no-cache-dir "alopex==${ALOPEX_VERSION}"
+--> Using cache aac440d96bd376e14999391ed004b365eaa7379cd1ad15614f858a4bc9256235
+--> aac440d96bd3
+[2/2] STEP 13/26: ENV PATH=/opt/verify/venv/bin:${PATH}
+--> Using cache fef87243bcedefee9394eff84268aedb4993de2545645c6498bb2b175a0389c9
+--> fef87243bced
+[2/2] STEP 14/26: USER verify
+--> Using cache 85c3c5420560a64487661abeb8120d42192d116773f33d40963da2176b6c5d2b
+--> 85c3c5420560
+[2/2] STEP 15/26: ENV HOME=/home/verify
+--> Using cache 59814601833344a3c2d264a963411562771419ab08faf907f2c64fa42c6f7e03
+--> 598146018333
+[2/2] STEP 16/26: ENV NIMBLE_DIR=/home/verify/.nimble
+--> Using cache e27bf68b10d0702840d6c317bb6a3166dc9b8184b8f4c9979af35ed7240d1d5b
+--> e27bf68b10d0
+[2/2] STEP 17/26: RUN nimble install -y npeg msgpack4nim  && chmod -R a+rX /home/verify/.nimble
+--> Using cache c8c6a2f4fdcfd2d4369e3819103b791924973144030619cf705c93f94444a96e
+--> c8c6a2f4fdcf
+[2/2] STEP 18/26: ENV XDG_CACHE_HOME=/tmp/verify-cache
+--> Using cache e9073e4f1d13604d60047e06ac1bb8516b990b4086d466e5635095ab11b5a52a
+--> e9073e4f1d13
+[2/2] STEP 19/26: ARG ALOPEX_VERSION
+--> Using cache 023023888518a0b6fbc7ea216c02c1a35db32779ed094c21e3106990c0f7ff46
+--> 023023888518
+[2/2] STEP 20/26: ENV CARGO_HOME=/home/verify/.cargo
+--> Using cache 0bac60973f13875a611277a90c3ed3adfe16d8fb3a098ee40f36c1bf35a0c4e1
+--> 0bac60973f13
+[2/2] STEP 21/26: RUN cargo install alopex-cli --version "=${ALOPEX_VERSION}" --locked  && cargo install alopex-server --version "=${ALOPEX_VERSION}" --locked
+--> Using cache cbe750b2a337514635613f06f689d2ad5bc4b7062e22a0d077720fcdd17f8ece
+--> cbe750b2a337
+[2/2] STEP 22/26: ENV PATH=/home/verify/.cargo/bin:${PATH}
+--> Using cache 74a50e14a4e84b6a8c6095e2b223ad61bf1045578421c9fba0c7bc717b476fd3
+--> 74a50e14a4e8
+[2/2] STEP 23/26: COPY --chmod=0755 docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+--> Using cache 81eacc7850c5deab274867ae35fe43bfca8687f83b3e7ed38b750628976bf1c7
+--> 81eacc7850c5
+[2/2] STEP 24/26: ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+--> Using cache a3c7eb49b253c413d331e057c9e52aa1d00dcec062c104d0f65cc8e962d78113
+--> a3c7eb49b253
+[2/2] STEP 25/26: WORKDIR /workspace
+--> Using cache aa2fde55521ba496db2ae75fa3a334b9aa98c90ee8a70d1650965246e2f96c71
+--> aa2fde55521b
+[2/2] STEP 26/26: CMD ["bash"]
+--> Using cache 0c616e71f08111e49ce7aae7d96e9df49b7b8b5973da3152159873712869b0df
+[2/2] COMMIT alopex-verify-release:0.8.11
+--> 0c616e71f081
+Successfully tagged localhost/alopex-verify-release:0.8.11
+0c616e71f08111e49ce7aae7d96e9df49b7b8b5973da3152159873712869b0df
+```
+
+### 2. verify-release-embedded ビルド ❌
+
+公開検証用の3つの bin source を一時 crate へコピーし、ALOPEX_VERSION と完全一致する crates.io 公開版 alopex-embedded/alopex-core/alopex-sql だけを依存としてビルドする。固定 Cargo.toml の追随漏れと repository path 混入の双方を防ぐ。
+
+```
+cp: cannot stat 'crates/alopex-tools/src/bin/verify_release_embedded.rs': No such file or directory
+```
+
+---
+
+## 検証環境
+
+| 項目 | 値 |
+|---|---|
+| 対象バージョン | v0.8.11 |
+| 生成日時 (UTC) | 2026-09-08T18:56:21.665626Z |
+| パッケージ取得元 | crates.io / PyPI |
+| ソースビルド | なし(公開パッケージのみ使用) |
+| Rust | `1.96` |
+| Nim(ビルド専用イメージ) | `nimlang/nim:2.2` |
+| Python | `3.11` |
