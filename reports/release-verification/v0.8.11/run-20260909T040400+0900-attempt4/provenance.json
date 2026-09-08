@@ -1,0 +1,12 @@
+{
+  "schema": "alopex-release-verification-provenance/v1",
+  "version": "0.8.11",
+  "tag": "v0.8.11",
+  "commit": "c0ef1f7f77bf0ed966bc3b11dfbc239ed2806c53",
+  "responsibility": "historical post-release verification",
+  "run_id": "20260909T040400+0900-attempt4",
+  "report": "report.json",
+  "outcome": "failed",
+  "failure_step": "mode-parity verification",
+  "failure_summary": "The temporary runner omitted scripts/parity after three successful verifier checks."
+}
