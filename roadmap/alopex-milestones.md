@@ -33,12 +33,17 @@
 >   [alopex-db/alopex#441](https://github.com/alopex-db/alopex/issues/441)
 >
 > 調査の結果、3つ目の hook である distributed transaction coordination は
-> 既に issue 化されている（#187, #200, #225, #269, #273, #275）が、すべて
-> milestone **v1.3-Distributed-Coordination**（`docs-internal/roadmap.md` の
-> v1.x storage roadmap chain、v0.9 よりずっと後段）に割り当てられている。
-> v0.9 がこの領域を所有するという `docs/cluster-aware-foundation.md` の記述と
-> 実際の milestone 配置が食い違っており、milestone を v0.9.0 へ動かすか
-> 文書側を訂正するかは未決定のまま残っている。
+> 既に issue 化されていたが、milestone **v1.3-Distributed-Coordination**
+> （`docs-internal/roadmap.md` の v1.x storage roadmap chain、v0.9 よりずっと
+> 後段）に割り当てられており、`docs/cluster-aware-foundation.md` が「v0.9 の
+> hook」と明記する記述と食い違っていた。当初は #187, #200, #225, #269, #273,
+> #275 の6件だと見ていたが、精査したところ meta issue #200 配下の
+> gRPC/embedded/CLI/Python 横断 API mapping（#226〜#228, #270〜#274）を
+> 含む同一エピック13件全てが対象だった。ユーザーの指示により、この13件を
+> milestone **v0.9.0** へ付け替え済み（[alopex-db/alopex#442](https://github.com/alopex-db/alopex/pull/442)）。
+> `v1.3-Distributed-Coordination` milestone は現在空である。このフェーズに
+> v1.x ストレージ固有の分散協調契約（epoch・manifest・chirps バックエンド
+> 境界）として別途 issue が必要かどうかは未決定のまま残っている。
 > **Historical note (2026-08-03)**: 当時、Alopex DB v0.8.1〜v0.8.3 はリリース済みで、`CREATE CONTINUOUS AGGREGATE` と parser contract `0.4.0` を v0.8.4 の prerequisite としていた。この prerequisite はその後 v0.8.4 で出荷済み。経緯は [Skulk v0.5 SQL パーサー準備状況](../reports/skulk-v0.5-sql-parser-readiness.md) を参照。
 > **Note (2026-07-18)**: **Alopex DB v0.7.0 はリリース済み**。v0.7のクラスタ機能は single-node compatible な cluster-aware foundation（status、join/leave lifecycle、routing diagnostics、simulation）までで、ノード跨ぎの実行・Raft・分散トランザクションは未実装。これらは v0.8 以降の計画である。DataFrame P3（`str`/`dt`/`list`、`explode`/`implode`）も v0.7.0 で出荷済み。
 > **Note (2026-06-27)**: alopex-sql の SQL パーサーを **Nim 実装に置き換える方針を決定**（C ABI FFI で統合、Rust 手書きパーサーは廃止）。あわせて JOIN/Subquery を Planner/Executor まで実装する（対応 DB v0.6）。技術選定は steering `tech.md` / `technical-decisions.md`、実装 spec は `.spec-workflow/specs/nim-sql-parser-migration/` を参照。詳細な機能対応は `alopex-sql-milestone.md` を参照。
@@ -68,7 +73,7 @@
 | **v0.8.8** | **v0.8.8** | **v0.8.8** | **v0.8.8** | v0.5.2 | Portable relational grammar ✅ **リリース済** |
 | **v0.8.9** | **v0.8.9** | **v0.8.9** | **v0.8.9** | v0.5.2 | Portable functions + KV glob/regex search ✅ **リリース済** |
 | **v0.8.10〜v0.8.11** | **同一版** | **同一版** | **同一版** | v0.5.2 | 単一 node SQL compatibility closure 🚧 **順次実装・公開** |
-| **v0.9.0** | **v0.9.0** | **v0.9.0** | **v0.9.0** | v0.7+ | Distributed query parity + server 認証(RBAC) + Multi-Raft range placement + Changefeed 🧊 **v0.8.11 公開まで凍結** |
+| **v0.9.0** | **v0.9.0** | **v0.9.0** | **v0.9.0** | v0.7+ | Distributed query parity + distributed transaction coordination + server 認証(RBAC) + Multi-Raft range placement + Changefeed 🧊 **v0.8.11 公開まで凍結** |
 | v1.0 | v1.0 | v1.0 | v1.0 | v0.8+ | Federation + Optimizer |
 
 ---
@@ -107,7 +112,7 @@
 | **v0.8.9** | **Portable functions** | Alopex v0.8.8 | temporal/statistics/math/string/regex/bitwise/boolean aggregate、KV glob/regex search | v0.8.9 | ✅ **リリース済** |
 | **v0.8.10** | **Type / nested / search foundation** | Alopex v0.8.9 | DECIMAL、DATE/TIME/INTERVAL、JSON、nested types、FTS | v0.8.10 | ⏳ **待機** |
 | **v0.8.11** | **Application / administration SQL** | Alopex v0.8.10 | transaction、bind、introspection、schema/DML/COPY/identity | v0.8.11 | ⏳ **待機** |
-| **v0.9.0** | **Distributed query parity + server auth (RBAC) + cluster foundation** | Chirps v0.7+ | v0.8 SQL surface の capability classification / deterministic rejection / parity、multi-user credential 認証と RBAC 認可（[#438](https://github.com/alopex-db/alopex/issues/438)）、Multi-Raft range placement（[#440](https://github.com/alopex-db/alopex/issues/440)）、Changefeed integration（[#441](https://github.com/alopex-db/alopex/issues/441)） | v0.9.0 | 🧊 **凍結** |
+| **v0.9.0** | **Distributed query parity + server auth (RBAC) + cluster foundation** | Chirps v0.7+ | v0.8 SQL surface の capability classification / deterministic rejection / parity、multi-user credential 認証と RBAC 認可（[#438](https://github.com/alopex-db/alopex/issues/438)）、Multi-Raft range placement（[#440](https://github.com/alopex-db/alopex/issues/440)）、Changefeed integration（[#441](https://github.com/alopex-db/alopex/issues/441)）、distributed transaction coordination: cross-transport transaction/freshness/commit-barrier/post-commit-visibility契約とgRPC/embedded/CLI/Python mapping（[#187](https://github.com/alopex-db/alopex/issues/187), [#200](https://github.com/alopex-db/alopex/issues/200) 他13 issue、v1.3-Distributed-Coordinationから付け替え） | v0.9.0 | 🧊 **凍結** |
 | v1.0.0 | Query Optimizer | - | コストベース最適化、統計情報 | v1.0 | ⏳ 予定 |
 | v1.0+-wasm | WASM Parser (再評価) | Alopex v1.0+ | Read-Only SQL (wasm32) | v1.0+ | ⏳ 再評価 |
 
