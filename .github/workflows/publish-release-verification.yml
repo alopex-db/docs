@@ -39,10 +39,10 @@ jobs:
 
           if [[ -n "${REQUESTED_VERSION}" ]]; then
             [[ "${REQUESTED_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
-            branch="report/verify-release-v${REQUESTED_VERSION}"
             git fetch --force --quiet alopex \
-              "refs/heads/${branch}:refs/remotes/alopex/${branch}"
-            refs=("refs/remotes/alopex/${branch}")
+              "+refs/heads/report/verify-release-v${REQUESTED_VERSION}*:refs/remotes/alopex/report/verify-release-v${REQUESTED_VERSION}*"
+            mapfile -t refs < <(git for-each-ref \
+              --format='%(refname)' "refs/remotes/alopex/report/verify-release-v${REQUESTED_VERSION}*")
           else
             git fetch --force --quiet alopex \
               '+refs/heads/report/verify-release-v*:refs/remotes/alopex/report/verify-release-v*'
@@ -60,14 +60,22 @@ jobs:
 
           for ref in "${refs[@]}"; do
             branch="${ref#refs/remotes/alopex/}"
-            version="${branch#report/verify-release-v}"
-            [[ "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
-            report="reports/release-verification/v${version}.md"
+            if [[ "${branch}" =~ ^report/verify-release-v([0-9]+\.[0-9]+\.[0-9]+)-([1-9][0-9]*)-([1-9][0-9]*)$ ]]; then
+              version="${BASH_REMATCH[1]}"
+              run_id="${BASH_REMATCH[2]}"
+              run_attempt="${BASH_REMATCH[3]}"
+              report="reports/release-verification/v${version}/run-${run_id}-${run_attempt}.md"
+            elif [[ "${branch}" =~ ^report/verify-release-v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+              version="${BASH_REMATCH[1]}"
+              report="reports/release-verification/v${version}.md"
+            else
+              continue
+            fi
             source_sha="$(git rev-parse "${ref}")"
             changed="$(git diff-tree --no-commit-id --name-only -r "${source_sha}")"
             test "${changed}" = "${report}"
 
-            incoming="${RUNNER_TEMP}/v${version}.md"
+            incoming="${RUNNER_TEMP}/$(basename "${report}")"
             git show "${source_sha}:${report}" > "${incoming}"
             grep -Fxq "# リリース確認レポート: v${version}" "${incoming}"
             if ! grep -Fq '> 総合結果: **✅ 全ステップ成功**' "${incoming}" && \
