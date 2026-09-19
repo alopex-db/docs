@@ -1,6 +1,8 @@
 name: Publish release verification report
 
 on:
+  repository_dispatch:
+    types: [release-verification-ready]
   workflow_dispatch:
     inputs:
       version:
@@ -31,7 +33,7 @@ jobs:
       - name: Import reports from Alopex CI
         id: reports
         env:
-          REQUESTED_VERSION: ${{ github.event.inputs.version || '' }}
+          REQUESTED_VERSION: ${{ github.event.inputs.version || github.event.client_payload.version || '' }}
         shell: bash
         run: |
           set -euo pipefail
