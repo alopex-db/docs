@@ -1224,6 +1224,8 @@ mesh.subscribe(|from_node, payload| async move {
 └───────────────────┘   └───────────────────┘   └───────────────────┘
 ```
 
+> **Connectivity boundary (2026-09-25)**: Federation Gateway は remote cluster を固定 `SocketAddr` や単一 QUIC connection として管理しない。peer identity、endpoint discovery、NAT traversal、relay、path selection は Chirps Connectivity Layer に委譲する。詳細は [Chirps Connectivity Layer](../design/chirps-connectivity-layer.md) を参照。
+
 #### 4.3.2 コンポーネント設計
 
 ##### A. Federation Gateway
@@ -1246,11 +1248,11 @@ pub struct FederationGateway {
     conflict_resolver: Arc<dyn ConflictResolver>,
 }
 
-/// リモートクラスタ接続
+/// リモートクラスタ接続。
+/// physical endpoint / NAT / relay / path selection は Chirps Connectivity Layer に委譲する。
 pub struct RemoteClusterConnection {
     cluster_id: ClusterId,
-    endpoints: Vec<SocketAddr>,  // 複数エンドポイントで冗長化
-    quic_connection: QuicConnection,
+    connectivity: ConnectivityHandle,
     status: ConnectionStatus,
     latency_tracker: LatencyTracker,
 }
@@ -1516,10 +1518,11 @@ pub enum MessageProfile {
     Federation,   // クラスタ間通信専用
 }
 
-/// フェデレーション用バックエンド
+/// フェデレーション用バックエンド。
+/// 単一 SocketAddr / 単一 QUIC connection を保持せず、Chirps Connectivity Layer
+/// が discovery / NAT traversal / relay / path selection を担当する。
 pub struct FederationBackend {
-    /// 各リモートクラスタへのQUICコネクション
-    connections: HashMap<ClusterId, QuicConnection>,
+    connectivity: HashMap<ClusterId, ConnectivityHandle>,
 
     /// mTLS証明書（クラスタ間認証）
     cluster_certs: ClusterCertificates,
@@ -1537,11 +1540,11 @@ impl MessageBackend for FederationBackend {
         // NodeIdからクラスタとノードを特定
         let (cluster_id, local_node_id) = parse_federated_node_id(target)?;
 
-        // クラスタ間接続経由で送信
-        let conn = self.connections.get(&cluster_id)
+        // physical endpoint や relay を意識せず Connectivity Layer 経由で送信
+        let connectivity = self.connectivity.get(&cluster_id)
             .ok_or(FederationError::ClusterNotConnected)?;
 
-        conn.send(local_node_id, bytes).await
+        connectivity.send(local_node_id, bytes).await
     }
 }
 ```
