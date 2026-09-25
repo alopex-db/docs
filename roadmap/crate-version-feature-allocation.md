@@ -165,6 +165,26 @@ Cargo.toml の description に基づく公式責務。
 - **v0.8.0 は温存**: 本来予定の「Metadata Raft + 分散クエリ本実装」。債務を混ぜない。
 - **各パッチの着手前ゲート**: spec（requirements/design/tasks）を起こし、**ロードマップの約束を tasks が全網羅しているか照合する**（#3 の merge が過去に脱落した原因の是正）。
 
+## 5.5 Chirps Connectivity / Federation allocation
+
+Chirps の Federation / Multi-Cluster については、physical connectivity を独立責務として割り付ける。詳細設計は [Chirps Connectivity Layer](../design/chirps-connectivity-layer.md) を正本とする。
+
+| Chirps | 責任機能 | Issue | DoD |
+|---|---|---|---|
+| v0.7 | Connectivity abstraction: identity / endpoint / path / connection の責務分離 | [#78](https://github.com/alopex-db/alopex-chirps/issues/78) | `NodeId` と location が分離され、複数 endpoint を transport 再設計なしで扱える |
+| v0.8 | Endpoint discovery / rendezvous | [#79](https://github.com/alopex-db/alopex-chirps/issues/79) | authenticated endpoint candidate を discovery / expiry できる |
+| v0.8 | UDP NAT traversal | [#80](https://github.com/alopex-db/alopex-chirps/issues/80) | QUIC/TLS を維持したまま NAT 配下 peer の direct UDP path を確立できる |
+| v0.8 | Relay fallback | [#81](https://github.com/alopex-db/alopex-chirps/issues/81) | direct 不可時に authenticated relay path へ fallback し、direct recovery を観測できる |
+| v0.9 | Multi-path Path Manager | [#82](https://github.com/alopex-db/alopex-chirps/issues/82) | direct/NAT/relay path を health 指標で選択・切替できる |
+| v0.9 | MessageProfile × PathPolicy | [#83](https://github.com/alopex-db/alopex-chirps/issues/83) | Raft/Gossip/Snapshot/FileTransfer/Durable ごとに path preference と relay policy を制御できる |
+
+補足:
+
+- HLC 自体は Chirps v0.6 で実装済み。v0.9 は cross-cluster HLC/TSO integration を担当する。
+- WireGuard は導入しない。Chirps は QUIC/TLS native transport を維持する。
+- Federation の mixed-version / TLS rotation / churn 検証は既存 [#10](https://github.com/alopex-db/alopex-chirps/issues/10)、[#11](https://github.com/alopex-db/alopex-chirps/issues/11) に統合する。
+- capability advertisement は [#74](https://github.com/alopex-db/alopex-chirps/issues/74) を利用し、connectivity capability の versioned negotiation を行う。
+
 ## 6. 運用ルール (実装漏れの構造的再発防止)
 
 gap-audit §6 の教訓を割り付け運用に反映する。
