@@ -124,12 +124,23 @@
 | v0.1-v0.3 | Node Identity、QUIC、Gossip | - | ✅ 完了 |
 | v0.4 | Raft-ready Transport | Chirps v0.3 | ✅ 完了 |
 | v0.5 | Raft Consensus API | Chirps v0.4 | ✅ 完了 |
-| **v0.5.1** | **File Transfer API** | Chirps v0.5 | ⏳ 予定 |
-| v0.6 | Multi-Raft + TSO + Observability | Chirps v0.5.1 | ⏳ 予定 |
-| v0.7 | Pluggable Backend + Durable | Chirps v0.6 | ⏳ 予定 |
-| v0.8 | Federation Profile | Chirps v0.7 | ⏳ 予定 |
-| v0.9 | Multi-Cluster + HLC | Chirps v0.8 | ⏳ 予定 |
-| v1.0 | Advanced Federation | Chirps v0.9 | ⏳ 予定 |
+| **v0.5.1-v0.5.2** | **File Transfer API + correctness / performance hardening** | Chirps v0.5 | ✅ v0.5.2 で完了 |
+| **v0.6-v0.6.3** | **Multi-Raft + TSO + Gossip HLC + Observability + mTLS / memory / connection control** | Chirps v0.5.2 | ✅ v0.6.3 まで公開済 |
+| v0.7 | Pluggable Backend + Durable + **Connectivity abstraction** | Chirps v0.6 | ⏳ 予定 |
+| v0.8 | Federation Profile + **Endpoint Discovery / Rendezvous / NAT Traversal / Relay** | Chirps v0.7 | ⏳ 予定 |
+| v0.9 | **Multi-Cluster Connectivity + Path Manager + cross-cluster HLC/TSO integration** | Chirps v0.8 | ⏳ 予定 |
+| v1.0 | Advanced Federation + **policy-aware routing / failover integration** | Chirps v0.9 | ⏳ 予定 |
+
+### Chirps Connectivity Layer (v0.7-v0.9)
+
+Federation / Multi-Cluster の下位接続基盤として、transport と membership の間に Connectivity Layer を置く。設計の正本は [chirps-connectivity-layer.md](../design/chirps-connectivity-layer.md)。
+
+- **v0.7**: identity / endpoint / path / connection の責務分離。[#78](https://github.com/alopex-db/alopex-chirps/issues/78)
+- **v0.8**: endpoint discovery / rendezvous [#79](https://github.com/alopex-db/alopex-chirps/issues/79)、UDP NAT traversal [#80](https://github.com/alopex-db/alopex-chirps/issues/80)、relay fallback [#81](https://github.com/alopex-db/alopex-chirps/issues/81)
+- **v0.9**: Path Manager [#82](https://github.com/alopex-db/alopex-chirps/issues/82)、MessageProfile × PathPolicy [#83](https://github.com/alopex-db/alopex-chirps/issues/83)
+- Federation compatibility / soak は既存 [#10](https://github.com/alopex-db/alopex-chirps/issues/10)、[#11](https://github.com/alopex-db/alopex-chirps/issues/11) で横断検証する。
+- HLC 自体は v0.6 で実装済み。v0.9 の責務は **cross-cluster HLC/TSO integration** であり、HLC の新規実装ではない。
+- QUIC/TLS は維持し、WireGuard は導入しない。
 
 ### Chirps File Transfer API (v0.5.1)
 
@@ -169,7 +180,7 @@
 ### フェデレーション連携
 - v1.0 (DB): Chirps v0.8 の Federation profile で 2 クラスタ間フェデレーション
   - Chirps v0.5.1 の File Transfer API で SSTable/セグメントファイル同期
-- v1.1 (DB): Chirps v0.9 のマルチクラスタ + HLC で Mesh
+- v1.1 (DB): Chirps v0.9 の Multi-Cluster Connectivity / Path Manager と cross-cluster HLC/TSO integration で Mesh
 - v1.2 (DB): Chirps v1.0 のフェイルオーバー通知で自動フェイルオーバー
 
 ---
