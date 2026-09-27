@@ -1,5 +1,10 @@
 # alopex-sql Query Engine Milestone
 
+> **現行割当（2026-09-27）**: [v0.8先行計画](./v08-single-node-advancement.md)を適用する。
+> 単一ノードで実装・受入検証できる関数・型・構文・Optimizerは、旧v1.0等の到来を待たず
+> [v0.8.x-SQL-Server](https://github.com/alopex-db/alopex/milestone/27)で進める。
+> 旧版の予定表記と現在のIssue状態を区別し、分散固有の受入は #174/#500で保持する。
+
 > 詳細仕様は `.spec-workflow/specs/` 配下の各 spec ドキュメントを参照。
 
 > **Note (2026-08-27, TDR #15) — バージョン軸について**: 本書の見出しに残る `v0.4.0` / `v0.5.0` / `v0.6.0` / `v0.9.0+` 等は、**alopex-sql に独自バージョン軸があるという前提で書かれた歴史的表記**である。alopex-sql は Alopex DB と同一バージョン・同一 tag で公開され、現在の公開版は v0.8.9。parser contract version は FFI 互換性メタデータで、独立 release lane ではない。次の公開順は v0.8.10〜v0.8.11、v0.9.0 はその完了まで凍結する。経緯は `.spec-workflow/steering/technical-decisions.md` §15 を参照。
@@ -27,8 +32,8 @@ QuestDB / TiDB / CockroachDB / YugabyteDB / InfluxDB と Alopex `main` の差分
 | [v0.8.9](https://github.com/alopex-db/alopex/milestone/9) | 既存 scalar 型上の temporal/statistics/math/string/regex/bitwise 関数と GENERATE_SERIES | [#153](https://github.com/alopex-db/alopex/issues/153)–[#157](https://github.com/alopex-db/alopex/issues/157) |
 | [v0.8.10](https://github.com/alopex-db/alopex/milestone/10) | DECIMAL、DATE/TIME/INTERVAL、JSON/JSONB、nested types、FTS と全境界の互換 gate | [#158](https://github.com/alopex-db/alopex/issues/158)–[#164](https://github.com/alopex-db/alopex/issues/164) |
 | [v0.8.11](https://github.com/alopex-db/alopex/milestone/11) | transaction、bind、introspection、schema evolution、constraint、advanced DML、COPY、identity | [#165](https://github.com/alopex-db/alopex/issues/165)–[#173](https://github.com/alopex-db/alopex/issues/173) |
-| [v0.9.0](https://github.com/alopex-db/alopex/milestone/12) | 🧊 **凍結中**。v0.8 SQL surface の distributed capability/parity。未実装の単一 node 構文は受け入れない | [#174](https://github.com/alopex-db/alopex/issues/174) |
-| [v1.0-SQL](https://github.com/alopex-db/alopex/milestone/13) | native INET と、PIVOT/UNPIVOT/UNION BY NAME の互換性評価・実装 | [#175](https://github.com/alopex-db/alopex/issues/175)–[#176](https://github.com/alopex-db/alopex/issues/176) |
+| [v0.8.x-SQL-Server](https://github.com/alopex-db/alopex/milestone/27) | native INET/CIDR・関数、PIVOT/UNPIVOT/UNION BY NAME、階層名、metadata、単体Optimizer、wildcard FROM | #175, #176, #193, #194, #355, #502, #503 |
+| [v0.9.0](https://github.com/alopex-db/alopex/milestone/12) | v0.8で出荷したSQLのdistributed capability/parity。単一ノード機能の先行を妨げない | [#174](https://github.com/alopex-db/alopex/issues/174), [#500](https://github.com/alopex-db/alopex/issues/500) |
 
 SQL-TS の意味論は Alopex core ではなく Skulk が所有する。Skulk
 [v0.4](https://github.com/alopex-db/alopex-skulk/milestone/1) で
@@ -1054,7 +1059,7 @@ pub fn execute_exists<S: KVStore>(
 | v0.10.0 | Raft-aware Executor | Chirps v0.6 |
 | v0.11.0 | Multi-Raft Query | Chirps v0.7 |
 | v0.12.0 | Federation Query | Chirps v0.8 |
-| v1.0.0 | Query Optimizer | - |
+| v0.8.x | Query Optimizer (#502、単一ノード) | なし |
 
 ### New Concepts (v0.9.0+)
 
@@ -1322,7 +1327,7 @@ JULIANDAY(ts)               -- ユリウス日 (SQLite)
 UNIXEPOCH(ts)               -- Unix時刻 (SQLite 3.38+)
 ```
 
-### v0.8.9 / v0.8.10 / v1.0-SQL (Advanced Functions)
+### v0.8.9 / v0.8.10 / v0.8.x (Advanced Functions)
 
 ```
 -- JSON関数 (v0.8.10: #160, #161)
@@ -1395,7 +1400,7 @@ WEBSEARCH_TO_TSQUERY(config, query)  -- Web検索形式
 TS_RANK(tsvector, tsquery)      -- 関連度スコア
 TS_HEADLINE(config, document, query)  -- ハイライト
 
--- ネットワークアドレス関数 (v1.0-SQL: #175)
+-- ネットワークアドレス関数 (v0.8.x-SQL-Server: #175)
 HOST(inet)                  -- ホスト部分
 NETWORK(inet)               -- ネットワーク部
 NETMASK(inet)               -- ネットマスク
@@ -1426,6 +1431,9 @@ BROADCAST(inet)             -- ブロードキャスト
 ---
 
 ## Version Dependencies
+
+現行の依存は [v0.8先行計画の技術依存](./v08-single-node-advancement.md)を参照する。
+下図は旧版の履歴であり、単一ノードOptimizerやSQL関数・構文を分散機能の後まで待たせる根拠にはしない。
 
 > **Note (2025-12-18)**: CD ワークフロー修正により v0.3.0 が crates.io に公開済み（旧 v0.1.3 Vector SQL 相当）。
 > 旧 v0.1.x は v0.3.0 に統合、旧 v0.1.4 以降は v0.4.0 以降に再番号付け。
@@ -1459,9 +1467,11 @@ v0.10.0 Raft-aware Executor ─────────────────�
 v0.11.0 Multi-Raft Query ───────────────────────→ Alopex DB v0.10 (Chirps v0.7)
     ↓
 v0.12.0 Federation Query ───────────────────────→ Alopex DB v1.0 (Chirps v0.8)
-    ↓
-v1.0.0 Query Optimizer (Cost-based)
-    ↓
+
+分散系列から独立して先行:
+v0.8.x Query Optimizer (Cost-based, #502。分散系列とは独立)
+
+製品対象・利用要件を別途評価:
 v1.0+ WASM Parser (Read-Only, Re-evaluation)
 ```
 
