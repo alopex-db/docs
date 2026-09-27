@@ -2,6 +2,13 @@
 
 バージョン間の依存関係と機能マッピング。
 
+> **現行方針（2026-09-27）**: [単一ノード機能のv0.8先行計画](./v08-single-node-advancement.md)
+> に基づき、SQL関数・構文・型・Optimizer、認証/API、storage/migration、S3、runtimeを
+> 既存の予定版にかかわらずv0.8系へ前倒しする。認証 #438もv0.8へ移動した。
+> 実行範囲は [#499](https://github.com/alopex-db/alopex/issues/499) とmilestone 27–32で管理する。
+> 以下の旧release train・凍結・版の順番による着手制約は、この現行計画に置き換える。
+> v0.8.16の進行中修正は維持し、v0.9のクラスタ実装と単体機能は独立に進める。
+
 ## クレート間バージョン対応
 
 > **Current policy (2026-08-27)**: Alopex の全公開 Rust crate と Python
@@ -15,7 +22,7 @@
 > [v0.8.7](https://github.com/alopex-db/alopex/milestone/7)〜
 > [v0.9.0](https://github.com/alopex-db/alopex/milestone/12)。
 
-> **Note (2026-09-16)**: v0.9.0 に server authentication（現行の
+> **履歴 (2026-09-16、認証は2026-09-27にv0.8へ前倒し)**: v0.9.0 に server authentication（現行の
 > `AuthMode::None`/固定1本の `Dev` API key しかない alopex-server の
 > 認証を、複数ユーザー資格情報認証と RBAC 認可へ拡張する）を追加。
 > Distributed query parity と並ぶ v0.9.0 scope として、
@@ -50,8 +57,9 @@
 | **v0.8.8** | **v0.8.8** | **v0.8.8** | **v0.8.8** | v0.5.2 | Portable relational grammar ✅ **リリース済** |
 | **v0.8.9** | **v0.8.9** | **v0.8.9** | **v0.8.9** | v0.5.2 | Portable functions + KV glob/regex search ✅ **リリース済** |
 | **v0.8.10〜v0.8.11** | **同一版** | **同一版** | **同一版** | v0.5.2 | 単一 node SQL compatibility closure 🚧 **順次実装・公開** |
-| **v0.9.0** | **v0.9.0** | **v0.9.0** | **v0.9.0** | v0.7+ | Distributed query parity + server 認証(RBAC) 🧊 **v0.8.11 公開まで凍結** |
-| v1.0 | v1.0 | v1.0 | v1.0 | v0.8+ | Federation + Optimizer |
+| **v0.8.x** | **同一版** | **同一版** | **同一版** | cluster非依存 | SQL/Server・storage/migration・S3・runtimeを先行（#499、milestone 27–32） |
+| **v0.9.0** | **v0.9.0** | **v0.9.0** | **v0.9.0** | 機能ごとのChirps契約 | Distributed query parity / Multi-Raft / 分散Changefeed・consistency。認証はv0.8系へ前倒し |
+| v1.0 | v1.0 | v1.0 | v1.0 | v0.8+ | Federation。単体Optimizerはv0.8系 #502へ前倒し |
 
 ---
 
@@ -89,8 +97,8 @@
 | **v0.8.9** | **Portable functions** | Alopex v0.8.8 | temporal/statistics/math/string/regex/bitwise/boolean aggregate、KV glob/regex search | v0.8.9 | ✅ **リリース済** |
 | **v0.8.10** | **Type / nested / search foundation** | Alopex v0.8.9 | DECIMAL、DATE/TIME/INTERVAL、JSON、nested types、FTS | v0.8.10 | ⏳ **待機** |
 | **v0.8.11** | **Application / administration SQL** | Alopex v0.8.10 | transaction、bind、introspection、schema/DML/COPY/identity | v0.8.11 | ⏳ **待機** |
-| **v0.9.0** | **Distributed query parity + server auth (RBAC)** | Chirps v0.7+ | v0.8 SQL surface の capability classification / deterministic rejection / parity、multi-user credential 認証と RBAC 認可（[#438](https://github.com/alopex-db/alopex/issues/438)） | v0.9.0 | 🧊 **凍結** |
-| v1.0.0 | Query Optimizer | - | コストベース最適化、統計情報 | v1.0 | ⏳ 予定 |
+| **v0.9.0** | **Distributed query parity** | 機能ごとのChirps契約 | v0.8 SQL surface の capability classification / deterministic rejection / parity。認証 [#438](https://github.com/alopex-db/alopex/issues/438)はv0.8系で先行 | v0.9.0 | 分散側の実装を継続 |
+| v0.8.x | Query Optimizer | 単一ノードの統計・planner契約 | コストベース最適化、統計情報 | v0.8.x | #502で実装管理 |
 | v1.0+-wasm | WASM Parser (再評価) | Alopex v1.0+ | Read-Only SQL (wasm32) | v1.0+ | ⏳ 再評価 |
 
 ---
@@ -112,8 +120,9 @@
 | v0.8.5 | Release surface hardening | **v0.8.5（リリース済）** |
 | v0.8.6 | Alias / REAL / set operations / CASE / CTE / basic window | **v0.8.6（リリース済）** |
 | v0.8.7〜v0.8.11 | Single-node SQL compatibility closure | **Alopex DB と同一版** |
-| v0.9.0 | Distributed query parity | **v0.9.0（凍結）** |
-| v1.0 | Federation クエリ、オプティマイザ | **v1.0** |
+| v0.8.x | 単一ノードSQL拡張・Query Optimizer | **v0.8.x（#499）** |
+| v0.9.0 | Distributed query parity | **v0.9.0** |
+| v1.0 | Federation クエリ | **v1.0** |
 
 ---
 
