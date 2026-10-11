@@ -2,7 +2,7 @@
 
 > 詳細仕様は `.spec-workflow/specs/` 配下の各 spec ドキュメントを参照。
 
-> **Note (2026-08-27, TDR #15) — バージョン軸について**: 本書の見出しに残る `v0.4.0` / `v0.5.0` / `v0.6.0` / `v0.9.0+` 等は、**alopex-sql に独自バージョン軸があるという前提で書かれた歴史的表記**である。alopex-sql は Alopex DB と同一バージョン・同一 tag で公開され、現在の公開版は v0.8.9。parser contract version は FFI 互換性メタデータで、独立 release lane ではない。次の公開順は v0.8.10〜v0.8.11、v0.9.0 はその完了まで凍結する。経緯は `.spec-workflow/steering/technical-decisions.md` §15 を参照。
+> **Note (2026-10-11, TDR #15) — バージョン軸について**: 本書の見出しに残る `v0.4.0` / `v0.5.0` / `v0.6.0` / `v0.9.0+` 等は、**alopex-sql に独自バージョン軸があるという前提で書かれた歴史的表記**である。alopex-sql は Alopex DB と同一バージョン・同一 tag で公開され、現在の公開版は v0.8.15。parser contract version は FFI 互換性メタデータで、独立 release lane ではない。経緯は `.spec-workflow/steering/technical-decisions.md` §15 を参照。
 
 > **Note (2026-06-27)**: SQL パーサーを **Nim 実装に置き換える方針を決定**（C ABI FFI で統合、Rust 手書きパーサーは廃止）。あわせて JOIN/Subquery を Planner/Executor まで実装する。技術選定は steering `tech.md` / `technical-decisions.md` を参照。実装 spec: `.spec-workflow/specs/nim-sql-parser-migration/`。
 > **Note (2026-01-13)**: v0.4.0 Async/Stream 基盤実装完了（runtime-agnostic async facade, tokio adapter, streaming SELECT）。
@@ -12,6 +12,20 @@
 ## Overview
 
 alopex-sql クエリエンジンの実装マイルストーンと、各バージョンで実装する具体的な関数・型の一覧。
+
+### v1.x Property Graph SQL track
+
+v1.x では [alopex#596](https://github.com/alopex-db/alopex/issues/596) の一部として、SQL/PGQ の概念に沿う Property Graph surface を追加する。過去の `COPY ... INTO GRAPH ... MAP COLUMNS` は構想段階のスケッチであり、そのまま互換構文として復活させない。
+
+| Phase | alopex-sql の責任 | 受け入れ条件 |
+| --- | --- | --- |
+| G1 | graph AST、catalog contract、capability error | Rust／Python／server API と同じ graph identity と mapping を表現できる |
+| G3 | `CREATE PROPERTY GRAPH`、`GRAPH_TABLE`、fixed path、bounded variable path | direction、label、property predicate、path bound、relational projection を一貫して実行する |
+| G4 | ETL mapping plan と dry-run diagnostics | storage 書込み前に型変換、重複、欠損端点を検出できる |
+| G5 | HNSW seed と traversal／filter／rerank の統合計画 | vector と graph の snapshot 可視性が一致し、無制限 traversal を許さない |
+| G6 | 外部 Parquet source と graph generation の計画 | DB artifact backend と外部 source connector の capability を区別する |
+
+Rust の型付き API を中核とし、SQL は別実装のグラフエンジンを持たない。IVF は独立した将来の vector index であり、この SQL track の前提条件ではない。
 
 ### SQL compatibility roadmap (2026-08-17)
 
@@ -27,7 +41,7 @@ QuestDB / TiDB / CockroachDB / YugabyteDB / InfluxDB と Alopex `main` の差分
 | [v0.8.9](https://github.com/alopex-db/alopex/milestone/9) | 既存 scalar 型上の temporal/statistics/math/string/regex/bitwise 関数と GENERATE_SERIES | [#153](https://github.com/alopex-db/alopex/issues/153)–[#157](https://github.com/alopex-db/alopex/issues/157) |
 | [v0.8.10](https://github.com/alopex-db/alopex/milestone/10) | DECIMAL、DATE/TIME/INTERVAL、JSON/JSONB、nested types、FTS と全境界の互換 gate | [#158](https://github.com/alopex-db/alopex/issues/158)–[#164](https://github.com/alopex-db/alopex/issues/164) |
 | [v0.8.11](https://github.com/alopex-db/alopex/milestone/11) | transaction、bind、introspection、schema evolution、constraint、advanced DML、COPY、identity | [#165](https://github.com/alopex-db/alopex/issues/165)–[#173](https://github.com/alopex-db/alopex/issues/173) |
-| [v0.9.0](https://github.com/alopex-db/alopex/milestone/12) | 🧊 **凍結中**。v0.8 SQL surface の distributed capability/parity。未実装の単一 node 構文は受け入れない | [#174](https://github.com/alopex-db/alopex/issues/174) |
+| [v0.9.0](https://github.com/alopex-db/alopex/milestone/12) | v0.8 SQL surface の distributed capability/parity。未実装の単一 node 構文は受け入れない | [#174](https://github.com/alopex-db/alopex/issues/174) |
 | [v1.0-SQL](https://github.com/alopex-db/alopex/milestone/13) | native INET と、PIVOT/UNPIVOT/UNION BY NAME の互換性評価・実装 | [#175](https://github.com/alopex-db/alopex/issues/175)–[#176](https://github.com/alopex-db/alopex/issues/176) |
 
 SQL-TS の意味論は Alopex core ではなく Skulk が所有する。Skulk
@@ -1452,7 +1466,7 @@ v0.6.0 JOIN Support ────────────────────
     ↓
 v0.6.0 Subquery ────────────────────────────────→ Alopex DB v0.6
     ↓
-v0.9.0 Distributed Query Parity ─────────────────→ Alopex DB v0.9（v0.8.11 公開まで凍結）
+v0.9.0 Distributed Query Parity ─────────────────→ Alopex DB v0.9
     ↓
 v0.10.0 Raft-aware Executor ────────────────────→ Alopex DB v0.9 (Chirps v0.6)
     ↓

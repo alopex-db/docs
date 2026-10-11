@@ -8,10 +8,10 @@
 > package は、Alopex DB と同じバージョンを同じ `vX.Y.Z` release lane で
 > 出荷する。`alopex-sql` / Nim parser に独立した feature version や release
 > lane はない。parser contract version は FFI 互換性を検査するメタデータで
-> あり、Alopex の release version を置き換えない。現在の公開版は v0.8.9。
-> v0.8.7〜v0.8.9は公開済みで、次の実装・公開順は **v0.8.10 → v0.8.11**。
-> **v0.9.0 はこの列がすべて公開されるまで凍結**し、`release/v0.9.0` を
-> release candidate として扱わない。実行状況の正本は GitHub milestones
+> あり、Alopex の release version を置き換えない。現在の公開版は v0.8.15。
+> v0.8.10〜v0.8.15も公開済み。以下の表には当時の計画表記を履歴として残すが、
+> 現在の実行 scope は GitHub milestones と Issue を正本とする。
+> v0.9.0 以降の実行状況の正本は GitHub milestones
 > [v0.8.7](https://github.com/alopex-db/alopex/milestone/7)〜
 > [v0.9.0](https://github.com/alopex-db/alopex/milestone/12)。
 
@@ -49,9 +49,26 @@
 | **v0.8.7** | **v0.8.7** | **v0.8.7** | **v0.8.7** | v0.5.2 | CTE / window correctness closure ✅ **リリース済** |
 | **v0.8.8** | **v0.8.8** | **v0.8.8** | **v0.8.8** | v0.5.2 | Portable relational grammar ✅ **リリース済** |
 | **v0.8.9** | **v0.8.9** | **v0.8.9** | **v0.8.9** | v0.5.2 | Portable functions + KV glob/regex search ✅ **リリース済** |
-| **v0.8.10〜v0.8.11** | **同一版** | **同一版** | **同一版** | v0.5.2 | 単一 node SQL compatibility closure 🚧 **順次実装・公開** |
-| **v0.9.0** | **v0.9.0** | **v0.9.0** | **v0.9.0** | v0.7+ | Distributed query parity + server 認証(RBAC) 🧊 **v0.8.11 公開まで凍結** |
+| **v0.8.10〜v0.8.15** | **同一版** | **同一版** | **同一版** | v0.5.2 | 単一 node SQL compatibility closure／release hardening ✅ **公開済** |
+| **v0.9.0** | **v0.9.0** | **v0.9.0** | **v0.9.0** | v0.7+ | Distributed query parity + server 認証(RBAC) ⏳ **計画** |
 | v1.0 | v1.0 | v1.0 | v1.0 | v0.8+ | Federation + Optimizer |
+
+---
+
+## v1.x Graph／Lake-Link track
+
+v1.x では [alopex#596](https://github.com/alopex-db/alopex/issues/596) を親 Issue とし、リレーショナルテーブルを正本にした Property Graph と Graph ETL を実装する。これは v2.0 で新規着手する機能ではない。v2.0 はストレージ／分散系との統合受け入れに使う。G1〜G6 は実装フェーズであり、公開パッケージの独立バージョンではない。
+
+| Phase | 到達点 | 公開 surface |
+| --- | --- | --- |
+| G1 | Property Graph、mapping、job、generation の契約を固定 | Rust、SQL、Python、HTTP/gRPC、CLI |
+| G2 | catalog と transactional adjacency index | Rust catalog/storage API、introspection |
+| G3 | SQL/PGQ query MVP | `CREATE PROPERTY GRAPH`、`GRAPH_TABLE`、固定長／上限付き path |
+| G4 | local Graph ETL | CSV、Parquet、Arrow、DataFrame、dry-run、reject、atomic publish |
+| G5 | GraphRAG と増分保守 | HNSW seed、bounded traversal、append／upsert／delete、provenance |
+| G6 | S3 Lake-Link と tiering | resume、export、rehydrate、世代切替 |
+
+Graph は HNSW を GraphRAG の seed に再利用するが、IVF の実装には依存しない。機能・性能の比較軸は[グラフデータベース機能・性能調査](https://github.com/alopex-db/alopex/blob/main/docs/graph-database-feature-performance-research.md)を参照する。
 
 ---
 
@@ -87,9 +104,9 @@
 | **v0.8.7** | **CTE / window correctness closure** | Alopex v0.8.6 | recursive CTE、CTE column list、peer/frame、LAG/LEAD、aggregate composition | v0.8.7 | ✅ **リリース済** |
 | **v0.8.8** | **Portable relational grammar** | Alopex v0.8.7 | predicates、VALUES、window/aggregate/grouping/table expressions | v0.8.8 | ✅ **リリース済** |
 | **v0.8.9** | **Portable functions** | Alopex v0.8.8 | temporal/statistics/math/string/regex/bitwise/boolean aggregate、KV glob/regex search | v0.8.9 | ✅ **リリース済** |
-| **v0.8.10** | **Type / nested / search foundation** | Alopex v0.8.9 | DECIMAL、DATE/TIME/INTERVAL、JSON、nested types、FTS | v0.8.10 | ⏳ **待機** |
-| **v0.8.11** | **Application / administration SQL** | Alopex v0.8.10 | transaction、bind、introspection、schema/DML/COPY/identity | v0.8.11 | ⏳ **待機** |
-| **v0.9.0** | **Distributed query parity + server auth (RBAC)** | Chirps v0.7+ | v0.8 SQL surface の capability classification / deterministic rejection / parity、multi-user credential 認証と RBAC 認可（[#438](https://github.com/alopex-db/alopex/issues/438)） | v0.9.0 | 🧊 **凍結** |
+| **v0.8.10** | **Type / nested / search foundation** | Alopex v0.8.9 | DECIMAL、DATE/TIME/INTERVAL、JSON、nested types、FTS | v0.8.10 | ✅ **リリース済** |
+| **v0.8.11** | **Application / administration SQL** | Alopex v0.8.10 | transaction、bind、introspection、schema/DML/COPY/identity | v0.8.11 | ✅ **リリース済** |
+| **v0.9.0** | **Distributed query parity + server auth (RBAC)** | Chirps v0.7+ | v0.8 SQL surface の capability classification / deterministic rejection / parity、multi-user credential 認証と RBAC 認可（[#438](https://github.com/alopex-db/alopex/issues/438)） | v0.9.0 | ⏳ **計画** |
 | v1.0.0 | Query Optimizer | - | コストベース最適化、統計情報 | v1.0 | ⏳ 予定 |
 | v1.0+-wasm | WASM Parser (再評価) | Alopex v1.0+ | Read-Only SQL (wasm32) | v1.0+ | ⏳ 再評価 |
 
@@ -112,7 +129,7 @@
 | v0.8.5 | Release surface hardening | **v0.8.5（リリース済）** |
 | v0.8.6 | Alias / REAL / set operations / CASE / CTE / basic window | **v0.8.6（リリース済）** |
 | v0.8.7〜v0.8.11 | Single-node SQL compatibility closure | **Alopex DB と同一版** |
-| v0.9.0 | Distributed query parity | **v0.9.0（凍結）** |
+| v0.9.0 | Distributed query parity | **v0.9.0（計画）** |
 | v1.0 | Federation クエリ、オプティマイザ | **v1.0** |
 
 ---
