@@ -7,6 +7,12 @@
 > [alopex-db-design-spec.md §3.4 / §4.3](../concepts/alopex-db-design-spec.md),
 > [chirps-raft-integration-proposal.md](./chirps-raft-integration-proposal.md)
 
+## 2026-10-16 共通IRへの接続
+
+本書の分散演算・partial/merge/finalize構想を、[alopex#636](https://github.com/alopex-db/alopex/issues/636) と[共通Query IR / Graph契約](query-graph-ir-contract.md)へ接続する。SQL/PGQ、Elastic Aggregation、将来Graph言語、Rust/Pythonは共通Logical IRを経由し、plannerがphysical fragment、Exchange、provider、read fenceを選択する。Graphのfrontier/path state、HNSW global seed TopK、retry identity、global budget、EXPLAINの対応を同契約で固定する。
+
+以下のAs-Isは2026-07-14時点の履歴として保持する。今回確認したコード基点と現在の移行境界は共通IR契約を参照する。Graph G1〜G6と既存SQL互換性を維持し、C07/C10/C11およびalopex#174のcapability gateで分散対応を受け入れる。
+
 ## 0. この文書の位置づけ
 
 alopex-db は単なる RDBMS ではなく**分散データベース**である。したがって SQL エンジンの本質的な設計課題は「どの組み込み関数を実装するか」ではなく、**クラスタ内の複数ノードにまたがって演算をどう分割し、各ノードで計算した部分結果をどう戻し、どう最終集約するか**にある。

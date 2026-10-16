@@ -57,6 +57,8 @@
 
 ## v1.x Graph／Lake-Link track
 
+[alopex#636](https://github.com/alopex-db/alopex/issues/636) との接続は[共通IR契約](../design/query-graph-ir-contract.md)を正本とする。G1で共通schema/context、G2でadjacency provider、G3でGraph lowering、G4でatomic publish、G5でHNSW seedとincremental capability、G6で分散fenceへ接続する。共通試験C01〜C12を各段階の受け入れへ追加し、既存のG1〜G6とストレージ／SQL計画を保持する。
+
 v1.x では [alopex#596](https://github.com/alopex-db/alopex/issues/596) を親 Issue とし、リレーショナルテーブルを正本にした Property Graph と Graph ETL を実装する。これは v2.0 で新規着手する機能ではない。v2.0 はストレージ／分散系との統合受け入れに使う。G1〜G6 は実装フェーズであり、公開パッケージの独立バージョンではない。
 
 | Phase | 到達点 | 公開 surface |
@@ -68,7 +70,7 @@ v1.x では [alopex#596](https://github.com/alopex-db/alopex/issues/596) を親 
 | G5 | GraphRAG と増分保守 | HNSW seed、bounded traversal、append／upsert／delete、provenance |
 | G6 | S3 Lake-Link と tiering | resume、export、rehydrate、世代切替 |
 
-Graph は HNSW を GraphRAG の seed に再利用するが、IVF の実装には依存しない。機能・性能の比較軸は[グラフデータベース機能・性能調査](https://github.com/alopex-db/alopex/blob/main/docs/graph-database-feature-performance-research.md)を参照する。
+Graph は HNSW を GraphRAG の seed に再利用するが、IVF の実装には依存しない。機能・性能の比較軸は[グラフデータベース機能・性能調査](../tech/graph-database-feature-performance-research.md)を参照する。
 
 ---
 

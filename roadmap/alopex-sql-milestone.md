@@ -15,6 +15,8 @@ alopex-sql クエリエンジンの実装マイルストーンと、各バージ
 
 ### v1.x Property Graph SQL track
 
+[alopex#636](https://github.com/alopex-db/alopex/issues/636) の[共通IR契約](../design/query-graph-ir-contract.md)に従い、SQL/PGQは型・NULL・cast・collation・path意味論を明示してGraph IRへlowerする。以下のSQL側計画責務は共通plannerへのadapterとして実装し、Graph演算子とphysical providerはRust/Python、将来Graph言語、Elastic集約と共有する。G1で契約を固定し、G3/G5で対応adapterとC01/C03/C05/C08/C10/C11を検証する。
+
 v1.x では [alopex#596](https://github.com/alopex-db/alopex/issues/596) の一部として、SQL/PGQ の概念に沿う Property Graph surface を追加する。過去の `COPY ... INTO GRAPH ... MAP COLUMNS` は構想段階のスケッチであり、そのまま互換構文として復活させない。
 
 | Phase | alopex-sql の責任 | 受け入れ条件 |

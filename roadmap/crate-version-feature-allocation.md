@@ -62,12 +62,14 @@ Cargo.toml の description に基づく公式責務。
 
 ### 1.3 v1.x Graph track の責任配置
 
+共通IR・planner・runtimeの責務は [alopex#636](https://github.com/alopex-db/alopex/issues/636) と[接続契約](../design/query-graph-ir-contract.md)で管理する。具体的なcrate抽出先は#636の依存関係inventoryで決定する。下表は現行crateへの接続責任を示し、Graph演算子の意味契約は言語共通層が所有する。
+
 Graph／Lake-Link は [alopex#596](https://github.com/alopex-db/alopex/issues/596) の G1〜G6 を実装単位とする。各公開 crate と Python package は同じ workspace version で出荷し、G1〜G6 を独立した release version にはしない。
 
 | Owner | 単一責任 | DoD の要点 |
 | --- | --- | --- |
 | `alopex-core` | adjacency index、generation／manifest、HNSW と graph の原子的可視性 | commit、rollback、再起動、破損検出を通して table／vector／graph が同じ snapshot を示す |
-| `alopex-sql` | Property Graph DDL、SQL/PGQ subset、graph planner／operator | `CREATE PROPERTY GRAPH` と `GRAPH_TABLE` を解析・計画・実行し、path bound を強制する |
+| `alopex-sql` | Property Graph DDL、SQL/PGQ subset、共通Graph IRへのlowering adapter | `CREATE PROPERTY GRAPH` と `GRAPH_TABLE` を共通catalog/planner/runtimeへ接続し、path boundとAPI parityを検証する |
 | `alopex-dataframe` | mapping transform、typed explode、local／S3 streaming batch | CSV／Parquet／Arrow／DataFrame の同じ mapping が同じ node／edge を生成する |
 | `alopex-embedded` | Rust typed API、job lifecycle、transaction orchestration | plan、dry-run、start、status、cancel、resume を型付き API で扱える |
 | `alopex-py` | Python API、Arrow／Pandas／Polars adapter、job status | Rust と同じ mapping／job semantics を Python から利用できる |
