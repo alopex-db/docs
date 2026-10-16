@@ -15,3 +15,8 @@ Alopex DB 本体と Skulk は**独立したリポジトリ・独立したバー�
 |---|---|---|
 | Alopex DB（本体） | [![Latest Alopex DB release](https://img.shields.io/github/v/release/alopex-db/alopex?sort=semver&label=latest)](https://github.com/alopex-db/alopex/releases/latest) | [alopex-milestones.md](roadmap/alopex-milestones.md) |
 | Alopex Skulk（時系列DB） | [![crates.io](https://img.shields.io/crates/v/alopex-skulk.svg)](https://crates.io/crates/alopex-skulk) | [skulk-milestones.md](roadmap/skulk-milestones.md) |
+
+## Query / Graph Architecture
+
+- [共通Query IRとGraph trackの接続契約](design/query-graph-ir-contract.md): SQL/PGQ、Elastic Aggregation、Rust/Python、Graph演算子、transaction/snapshot、分散実行と共通試験。
+- [Graph DB機能・性能調査](tech/graph-database-feature-performance-research.md): Graph ETLの到達条件と比較基準。
