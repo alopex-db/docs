@@ -6,7 +6,7 @@
 > milestone 27–32は実装テーマであり、公開は受入済み機能のまとまりで決める。
 > 以下の過去版の順序・凍結記述は履歴として残し、現行スケジュール判断には使わない。
 
-> Status: **実装・公開状況の記録** / 2026-08-27 (v0.8.9公開後に更新)
+> Status: **実装・公開状況の記録** / 2026-10-11（現行公開版 v0.8.15）
 > 目的: 実装漏れ債務と今後の機能を、担当クレートと着手バージョンに **1つずつ明示配置** する。
 > 「全部いっぺんに」を禁じ、各機能に責任クレートと期日を持たせることで実装漏れの再発を防ぐ。
 > 関連: [distributed-implementation-gap-audit.md](../design/distributed-implementation-gap-audit.md)（漏れの棚卸し）,
@@ -24,22 +24,21 @@
 
 ### 1.1 実リリース状況 (2026-08-18、git tag / manifests を観測で確定)
 
-**Alopex v0.8.9 は公開済みで、全公開 Rust crate と Python package は同じ
+**Alopex v0.8.15 は公開済みで、全公開 Rust crate と Python package は同じ
 バージョンを使う。** v0.8.4 で parser contract `0.4.0`、v0.8.5 で release
-surface hardening、v0.8.6〜v0.8.9 で単一 node SQL correctness、portable grammar、portable functionsを出荷した。次の公開順は
-v0.8.10〜v0.8.11 であり、v0.9.0 はその完了まで凍結する。
+surface hardening、v0.8.6〜v0.8.15 で単一 node SQL correctness、portable grammar、portable functions、互換性 closure を出荷した。v0.9.0 以降の実行 scope は GitHub milestone を正本とする。
 
 | クレート | 実公開版 (crates.io/PyPI) | Cargo.toml 版定義 | 版定義の種別 |
 |---|---|---|---|
-| alopex-core | crates.io **0.8.9** | `version.workspace = true` | workspace 継承 |
-| alopex-sql | crates.io **0.8.9** | `version.workspace = true` | workspace 継承 |
-| alopex-dataframe | crates.io **0.8.9** | `version.workspace = true` | workspace 継承 |
-| alopex-embedded | crates.io **0.8.9** | `version.workspace = true` | workspace 継承 |
-| alopex-server | crates.io **0.8.9** | `version.workspace = true` | workspace 継承 |
-| alopex-cli | crates.io **0.8.9** | `version.workspace = true` | workspace 継承 |
-| alopex-cluster | crates.io **0.8.9** | `version.workspace = true` | workspace 継承 |
+| alopex-core | crates.io **0.8.15** | `version.workspace = true` | workspace 継承 |
+| alopex-sql | crates.io **0.8.15** | `version.workspace = true` | workspace 継承 |
+| alopex-dataframe | crates.io **0.8.15** | `version.workspace = true` | workspace 継承 |
+| alopex-embedded | crates.io **0.8.15** | `version.workspace = true` | workspace 継承 |
+| alopex-server | crates.io **0.8.15** | `version.workspace = true` | workspace 継承 |
+| alopex-cli | crates.io **0.8.15** | `version.workspace = true` | workspace 継承 |
+| alopex-cluster | crates.io **0.8.15** | `version.workspace = true` | workspace 継承 |
 | alopex-tools | crates.io **未公開** | `0.0.0` | 独立ワークスペース (issue #45 是正済み)。crates.io 公開版 alopex-embedded/alopex-sql に依存し、リリース確認コンテナの `verify-release-embedded` バイナリ等を提供。publish=false (内部ツール) |
-| alopex (=alopex-py) | PyPI **0.8.9** | `version.workspace = true` | workspace 継承 |
+| alopex (=alopex-py) | PyPI **0.8.15** | `version.workspace = true` | workspace 継承 |
 
 **現行 invariant**:
 
@@ -66,6 +65,26 @@ Cargo.toml の description に基づく公式責務。
 | **alopex-cluster** (公開済み) | v0.7 cluster-aware foundation（Chirps 基盤の上） | cluster metadata、status、membership lifecycle、routing simulation。リモート実行は未実装 |
 | alopex-embedded / server / py / cli | 上位インターフェース | 分散クエリの入口（透過的にルーティング） |
 | (外部) **Chirps** | 合意(Raft)・通信(QUIC)・メンバーシップ(SWIM)・(v0.6)Multi-Raft/TSO | 基盤。alopex-cluster が利用 |
+
+### 1.3 v1.x Graph track の責任配置
+
+共通IR・planner・runtimeの責務は [alopex#636](https://github.com/alopex-db/alopex/issues/636) と[接続契約](../design/query-graph-ir-contract.md)で管理する。具体的なcrate抽出先は#636の依存関係inventoryで決定する。下表は現行crateへの接続責任を示し、Graph演算子の意味契約は言語共通層が所有する。
+
+Graph／Lake-Link は [alopex#596](https://github.com/alopex-db/alopex/issues/596) の G1〜G6 を実装単位とする。各公開 crate と Python package は同じ workspace version で出荷し、G1〜G6 を独立した release version にはしない。
+
+| Owner | 単一責任 | DoD の要点 |
+| --- | --- | --- |
+| `alopex-core` | adjacency index、generation／manifest、HNSW と graph の原子的可視性 | commit、rollback、再起動、破損検出を通して table／vector／graph が同じ snapshot を示す |
+| `alopex-sql` | Property Graph DDL、SQL/PGQ subset、共通Graph IRへのlowering adapter | `CREATE PROPERTY GRAPH` と `GRAPH_TABLE` を共通catalog/planner/runtimeへ接続し、path boundとAPI parityを検証する |
+| `alopex-dataframe` | mapping transform、typed explode、local／S3 streaming batch | CSV／Parquet／Arrow／DataFrame の同じ mapping が同じ node／edge を生成する |
+| `alopex-embedded` | Rust typed API、job lifecycle、transaction orchestration | plan、dry-run、start、status、cancel、resume を型付き API で扱える |
+| `alopex-py` | Python API、Arrow／Pandas／Polars adapter、job status | Rust と同じ mapping／job semantics を Python から利用できる |
+| `alopex-server` | HTTP/gRPC API、長時間 job の制御 | idempotency key、認可、status、cancel、resume、reject artifact を扱える |
+| `alopex-cli` | ETL の plan／dry-run／start／status／cancel／resume UX | automation 用の安定した JSON 出力と人向け diagnostics を提供する |
+| `alopex-tools` | LDBC SNB、Kùzu／Neo4j 比較 harness と成果物 | dataset、設定、hardware、p50／p95／p99、throughput、load、更新コストを再現できる |
+| `alopex-cluster` | v2 capability classification と distributed graph parity | unsupported operation を決定的に拒否し、対応機能は single-node と同じ結果を返す |
+
+S3 上の外部 Parquet を Graph ETL の入力にする責務と、[#190](https://github.com/alopex-db/alopex/issues/190) が扱う DB artifact の配置先は分離する。IVF は Graph track の依存条件に含めない。
 
 ## 2. 実装漏れ債務の割り付け (最優先)
 
@@ -154,10 +173,10 @@ Cargo.toml の description に基づく公式責務。
   v0.9.0 distributed capability / parity（v0.8.11 公開後に再起動判断）
 ```
 
-**過去のrelease trainの制約（2026-09-27の先行計画へ移行済み）**:
-- v0.8.7〜v0.8.9 は公開済み。v0.8.10〜v0.8.11 は milestone 番号順に実装・検証・公開する。
-- 後続 milestone の実装は、直前版の公開と post-publish verification が完了するまで開始しない。
-- v0.9.0 の開発・release 操作は v0.8.11 公開まで凍結する。
+**release trainの現行制約**:
+- v0.8.7〜v0.8.15 は公開済み。以下の v0.8.10〜v0.8.11 の順序記述は完了履歴として読む。
+- 後続 milestone は GitHub 上の技術依存と受入条件に従い、単一ノード機能はv0.8系で先行する。
+- v0.9.0 の分散要件と release scope は GitHub milestone で管理する。
 - parser source / ABI asset は独立公開せず、該当 Alopex tag の release gate で全 target を再生成・検証する。
 - v0.7.x の詳細は完了履歴であり、現在のスケジュール判断には使わない。
 
