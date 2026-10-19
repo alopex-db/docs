@@ -1,0 +1,57 @@
+{
+  "schema": "alopex-release-verification/v2",
+  "version": "0.8.16",
+  "started_at": "2026-10-19T11:06:11.633550Z",
+  "completed_at": "2026-10-19T11:06:17.568172Z",
+  "outcome": "success",
+  "failure_stage": null,
+  "environment": {
+    "package_source": "crates.io / PyPI",
+    "rust": "1.96",
+    "nim": "nimlang/nim:2.2",
+    "python": "3.11"
+  },
+  "identity": {
+    "commit": "d9ff8783b8d18a63d167204e55902ea6cd90dcd1",
+    "tag": "alopex-py-v0.8.16",
+    "run_id": "39242169470",
+    "run_attempt": 1,
+    "run_url": "https://github.com/alopex-db/alopex/actions/runs/39242169470",
+    "responsibility": "Stable Delivery / downstream availability"
+  },
+  "steps": [
+    {
+      "name": "public package availability",
+      "status": "success",
+      "description": "PyPIから完全一致wheelを取得し、隔離先へ導入してimportできることを確認する。既知機能の正しさは対象commitのDevelopment CI/Extended Verificationが所有する。",
+      "duration_ms": null,
+      "log_excerpt": [
+        "Collecting alopex==0.8.16",
+        "  Downloading alopex-0.8.16-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (18 kB)",
+        "Downloading alopex-0.8.16-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (12.5 MB)",
+        "   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.5/12.5 MB 12.7 MB/s eta 0:00:00",
+        "Saved /home/runner/work/_temp/pypi-readiness-v0.8.16/alopex-0.8.16-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+        "Successfully downloaded alopex",
+        "Looking in links: /home/runner/work/_temp/pypi-readiness-v0.8.16",
+        "Processing /home/runner/work/_temp/pypi-readiness-v0.8.16/alopex-0.8.16-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+        "Installing collected packages: alopex",
+        "Successfully installed alopex-0.8.16",
+        "0.8.16"
+      ],
+      "diagnostics": []
+    },
+    {
+      "name": "v0.8.16 public vector scenario",
+      "status": "success",
+      "description": "PyPIから取得した完全一致wheelで、Kaggleと同じ組み込みPythonのベクトル投入・検索を再実行し、v0.8.16のget_vectors、バッチHNSW投入、重複キー原子拒否、kNN EXPLAIN経路表示を検証する。",
+      "duration_ms": null,
+      "log_excerpt": [
+        "installed wheel executes v0.8.16 vector/HNSW/streaming contracts",
+        "nearest=b'point' distance=0.0",
+        "second=b'quarter' distance=0.25",
+        "search_stats=nodes_visited"
+      ],
+      "diagnostics": []
+    }
+  ]
+}
