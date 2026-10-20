@@ -135,6 +135,14 @@ def validate(payload, markdown, version, run_id, attempt):
     return payload
 
 
+def canonical_markdown(markdown):
+    """Correct a legacy display label while preserving immutable raw evidence."""
+    old = "| ソースビルド | なし(公開パッケージのみ使用) |".encode()
+    new = "| Rust製品の導入 | crates.ioの公開crateをコンパイル（作業コピーの製品コードは使用しない） |".encode()
+    parts = markdown.rsplit(old, 1)
+    return new.join(parts) if len(parts) == 2 else markdown
+
+
 def put_immutable(path, content):
     if path.is_symlink():
         raise ValueError(f"symlink report refused: {path}")
@@ -209,6 +217,8 @@ def import_ref(repo, ref):
         if rank >= prior_rank:
             for ext, blob in blobs.items():
                 target = Path(str(canonical) + "." + ext)
+                if ext == "md":
+                    blob = canonical_markdown(blob)
                 if target.is_symlink():
                     raise ValueError("canonical symlink refused")
                 target.write_bytes(blob)
