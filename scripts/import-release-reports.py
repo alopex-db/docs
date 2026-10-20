@@ -120,6 +120,18 @@ def import_ref(repo, ref):
         .decode()
         .splitlines()
     )
+    # Pre-pair publishers left Markdown-only branches behind. Retain their
+    # historical bytes, but never promote them to the canonical scenario pair.
+    if changed == {f"{stem}.md"}:
+        markdown = git(repo, "show", f"{ref}:{stem}.md")
+        text = markdown.decode("utf-8")
+        if not text.startswith(f"# リリース確認レポート: v{version}\n") or not any(
+            f"> 総合結果: **{marker}**" in text for marker in MARKERS.values()
+        ):
+            raise ValueError("invalid legacy report header/outcome")
+        target = repo / f"{stem}.md"
+        put_immutable(target, markdown)
+        return [target]
     if changed != paths:
         raise ValueError(f"report commit changes unrelated paths: {branch}")
     blobs = {ext: git(repo, "show", f"{ref}:{stem}.{ext}") for ext in ("md", "json")}
