@@ -246,6 +246,20 @@ class ReportTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "producing source run"):
                 REPORTS.import_ref(self.root, self.ref)
 
+    def test_legacy_build_label_is_corrected_only_in_canonical_view(self):
+        self.full_scenarios()
+        self.md += "\n| ソースビルド | なし(公開パッケージのみ使用) |\n"
+        self.publish()
+        REPORTS.import_ref(self.root, self.ref)
+        self.assertEqual((self.root / f"{self.stem}.md").read_text(), self.md)
+        canonical = (self.root / "reports/release-verification/v0.8.16.md").read_text()
+        self.assertIn("crates.ioの公開crateをコンパイル", canonical)
+        self.assertNotIn("ソースビルド | なし", canonical)
+        self.assertEqual(
+            (self.root / f"{self.stem}.json").read_bytes(),
+            (self.root / "reports/release-verification/v0.8.16.json").read_bytes(),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
