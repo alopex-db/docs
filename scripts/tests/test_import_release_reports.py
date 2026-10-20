@@ -4,6 +4,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 SPEC = importlib.util.spec_from_file_location(
     "reports", Path(__file__).parents[1] / "import-release-reports.py"
@@ -195,6 +196,55 @@ class ReportTests(unittest.TestCase):
             (self.root / "reports/release-verification/v0.8.16.md").exists()
         )
         self.assertFalse((self.root / f"{self.stem}.json").exists())
+
+    def test_data_only_branch_uses_actual_run_source_identity(self):
+        # The verifier is the earlier base; publication adds only report data
+        # on a later main snapshot whose source tree need not equal that verifier.
+        (self.root / "README.md").write_text("later main")
+        git(self.root, "add", ".")
+        git(self.root, "commit", "-qm", "later main snapshot")
+        self.base = git(self.root, "rev-parse", "HEAD")
+        verifier = self.payload["verifier_commit"]
+        self.publish()
+        with patch.object(
+            REPORTS,
+            "read_run",
+            return_value={
+                "head_sha": verifier,
+                "head_repository": {"full_name": "alopex-db/alopex"},
+            },
+        ) as read:
+            REPORTS.import_ref(self.root, self.ref)
+            read.assert_called_once_with("123")
+
+    def test_data_only_branch_rejects_wrong_source_run(self):
+        self.payload["verifier_commit"] = "a" * 40
+        self.publish()
+        with patch.object(
+            REPORTS,
+            "read_run",
+            return_value={
+                "head_sha": "b" * 40,
+                "head_repository": {"full_name": "alopex-db/alopex"},
+            },
+        ):
+            with self.assertRaisesRegex(ValueError, "producing source run"):
+                REPORTS.import_ref(self.root, self.ref)
+        self.assertFalse((self.root / f"{self.stem}.md").exists())
+
+    def test_data_only_branch_rejects_fork_origin(self):
+        self.payload["verifier_commit"] = "a" * 40
+        self.publish()
+        with patch.object(
+            REPORTS,
+            "read_run",
+            return_value={
+                "head_sha": "a" * 40,
+                "head_repository": {"full_name": "someone/fork"},
+            },
+        ):
+            with self.assertRaisesRegex(ValueError, "producing source run"):
+                REPORTS.import_ref(self.root, self.ref)
 
 
 if __name__ == "__main__":
