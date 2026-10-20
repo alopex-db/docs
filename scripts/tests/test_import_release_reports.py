@@ -180,6 +180,22 @@ class ReportTests(unittest.TestCase):
         self.assertEqual(markdown.read_text(), "newer canonical")
         self.assertEqual(json.loads(canonical.read_text())["identity"]["run_id"], "456")
 
+    def test_legacy_markdown_does_not_block_or_promote_new_pair_ingestion(self):
+        path = self.root / f"{self.stem}.md"
+        path.parent.mkdir(parents=True)
+        path.write_text(self.md)
+        git(self.root, "add", ".")
+        git(self.root, "commit", "-qm", "legacy Markdown-only publisher")
+        git(self.root, "update-ref", self.ref, "HEAD")
+        git(self.root, "reset", "--hard", self.base)
+        paths = REPORTS.import_ref(self.root, self.ref)
+        self.assertEqual(paths, [path])
+        self.assertEqual(path.read_text(), self.md)
+        self.assertFalse(
+            (self.root / "reports/release-verification/v0.8.16.md").exists()
+        )
+        self.assertFalse((self.root / f"{self.stem}.json").exists())
+
 
 if __name__ == "__main__":
     unittest.main()
