@@ -11,9 +11,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
+import urllib.request
 
 BRANCH = re.compile(r"^report/verify-release-v(\d+\.\d+\.\d+)-(\d+)-(\d+)$")
 MARKERS = {
@@ -25,6 +27,39 @@ MARKERS = {
 
 def git(repo, *args):
     return subprocess.check_output(["git", "-C", str(repo), *args])
+
+
+def read_run(run_id):
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "alopex-release-report-ingestion",
+    }
+    if os.environ.get("GH_TOKEN"):
+        headers["Authorization"] = "Bearer " + os.environ["GH_TOKEN"]
+    request = urllib.request.Request(
+        f"https://api.github.com/repos/alopex-db/alopex/actions/runs/{run_id}",
+        headers=headers,
+    )
+    with urllib.request.urlopen(request, timeout=30) as response:
+        return json.load(response)
+
+
+def validate_source_run(repo, ref, payload):
+    verifier = payload.get("verifier_commit")
+    parent = git(repo, "rev-parse", f"{ref}^").decode().strip()
+    if verifier in (None, "unknown"):
+        return  # Historical availability reports did not carry verifier identity.
+    if not re.fullmatch(r"[0-9a-f]{40}", verifier):
+        raise ValueError("invalid verifier commit")
+    if parent != verifier:
+        # A data-only branch need not carry an unmerged verifier's workflow files.
+        # The producing Actions run binds the report to the actual tested verifier.
+        origin = read_run(payload["identity"]["run_id"])
+        if (
+            origin.get("head_sha") != verifier
+            or origin.get("head_repository", {}).get("full_name") != "alopex-db/alopex"
+        ):
+            raise ValueError("report differs from its producing source run")
 
 
 def validate(payload, markdown, version, run_id, attempt):
@@ -79,6 +114,8 @@ def validate(payload, markdown, version, run_id, attempt):
         if f"### {index}. {step['name']} {mark}\n" not in text:
             raise ValueError("Markdown omits a recorded scenario")
     if payload.get("suite") == "scenarios" and status == "success":
+        if not re.fullmatch(r"[0-9a-f]{40}", payload.get("verifier_commit", "")):
+            raise ValueError("full scenario verifier identity missing")
         required = {
             "verify-release-embedded ビルド",
             "公開版 alopex-embedded 実行時依存 smoke",
@@ -148,10 +185,7 @@ def import_ref(repo, ref):
     )
     if tag != payload["identity"]["commit"]:
         raise ValueError("report source differs from peeled public tag")
-    if payload.get("verifier_commit") not in (None, "unknown"):
-        parent = git(repo, "rev-parse", f"{ref}^").decode().strip()
-        if parent != payload["verifier_commit"]:
-            raise ValueError("report branch is not based on the recorded verifier")
+    validate_source_run(repo, ref, payload)
     # Validate collisions before writing either half of the immutable pair.
     for ext, blob in blobs.items():
         target = repo / f"{stem}.{ext}"

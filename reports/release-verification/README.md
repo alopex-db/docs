@@ -17,7 +17,7 @@ docs側の `GITHUB_TOKEN` でmainへ保存します。リポジトリ間の書�
 `workflow_dispatch` の `version` を指定すれば、対象バージョンだけを即時取り込めます。
 
 取り込みでは、レポート以外の変更がないこと、JSONとMarkdownの結果とステップ、
-run/attempt、公開PythonタグのソースSHA、検証スクリプトの親コミットを確認します。
+run/attempt、公開PythonタグのソースSHA、検証コードのSHAを確認します。レポートだけの保存ブランチでは、生成元Actions runのソースSHAと照合します。
 保存後に両ファイルのSHA-256を確認します。入力ブランチのコードは実行しません。
 
 検証結果と保存処理の成否は別の記録です。過去の `*-publication-failure.*` は

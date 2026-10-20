@@ -33,6 +33,7 @@ jobs:
       - name: Import reports from Alopex CI
         id: reports
         env:
+          GH_TOKEN: ${{ github.token }}
           REQUESTED_VERSION: ${{ github.event.inputs.version || github.event.client_payload.version || '' }}
         shell: bash
         run: |
