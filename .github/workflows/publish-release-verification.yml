@@ -42,9 +42,9 @@ jobs:
           if [[ -n "${REQUESTED_VERSION}" ]]; then
             [[ "${REQUESTED_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
             git fetch --force --quiet alopex \
-              "+refs/heads/report/verify-release-v${REQUESTED_VERSION}*:refs/remotes/alopex/report/verify-release-v${REQUESTED_VERSION}*"
+              "+refs/heads/report/verify-release-v${REQUESTED_VERSION}-*:refs/remotes/alopex/report/verify-release-v${REQUESTED_VERSION}-*"
             mapfile -t refs < <(git for-each-ref \
-              --format='%(refname)' "refs/remotes/alopex/report/verify-release-v${REQUESTED_VERSION}*")
+              --format='%(refname)' "refs/remotes/alopex/report/verify-release-v${REQUESTED_VERSION}-*")
           else
             git fetch --force --quiet alopex \
               '+refs/heads/report/verify-release-v*:refs/remotes/alopex/report/verify-release-v*'
@@ -52,43 +52,11 @@ jobs:
               --format='%(refname)' 'refs/remotes/alopex/report/verify-release-v*')
           fi
 
-          manifest="${RUNNER_TEMP}/release-verification-hashes"
-          : > "${manifest}"
-          if [[ "${#refs[@]}" -eq 0 ]]; then
-            echo "No pending release reports"
-            echo "changed=false" >> "${GITHUB_OUTPUT}"
-            exit 0
-          fi
-
-          for ref in "${refs[@]}"; do
-            branch="${ref#refs/remotes/alopex/}"
-            if [[ "${branch}" =~ ^report/verify-release-v([0-9]+\.[0-9]+\.[0-9]+)-([1-9][0-9]*)-([1-9][0-9]*)$ ]]; then
-              version="${BASH_REMATCH[1]}"
-              run_id="${BASH_REMATCH[2]}"
-              run_attempt="${BASH_REMATCH[3]}"
-              report="reports/release-verification/v${version}/run-${run_id}-${run_attempt}.md"
-            elif [[ "${branch}" =~ ^report/verify-release-v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
-              version="${BASH_REMATCH[1]}"
-              report="reports/release-verification/v${version}.md"
-            else
-              continue
-            fi
-            source_sha="$(git rev-parse "${ref}")"
-            changed="$(git diff-tree --no-commit-id --name-only -r "${source_sha}")"
-            test "${changed}" = "${report}"
-
-            incoming="${RUNNER_TEMP}/$(basename "${report}")"
-            git show "${source_sha}:${report}" > "${incoming}"
-            grep -Fxq "# リリース確認レポート: v${version}" "${incoming}"
-            if ! grep -Fq '> 総合結果: **✅ 全ステップ成功**' "${incoming}" && \
-               ! grep -Fq '> 総合結果: **❌ 失敗あり**' "${incoming}"; then
-              echo "report has no exact overall result marker: ${report}" >&2
-              exit 1
-            fi
-            install -D -m 0644 "${incoming}" "${report}"
-            printf '%s\t%s\n' "${report}" "$(sha256sum "${incoming}" | awk '{print $1}')" \
-              >> "${manifest}"
-          done
+          git fetch --force --quiet alopex \
+            '+refs/tags/alopex-py-v*:refs/remotes/alopex/tags/alopex-py-v*'
+          python3 scripts/import-release-reports.py --repo "${GITHUB_WORKSPACE}" \
+            --version "${REQUESTED_VERSION}" \
+            --manifest "${RUNNER_TEMP}/release-verification-hashes"
 
           if [[ -z "$(git status --porcelain -- reports/release-verification)" ]]; then
             echo "changed=false" >> "${GITHUB_OUTPUT}"
@@ -98,7 +66,9 @@ jobs:
 
       - name: Run public documentation checks
         if: steps.reports.outputs.changed == 'true'
-        run: bash scripts/check-public-surface.sh
+        run: |
+          python3 -m unittest discover -s scripts/tests -p test_import_release_reports.py
+          bash scripts/check-public-surface.sh
 
       - name: Publish verified reports to main
         if: steps.reports.outputs.changed == 'true'
