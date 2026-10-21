@@ -1,0 +1,8 @@
+{
+  "initial_red": "runner not yet implemented: FileNotFoundError",
+  "initial_green": "3 tests passed",
+  "independent_review_finding": "Alopex successful DDL returns None, PostgreSQL helper returns []; normalize no-row success",
+  "regression_red": "test_successful_remote_ddl_has_no_result_rows failed before correction",
+  "regression_green": "4 tests passed",
+  "product_code_changed": false
+}

@@ -1,0 +1,27 @@
+{
+  "server_version": "0.8.16",
+  "source": "crates.io published crate",
+  "crate_sha256": "30abbe35c585d54017bd94db38c8a9c9b6c438126bb3c5f9c49daa732935e45d",
+  "cargo_lock_sha256": "cb107068f3492aa914d00a17b37f19a199f71c1b8e83ad4fb831ef253e616292",
+  "rust_toolchain": "1.96.0",
+  "profile": "release / opt-level=3",
+  "build_jobs": 2,
+  "incremental": false,
+  "product_source_modified": false,
+  "postgresql_configuration": {
+    "fsync": "on",
+    "synchronous_commit": "on",
+    "ssl": "off",
+    "max_parallel_workers_per_gather": "0",
+    "version": "PostgreSQL 16.14 (Debian 16.14-1.pgdg13+1)"
+  },
+  "postgresql_image_digest": "sha256:95206741a5b214807675e14165369d05b93a9cf692223b616d07cca227e74b0b",
+  "server_cpu_affinity": [
+    0
+  ],
+  "client_cpu_affinity": [
+    1
+  ],
+  "storage": "dedicated directories on same host filesystem; no tmpfs",
+  "client_protocols": "Alopex HTTP / PostgreSQL wire; no TLS/auth; connections reused"
+}
