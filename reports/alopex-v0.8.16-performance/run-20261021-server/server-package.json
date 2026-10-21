@@ -1,0 +1,13 @@
+{
+  "version": "0.8.16",
+  "source": "crates.io published crate",
+  "crate_sha256": "30abbe35c585d54017bd94db38c8a9c9b6c438126bb3c5f9c49daa732935e45d",
+  "cargo_lock_sha256": "cb107068f3492aa914d00a17b37f19a199f71c1b8e83ad4fb831ef253e616292",
+  "rust_toolchain": "1.96.0",
+  "profile": "release / opt-level=3",
+  "build_jobs": 2,
+  "incremental": false,
+  "product_source_modified": false,
+  "binary_sha256": "d0491d312993b2eacd8051b51c526abfa0e1ec72262f997e9df27d6f49562cfd",
+  "installed_version": "alopex-server 0.8.16"
+}

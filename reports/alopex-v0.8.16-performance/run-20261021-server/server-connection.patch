@@ -1,0 +1,11 @@
+diff --git a/scripts/performance/parity_v0811_measure.py b/scripts/performance/parity_v0811_measure.py
+index 8dbbe2dd..ebbdd079 100644
+--- a/scripts/performance/parity_v0811_measure.py
++++ b/scripts/performance/parity_v0811_measure.py
+@@ -564 +564 @@ def _sql(
+-    engine: str, workload: str, rows: int, warmups: int, runs: int
++    engine: str, workload: str, rows: int, warmups: int, runs: int, *, connection=None
+@@ -569 +569,2 @@ def _sql(
+-        connection = Database.new()
++        if connection is None:
++            connection = Database.new()

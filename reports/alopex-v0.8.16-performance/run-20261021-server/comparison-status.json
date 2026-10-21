@@ -1,0 +1,14 @@
+{
+  "schema": "alopex.server-client-comparison/v1",
+  "comparison_status": "failed_capability_parity",
+  "subject": "alopex-server 0.8.16 via RemoteDatabase",
+  "reference": "PostgreSQL 16.14 via psycopg 3.2.10",
+  "case": "sql-postgresql-curated",
+  "first_failed_sql": "DROP SEQUENCE IF EXISTS perf_sequence",
+  "error": "unsupported query plan: DropSequence",
+  "latency_ratio": null,
+  "throughput_ratio": null,
+  "timed_processes": 0,
+  "previous_embedded_comparison": "invalid; retained separately",
+  "acceptance": "not satisfied; implement server API contract before timing existing case"
+}

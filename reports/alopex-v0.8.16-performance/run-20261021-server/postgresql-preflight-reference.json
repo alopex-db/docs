@@ -1,0 +1,15 @@
+{
+  "engine": "postgresql",
+  "server_client": true,
+  "exit_code": 0,
+  "checks": [
+    "insert_returning",
+    "upsert_returning",
+    "merge_results",
+    "ddl_rollback",
+    "sequence_advances",
+    "complete_existing_workload_and_rollback_state"
+  ],
+  "result_sha256": "b97a1fb499381d8690840092283a59ad92d042a30cf2e52400ecb9147d422fc2",
+  "execution": "independent preflight after Alopex failure; no timed samples"
+}
