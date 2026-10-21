@@ -1,0 +1,7 @@
+{
+  "case": "module-scan-parquet",
+  "elapsed_seconds": 0.569208528031595,
+  "engine": "polars",
+  "exit_code": 1,
+  "trial": 0
+}

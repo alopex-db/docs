@@ -1,0 +1,10 @@
+{
+  "case": "series-constructor",
+  "elapsed_seconds": 0.21722432295791805,
+  "engine": "alopex",
+  "exception": "TypeError",
+  "exit_code": 0,
+  "message": "cannot create 'builtins.Series' instances",
+  "status": "capability-gap",
+  "trial": 0
+}

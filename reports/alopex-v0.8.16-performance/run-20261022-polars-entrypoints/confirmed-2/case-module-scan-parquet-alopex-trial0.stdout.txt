@@ -1,0 +1,1 @@
+{"engine": "alopex", "case": "module-scan-parquet", "status": "capability-gap", "exception": "AttributeError", "message": "module 'alopex' has no attribute 'scan_parquet'", "process_peak_rss_bytes": 290029568, "process_io": {"input_blocks": 0, "output_blocks": 0}}

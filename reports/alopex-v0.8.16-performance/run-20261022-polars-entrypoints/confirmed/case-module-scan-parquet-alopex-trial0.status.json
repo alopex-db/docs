@@ -1,0 +1,7 @@
+{
+  "case": "module-scan-parquet",
+  "elapsed_seconds": 0.21670837805140764,
+  "engine": "alopex",
+  "exit_code": 1,
+  "trial": 0
+}

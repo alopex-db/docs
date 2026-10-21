@@ -1,0 +1,14 @@
+{
+  "case": "module-select",
+  "elapsed_seconds": 0.41926220001187176,
+  "engine": "polars",
+  "exit_code": 0,
+  "process_io": {
+    "input_blocks": 0,
+    "output_blocks": 0
+  },
+  "process_peak_rss_bytes": 290029568,
+  "result_sha256": "248bd0b8c68aafa6dc8a1937e158e674cd812a04aea16d6becf7ae7fb9b5051e",
+  "status": "supported",
+  "trial": 0
+}

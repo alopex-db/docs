@@ -1,0 +1,51 @@
+{
+  "cases": [
+    {
+      "case": "csv-collect",
+      "comparison_status": "valid",
+      "latency_ratio": 1.915612854645656,
+      "paired_latency_ratio_range": [
+        1.616583626191218,
+        2.0226761853446975
+      ],
+      "throughput_ratio": 0.5220261482244944
+    },
+    {
+      "case": "csv-batches",
+      "comparison_status": "valid",
+      "latency_ratio": 1.944626980124092,
+      "paired_latency_ratio_range": [
+        1.8525421942567843,
+        1.9646041747515486
+      ],
+      "throughput_ratio": 0.5142374399928294
+    },
+    {
+      "case": "parquet-numeric-collect",
+      "comparison_status": "valid",
+      "latency_ratio": 0.8194967297394243,
+      "paired_latency_ratio_range": [
+        0.817666144252475,
+        0.8941502151391383
+      ],
+      "throughput_ratio": 1.2202611233335494
+    },
+    {
+      "case": "parquet-numeric-batches",
+      "comparison_status": "valid",
+      "latency_ratio": 0.8568873656165774,
+      "paired_latency_ratio_range": [
+        0.8518812063652049,
+        0.9024557818172232
+      ],
+      "throughput_ratio": 1.1670145227085302
+    }
+  ],
+  "default_skips": {
+    "parquet-batches": "Known Utf8/LargeUtf8 failure; explicit --case required",
+    "parquet-collect": "Known Utf8/LargeUtf8 failure; explicit --case required"
+  },
+  "reference": "polars",
+  "schema": "alopex.performance-comparison/v1",
+  "subject": "alopex"
+}

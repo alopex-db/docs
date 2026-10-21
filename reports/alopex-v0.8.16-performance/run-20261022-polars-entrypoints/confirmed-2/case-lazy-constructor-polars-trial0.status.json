@@ -1,0 +1,7 @@
+{
+  "case": "lazy-constructor",
+  "elapsed_seconds": 0.4691505199880339,
+  "engine": "polars",
+  "exit_code": 0,
+  "trial": 0
+}

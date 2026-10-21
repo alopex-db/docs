@@ -1,0 +1,1 @@
+{"engine": "alopex", "case": "module-scan-parquet", "status": "capability-gap", "exception": "AttributeError", "message": "module 'alopex' has no attribute 'scan_parquet'"}

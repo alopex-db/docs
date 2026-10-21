@@ -1,0 +1,10 @@
+{
+  "case": "module-scan-parquet",
+  "elapsed_seconds": 0.21527502301614732,
+  "engine": "alopex",
+  "exception": "AttributeError",
+  "exit_code": 0,
+  "message": "module 'alopex' has no attribute 'scan_parquet'",
+  "status": "capability-gap",
+  "trial": 0
+}

@@ -1,0 +1,164 @@
+{
+  "adopted_run": "confirmed-2",
+  "performance_processes": 24,
+  "samples": 504,
+  "probe_processes": 12,
+  "alopex_capability_gaps": 6,
+  "all_adopted_processes_exit_zero": true,
+  "cases": [
+    {
+      "case": "csv-collect",
+      "processes": 6,
+      "samples": 126,
+      "input_and_result_match": true,
+      "recomputed_ratio": 1.915612854645656,
+      "io_blocks_by_engine": {
+        "alopex": [
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          },
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          },
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          }
+        ],
+        "polars": [
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          },
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          },
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "case": "csv-batches",
+      "processes": 6,
+      "samples": 126,
+      "input_and_result_match": true,
+      "recomputed_ratio": 1.944626980124092,
+      "io_blocks_by_engine": {
+        "alopex": [
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          },
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          },
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          }
+        ],
+        "polars": [
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          },
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          },
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "case": "parquet-numeric-collect",
+      "processes": 6,
+      "samples": 126,
+      "input_and_result_match": true,
+      "recomputed_ratio": 0.8194967297394243,
+      "io_blocks_by_engine": {
+        "alopex": [
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          },
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          },
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          }
+        ],
+        "polars": [
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          },
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          },
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "case": "parquet-numeric-batches",
+      "processes": 6,
+      "samples": 126,
+      "input_and_result_match": true,
+      "recomputed_ratio": 0.8568873656165774,
+      "io_blocks_by_engine": {
+        "alopex": [
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          },
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          },
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          }
+        ],
+        "polars": [
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          },
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          },
+          {
+            "input_blocks": 0,
+            "output_blocks": 0
+          }
+        ]
+      }
+    }
+  ],
+  "excluded_runs": {
+    "root": "concurrent documentation dependency installation; not adopted",
+    "confirmed": "resource collector failed before JSON output; interrupted"
+  },
+  "independent_review": "ready: all final rows, source hashes, input hashes, independent Python oracle, capability statuses and excluded history verified",
+  "resource_qualification": "unqualified: all workers report identical peak RSS and zero input/output blocks; no resource parity or superiority claim"
+}

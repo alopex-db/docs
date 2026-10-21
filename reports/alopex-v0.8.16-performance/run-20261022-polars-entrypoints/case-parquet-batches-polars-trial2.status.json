@@ -1,0 +1,7 @@
+{
+  "case": "parquet-batches",
+  "elapsed_seconds": 4.647466024034657,
+  "engine": "polars",
+  "exit_code": 0,
+  "trial": 2
+}

@@ -1,0 +1,3 @@
+{"phase": "measure", "index": 0, "seconds": 0.003768864960875362, "validated": true, "output_rows": 34250}
+{"phase": "measure", "index": 1, "seconds": 0.004272446036338806, "validated": true, "output_rows": 34250}
+{"phase": "measure", "index": 2, "seconds": 0.0036801379756070673, "validated": true, "output_rows": 34250}

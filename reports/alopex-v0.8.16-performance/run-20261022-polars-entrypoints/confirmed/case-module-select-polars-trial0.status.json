@@ -1,0 +1,7 @@
+{
+  "case": "module-select",
+  "elapsed_seconds": 0.47158395301084965,
+  "engine": "polars",
+  "exit_code": 1,
+  "trial": 0
+}

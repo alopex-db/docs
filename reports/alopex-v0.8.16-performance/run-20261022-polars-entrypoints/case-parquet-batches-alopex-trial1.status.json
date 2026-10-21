@@ -1,0 +1,7 @@
+{
+  "case": "parquet-batches",
+  "elapsed_seconds": 0.47018990002106875,
+  "engine": "alopex",
+  "exit_code": 1,
+  "trial": 1
+}

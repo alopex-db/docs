@@ -1,0 +1,9 @@
+{
+  "case": "series-constructor",
+  "elapsed_seconds": 0.5215277579845861,
+  "engine": "polars",
+  "exit_code": 0,
+  "result_sha256": "ac246202475c42c60482ee5c4c00ec842afcfa4a445dfb7123818415d5fac626",
+  "status": "supported",
+  "trial": 0
+}

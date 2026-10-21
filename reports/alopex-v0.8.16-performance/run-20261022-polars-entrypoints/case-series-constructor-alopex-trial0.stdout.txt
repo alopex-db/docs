@@ -1,0 +1,1 @@
+{"engine": "alopex", "case": "series-constructor", "status": "capability-gap", "exception": "TypeError", "message": "cannot create 'builtins.Series' instances"}

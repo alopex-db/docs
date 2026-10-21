@@ -1,0 +1,30 @@
+{
+  "implementation_scope": "docs-hosted harness and assessment only; product source unchanged",
+  "public_product_source": "d9ff8783b8d18a63d167204e55902ea6cd90dcd1",
+  "tests": {
+    "entrypoints": {
+      "command": "POLARS_MAX_THREADS=1 python -B -m unittest discover -s scripts/performance -p test_polars_entrypoints.py",
+      "result": "4 tests passed, including real worker CLI serialization; six real API probes, six scan cases at 17 rows, and rejection of altered values/types/NULL/order",
+      "semantics": "tests explicitly expect the v0.8.16 Parquet string failure; test success is not feature parity"
+    },
+    "shared_dataframe": {
+      "command": "POLARS_MAX_THREADS=1 python -B -m unittest discover -s scripts/performance -p test_dataframe_phases_v0816.py",
+      "result": "6 tests passed after shared expression-plan extraction"
+    }
+  },
+  "preserved_failures": [
+    "Initial new test was RED because polars_entrypoints_v0816 module did not exist.",
+    "First implemented entrypoint tests failed for Parquet collect and batches: expected Utf8, got LargeUtf8. Product failure remains unfixed; tests now assert this observed failure explicitly.",
+    "Parent initialization failed once before any worker or environment.json was produced because a local import shadowed importlib. Module-level import fixed the harness error.",
+    "Independent review initially blocked because LazyFrame direct construction was omitted and Series arithmetic depended on construction. Separate probes resolved both review findings.",
+    "Initial full run at the root of this directory had concurrent documentation-lint dependency installation. Its time ratios are retained as excluded history and are not adopted. Initial failed summary reason input_digest_mismatch_or_missing masks the underlying worker exception; stderr contains the real Utf8/LargeUtf8 failure. The confirmed runner preserves worker failure classification.",
+    "First confirmed/ run failed because procfs process I/O was unavailable; run interrupted after 24 failed statuses. CLI regression reproduced RED; getrusage block counters fixed the harness; GREEN 4 tests passed. No values from this run adopted."
+  ],
+  "confirmed_run_contract": "confirmed-2/ only: 4 cases x 2 engines x 3 trials, 24 successful performance processes and 504 samples; 6 probes x 2 engines, 6 explicit Alopex capability gaps. No dependency installation or test execution concurrent. Shared host is not exclusive CPU allocation.",
+  "known_failure_policy": "Parquet 12-column string workloads are skipped by default after initial diagnostics; --case explicitly opts into either diagnostic. DROP SEQUENCE is never part of this matrix.",
+  "resource_scope": "confirmed-2 worker peak RSS and getrusage input/output block counts cover the entire Python process including oracle, validation and raw writes; not pure engine memory or I/O",
+  "diagnostic_redaction": "Only local worktree/venv path prefixes in initial stderr were replaced by descriptive placeholders; exception text and statuses retained.",
+  "independent_review": "Final source HEAD 017e52996ad4130c6a52064153c4f8d93d08e123, 36 status0 processes, 504 raw samples, all four medians/ratios/ranges/inverses, fixture hashes and independent oracle digests verified",
+  "resource_qualification": "Raw values retained, but identical worker RSS and zero block counters do not distinguish engine costs. Resource comparison remains unverified.",
+  "documentation_checks": "Main/detail/plan Japanese lint completed; info findings for repeated explicit subjects retained under repository subject rule; existing technical vocabulary diversity and plan rhythm reviewed manually."
+}

@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "<docs-worktree>/scripts/performance/polars_entrypoints_v0816.py", line 212, in <module>
+    main()
+  File "<docs-worktree>/scripts/performance/polars_entrypoints_v0816.py", line 136, in main
+    value = measure(args.engine, args.case, data, Path(os.environ["ALOPEX_PERF_RAW_PATH"]))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<docs-worktree>/scripts/performance/polars_entrypoints_v0816.py", line 104, in measure
+    assert_equal(actual, expected)
+  File "<docs-worktree>/scripts/performance/dataframe_phases_v0816.py", line 52, in assert_equal
+    assert_equal(actual[name], expected[name])
+  File "<docs-worktree>/scripts/performance/dataframe_phases_v0816.py", line 56, in assert_equal
+    assert_equal(a, b)
+  File "<docs-worktree>/scripts/performance/dataframe_phases_v0816.py", line 46, in assert_equal
+    def assert_equal(actual, expected):
+    
+KeyboardInterrupt

@@ -1,0 +1,7 @@
+{
+  "case": "module-scan-csv",
+  "elapsed_seconds": 0.6197090820060112,
+  "engine": "polars",
+  "exit_code": 0,
+  "trial": 0
+}

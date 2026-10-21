@@ -78,6 +78,16 @@ Codexは初期10,000件の専用データを使い、writeは明示beginから�
 
 今回のrandomアクセスはwarm cacheでのAPI応答性能であり、cold disk I/O、並行負荷、メモリを超える規模の評価ではない。SQLとKVはそれぞれ同じ責務の製品と比較し、両API境界の倍率を混ぜない。既知のDROP SEQUENCEは実行していない。SQL random DELETEとKV point read/rangeの差は[性能改善Issue #712](https://github.com/alopex-db/alopex/issues/712)の調査対象とする。
 
+## Polars互換：DataFrameを明示構築しない入口
+
+Codexはトップレベル関数・Series演算と、CSV／ParquetからのLazy実行も評価対象に追加した。**公開Alopex v0.8.16は、今回確認した6つの入口・操作でPolars互換を満たしていない。** moduleのselect／scan_csv／scan_parquet、Series直接構築・加算、LazyFrame直接構築が未対応だった。先行のDataFrame構築経由の測定だけを根拠に、これらの互換APIも比較済みとは扱わない。
+
+Codexは利用できるLazyFrameのstatic scanとPolarsのトップレベルscanから、DataFrameの明示構築を挟まずに同じ計算を実行した。この比較はファイル読み込みを含み、全sampleで全値・Python型・NULL・列順・行順を照合する。Parquetの文字列連結はUtf8／LargeUtf8の型不一致で失敗したため倍率を与えず、数値のみの独立ケースを比較した。同名入口の不足と、この別名経路の機能・性能比較は分けて判定する。
+
+Codexは[入口別の不足・Lazy計算の相対値・証跡](alopex-v0.8.16-performance/run-20261022-polars-entrypoints/report.md)を追加した。Polars互換という目標は維持し、Codexは未対応の入口を評価対象から除外しない。
+
+最終確認runでの時間比は、CSVの12列計算＋collectがPolarsの1.916倍、全batch取得が1.945倍だった。Parquetの数値等11列ではcollectが0.819倍、全batch取得が0.857倍だった。全24性能process・504測定sampleは成功したが、Parquetの文字列計算は別途機能失敗として保持し、成功した数値計算と混ぜない。
+
 ## DataFrame：旧0.135倍と計算性能の区別
 
 旧比較は、**両製品ともメモリ上のデータからDataFrameを構築する時間を含む**。ファイルからのデータロードは含まない。Codexは旧最終12列と返却tupleを独立Python oracleから再生成し、保存された全6 processのchecksumと一致することを確認した。旧計測は空結果や未評価planだけを測ったものではないが、explode/concatは件数だけ、next_idは未使用、全sampleの中間値は未照合だった。

@@ -1,0 +1,7 @@
+{
+  "case": "series-arithmetic",
+  "elapsed_seconds": 0.5216262739850208,
+  "engine": "polars",
+  "exit_code": 0,
+  "trial": 0
+}
