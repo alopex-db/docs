@@ -1,0 +1,9 @@
+{
+  "collect_p50_ms": 6.790658982936293,
+  "peak_rss_bytes": 80224256.0,
+  "plan_build_p50_ms": 0.20621501607820392,
+  "result_sha256": "98afeb725a4f51925adec4ad654a07088175c9652d7ec7c29d8a19bf475f5707",
+  "steady_state_rows_per_second": 36590348.2297257,
+  "time_to_first_batch_p50_ms": 5.8059110306203365,
+  "total_p50_ms": 6.865276023745537
+}

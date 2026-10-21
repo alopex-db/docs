@@ -1,0 +1,7 @@
+{
+  "build_time_seconds": 3.366150172019843,
+  "engine": "hnswlib",
+  "index_size_bytes": 6060472,
+  "node_count": 9171,
+  "note": "Build/persistence boundaries differ; these are diagnostic values, not speed ratios."
+}

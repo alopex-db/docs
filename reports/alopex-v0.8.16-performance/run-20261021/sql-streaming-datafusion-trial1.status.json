@@ -1,0 +1,7 @@
+{
+  "case": "sql-streaming",
+  "elapsed_seconds": 1.0930307849776,
+  "engine": "datafusion",
+  "exit_code": 0,
+  "trial": 1
+}

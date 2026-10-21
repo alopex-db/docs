@@ -1,0 +1,7 @@
+{
+  "case": "hnsw",
+  "elapsed_seconds": 38.002531557984184,
+  "engine": "alopex-hnsw",
+  "exit_code": 0,
+  "trial": 2
+}

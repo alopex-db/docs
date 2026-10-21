@@ -20,3 +20,7 @@ Alopex DB 本体と Skulk は**独立したリポジトリ・独立したバー�
 
 - [共通Query IRとGraph trackの接続契約](design/query-graph-ir-contract.md): SQL/PGQ、Elastic Aggregation、Rust/Python、Graph演算子、transaction/snapshot、分散実行と共通試験。
 - [Graph DB機能・性能調査](tech/graph-database-feature-performance-research.md): Graph ETLの到達条件と比較基準。
+
+## Performance Reports
+
+- [Alopex v0.8.16 性能比較](reports/alopex-v0.8.16-performance.md): 公開Python wheelとPolars・SQLite・PostgreSQL・DataFusion・hnswlib・Faissの再測定、相対値と検索精度。

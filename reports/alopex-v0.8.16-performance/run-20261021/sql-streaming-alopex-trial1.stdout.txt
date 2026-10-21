@@ -1,0 +1,1 @@
+{"peak_rss_bytes": 60715008.0, "plan_build_p50_ms": 0.2995860413648188, "result_sha256": "4d7a1b6245b9bb00e2b0193a8c29f3b1ff3e82a3d8e753af545f177e40f24402", "steady_state_rows_per_second": 289561.4955762104, "time_to_first_batch_p50_ms": 0.25893800193443894, "total_p50_ms": 59.426802035886794}

@@ -1,0 +1,11 @@
+{
+  "execution_latency_p50_ms": 3.532523987814784,
+  "latency_p50_ms": 3.532523987814784,
+  "latency_p95_ms": 4.991270019672811,
+  "peak_rss_bytes": 43220992.0,
+  "plan_latency_p50_ms": 0.016089004930108786,
+  "queries_per_second": 283.0837110942307,
+  "result_sha256": "bdb0d074606282cb84cbb4445c7bb6c7544057d81fd2ee0dc98f3ea834e3840b",
+  "rows_per_second": 9695617.104977401,
+  "temporary_io_bytes": 1.0
+}

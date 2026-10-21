@@ -1,0 +1,65 @@
+{"phase": "validation", "result_sha256": "98afeb725a4f51925adec4ad654a07088175c9652d7ec7c29d8a19bf475f5707"}
+{"phase": "samples", "sample": 0, "seconds": 7.0420210249722e-06}
+{"phase": "samples", "sample": 1, "seconds": 2.4104025214910507e-05}
+{"phase": "samples", "sample": 2, "seconds": 2.0292995031923056e-05}
+{"phase": "samples", "sample": 3, "seconds": 1.874897861853242e-05}
+{"phase": "samples", "sample": 4, "seconds": 2.2976018954068422e-05}
+{"phase": "samples", "sample": 5, "seconds": 2.925604349002242e-05}
+{"phase": "samples", "sample": 6, "seconds": 1.7438025679439306e-05}
+{"phase": "samples", "sample": 7, "seconds": 9.583018254488707e-06}
+{"phase": "samples", "sample": 8, "seconds": 9.695009794086218e-06}
+{"phase": "samples", "sample": 9, "seconds": 1.448002876713872e-05}
+{"phase": "samples", "sample": 10, "seconds": 9.329000022262335e-06}
+{"phase": "samples", "sample": 11, "seconds": 1.1889031156897545e-05}
+{"phase": "samples", "sample": 12, "seconds": 7.956987246870995e-06}
+{"phase": "samples", "sample": 13, "seconds": 1.073098974302411e-05}
+{"phase": "samples", "sample": 14, "seconds": 1.2528966180980206e-05}
+{"phase": "samples", "sample": 15, "seconds": 1.126900315284729e-05}
+{"phase": "samples", "sample": 16, "seconds": 1.480604987591505e-05}
+{"phase": "samples", "sample": 17, "seconds": 1.168600283563137e-05}
+{"phase": "samples", "sample": 18, "seconds": 1.5283003449440002e-05}
+{"phase": "samples", "sample": 19, "seconds": 9.22702020034194e-06}
+{"phase": "samples", "sample": 20, "seconds": 9.927956853061914e-06}
+{"phase": "samples", "sample": 0, "seconds": 0.005629250023048371}
+{"phase": "samples", "sample": 1, "seconds": 0.005078635003883392}
+{"phase": "samples", "sample": 2, "seconds": 0.004988000961020589}
+{"phase": "samples", "sample": 3, "seconds": 0.005325681995600462}
+{"phase": "samples", "sample": 4, "seconds": 0.005038830975536257}
+{"phase": "samples", "sample": 5, "seconds": 0.004997787007596344}
+{"phase": "samples", "sample": 6, "seconds": 0.005705552001018077}
+{"phase": "samples", "sample": 7, "seconds": 0.005542932020034641}
+{"phase": "samples", "sample": 8, "seconds": 0.005608963023405522}
+{"phase": "samples", "sample": 9, "seconds": 0.0055311129544861615}
+{"phase": "samples", "sample": 10, "seconds": 0.005546773027162999}
+{"phase": "samples", "sample": 11, "seconds": 0.005422237969469279}
+{"phase": "samples", "sample": 12, "seconds": 0.005591740016825497}
+{"phase": "samples", "sample": 13, "seconds": 0.005197305988986045}
+{"phase": "samples", "sample": 14, "seconds": 0.0058711100136861205}
+{"phase": "samples", "sample": 15, "seconds": 0.0048367519630119205}
+{"phase": "samples", "sample": 16, "seconds": 0.004926481982693076}
+{"phase": "samples", "sample": 17, "seconds": 0.004793573985807598}
+{"phase": "samples", "sample": 18, "seconds": 0.004695135983638465}
+{"phase": "samples", "sample": 19, "seconds": 0.004725051985587925}
+{"phase": "samples", "sample": 20, "seconds": 0.005451027012895793}
+{"first_rows": 8192, "first_seconds": 0.004145103041082621, "phase": "streaming", "rows": 34250, "sample": 0, "total_seconds": 0.005167226016055793}
+{"first_rows": 8192, "first_seconds": 0.004361084022093564, "phase": "streaming", "rows": 34250, "sample": 1, "total_seconds": 0.0056311170337721705}
+{"first_rows": 8192, "first_seconds": 0.004313536977861077, "phase": "streaming", "rows": 34250, "sample": 2, "total_seconds": 0.0052378010004758835}
+{"first_rows": 8192, "first_seconds": 0.004341065010521561, "phase": "streaming", "rows": 34250, "sample": 3, "total_seconds": 0.00529317301698029}
+{"first_rows": 8192, "first_seconds": 0.007276925025507808, "phase": "streaming", "rows": 34250, "sample": 4, "total_seconds": 0.008254803018644452}
+{"first_rows": 8192, "first_seconds": 0.004017541999928653, "phase": "streaming", "rows": 34250, "sample": 5, "total_seconds": 0.0049202319933101535}
+{"first_rows": 8192, "first_seconds": 0.004164390964433551, "phase": "streaming", "rows": 34250, "sample": 6, "total_seconds": 0.005110564001370221}
+{"first_rows": 8192, "first_seconds": 0.004102851031348109, "phase": "streaming", "rows": 34250, "sample": 7, "total_seconds": 0.004961733007803559}
+{"first_rows": 8192, "first_seconds": 0.00456555001437664, "phase": "streaming", "rows": 34250, "sample": 8, "total_seconds": 0.006032316014170647}
+{"first_rows": 8192, "first_seconds": 0.004757824004627764, "phase": "streaming", "rows": 34250, "sample": 9, "total_seconds": 0.00573941197944805}
+{"first_rows": 8192, "first_seconds": 0.0038139590178616345, "phase": "streaming", "rows": 34250, "sample": 10, "total_seconds": 0.00489969999762252}
+{"first_rows": 8192, "first_seconds": 0.0035974589991383255, "phase": "streaming", "rows": 34250, "sample": 11, "total_seconds": 0.0044801399926654994}
+{"first_rows": 8192, "first_seconds": 0.0036241139750927687, "phase": "streaming", "rows": 34250, "sample": 12, "total_seconds": 0.004577267973218113}
+{"first_rows": 8192, "first_seconds": 0.0033890290069393814, "phase": "streaming", "rows": 34250, "sample": 13, "total_seconds": 0.004487265017814934}
+{"first_rows": 8192, "first_seconds": 0.003607266000472009, "phase": "streaming", "rows": 34250, "sample": 14, "total_seconds": 0.004365322005469352}
+{"first_rows": 8192, "first_seconds": 0.004431465989910066, "phase": "streaming", "rows": 34250, "sample": 15, "total_seconds": 0.0054975280072540045}
+{"first_rows": 8192, "first_seconds": 0.004068685986567289, "phase": "streaming", "rows": 34250, "sample": 16, "total_seconds": 0.0051883329870179296}
+{"first_rows": 8192, "first_seconds": 0.0041607829625718296, "phase": "streaming", "rows": 34250, "sample": 17, "total_seconds": 0.0053836339502595365}
+{"first_rows": 8192, "first_seconds": 0.004575326980557293, "phase": "streaming", "rows": 34250, "sample": 18, "total_seconds": 0.005731688986998051}
+{"first_rows": 8192, "first_seconds": 0.004384354979265481, "phase": "streaming", "rows": 34250, "sample": 19, "total_seconds": 0.005339672963600606}
+{"first_rows": 8192, "first_seconds": 0.0033594470005482435, "phase": "streaming", "rows": 34250, "sample": 20, "total_seconds": 0.004352811956778169}
+{"phase": "validation", "result_sha256": "98afeb725a4f51925adec4ad654a07088175c9652d7ec7c29d8a19bf475f5707"}

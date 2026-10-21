@@ -1,0 +1,7 @@
+{
+  "case": "sql-streaming",
+  "elapsed_seconds": 3.068581814004574,
+  "engine": "alopex",
+  "exit_code": 0,
+  "trial": 2
+}

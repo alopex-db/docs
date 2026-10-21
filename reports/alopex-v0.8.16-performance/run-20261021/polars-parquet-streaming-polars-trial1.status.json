@@ -1,0 +1,7 @@
+{
+  "case": "polars-parquet-streaming",
+  "elapsed_seconds": 1.8324992210255004,
+  "engine": "polars",
+  "exit_code": 0,
+  "trial": 1
+}

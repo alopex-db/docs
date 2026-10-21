@@ -1,0 +1,1 @@
+{"latency_p50_ms": 1322.4853710271418, "latency_p95_ms": 2776.588818000164, "peak_rss_bytes": 111050752.0, "result_sha256": "21ba6f82aea60080fd1954d75db9867878031cd0f0ae05d526d73edae34d5837", "rows_per_second": 25898.20708065668}
