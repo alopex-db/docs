@@ -1,0 +1,8 @@
+{
+  "case": "put-commit",
+  "elapsed_seconds": 0.31775349099189043,
+  "engine": "lmdb",
+  "exit_code": 0,
+  "family": "kv",
+  "trial": 2
+}

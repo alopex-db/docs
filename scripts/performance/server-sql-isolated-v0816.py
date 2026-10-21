@@ -57,18 +57,18 @@ def run_process(command, output, name, metadata):
     return status
 
 
-def relative(results, cases):
+def relative(results, cases, engines=("alopex-server", "postgresql")):
     summary = []
     for case in cases:
         cells = [row for row in results if row["case"] == case]
-        expected = {(engine, trial) for engine in ("alopex-server", "postgresql") for trial in range(3)}
+        expected = {(engine, trial) for engine in engines for trial in range(3)}
         row = {"case": case, "comparison_status": "failed"}
         if (len(cells) == 6 and {(r["engine"], r["trial"]) for r in cells} == expected
                 and all(r["exit_code"] == 0 and math.isfinite(r.get("latency_p50_ms", 0)) and r.get("latency_p50_ms", 0) > 0 for r in cells)
                 and len({r["result_sha256"] for r in cells}) == 1):
-            times = {engine: [next(r["latency_p50_ms"] for r in cells if r["engine"] == engine and r["trial"] == trial) for trial in range(3)] for engine in ("alopex-server", "postgresql")}
-            ratio = statistics.median(times["alopex-server"]) / statistics.median(times["postgresql"])
-            paired = [a / b for a, b in zip(times["alopex-server"], times["postgresql"])]
+            times = {engine: [next(r["latency_p50_ms"] for r in cells if r["engine"] == engine and r["trial"] == trial) for trial in range(3)] for engine in engines}
+            ratio = statistics.median(times[engines[0]]) / statistics.median(times[engines[1]])
+            paired = [a / b for a, b in zip(times[engines[0]], times[engines[1]])]
             row.update(comparison_status="valid", latency_ratio=ratio, throughput_ratio=1 / ratio,
                        paired_latency_ratio_range=[min(paired), max(paired)])
         summary.append(row)

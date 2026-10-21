@@ -1,0 +1,8 @@
+{
+  "case": "insert-commit",
+  "elapsed_seconds": 2.2656322700204328,
+  "engine": "alopex-server",
+  "exit_code": 0,
+  "family": "sql",
+  "trial": 0
+}

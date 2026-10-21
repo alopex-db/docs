@@ -1,0 +1,8 @@
+{
+  "case": "batch-insert-commit",
+  "elapsed_seconds": 5.8597834490356036,
+  "engine": "alopex-server",
+  "exit_code": 0,
+  "family": "sql",
+  "trial": 2
+}

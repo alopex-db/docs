@@ -1,0 +1,23 @@
+{
+  "case": "random-batch-put",
+  "client_peak_rss_bytes": 33529856,
+  "elapsed_seconds": 0.41985436499817297,
+  "engine": "lmdb",
+  "exit_code": 0,
+  "family": "kv",
+  "final_rows": 12400,
+  "fixture_rows": 10000,
+  "input_sha256": "fccfd573c1c403f48d21e8722e75aa69c36d08a127d02366715e9295540e8f82",
+  "key_bytes": 10,
+  "latency_p50_ms": 5.260234989691526,
+  "operations_per_sample": 100,
+  "result_sha256": "82bcebbe080f8528ee58aec4e24702a6fbd1375677cd428943bdd5d031dfb752",
+  "samples": 21,
+  "server_client": false,
+  "store_allocated_bytes": 790528,
+  "store_logical_bytes": 794624,
+  "trial": 1,
+  "validation": "every sample and complete bytes/order after close/reopen",
+  "value_bytes": 32,
+  "warmups": 3
+}

@@ -1,0 +1,8 @@
+{
+  "case": "compute",
+  "elapsed_seconds": 14.271311848016921,
+  "engine": "alopex",
+  "exit_code": 0,
+  "family": "dataframe",
+  "trial": 1
+}

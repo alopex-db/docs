@@ -1,0 +1,28 @@
+{
+  "native_kv_regression": "RED module missing; GREEN 2 tests covering 8 cases x 2 real APIs with small fixture",
+  "sql_regression": "4 fake-client tests passed; real server measurement pending",
+  "dataframe_regression": "5 original tests passed; initial destructor-test adapter retained arguments and failed twice even with fix; adapter corrected; genuine RED [true,false] reproduced without release, GREEN 6 tests passed with explicit release outside timer",
+  "shared_summary_regression": "5 existing isolated SQL tests passed after engine-pair generalization",
+  "independent_static_review": "no major issue in sync/commit, server/client API, input seeds, every-sample validation, final complete state or relative aggregation",
+  "legacy_dataframe_audit": {
+    "ratio_reproduced": 0.135492237,
+    "legacy_final_result_sha256_prefix": "21ba6f82",
+    "independent_oracle": "all 34250 rows and 12 final columns plus returned tuple match all 6 saved process checksums",
+    "limits": "legacy next_id was unused; explode/concat only heights, initial to_dict only id values; legacy validated only before/after timing; no pure-compute claim"
+  },
+  "runtime_polars_thread_pool_size": 1,
+  "legacy_thread_setting_audit": "reproduce-v0816 explicitly set POLARS_MAX_THREADS=1; actual historical pool size was not stored",
+  "native_type_audit": "public d9ff878 Python int/string/list[str] constructors use Int64Array/StringArray/ListBuilder<StringBuilder>, logically matching Int64/String/List(String); not claiming identical physical representation",
+  "documentation_checks": "main and detail relative links valid; detail Japanese lint zero findings; main informational repeated explicit subjects/technical vocabulary manually reviewed",
+  "cleanup": {
+    "stopped_runtime": true,
+    "postgres_container_removed": true,
+    "build_target_removed": true,
+    "retained_public_executable": {
+      "owner": "Codex",
+      "version": "0.8.16",
+      "bytes": 41961496,
+      "reason": "reuse for Issue #712 profiling without another 17 minute release build; no process running"
+    }
+  }
+}

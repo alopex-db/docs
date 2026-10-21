@@ -1,0 +1,64 @@
+{
+  "public_source_commit": "d9ff8783b8d18a63d167204e55902ea6cd90dcd1",
+  "wheels": [
+    {
+      "file": "polars_runtime_32-1.43.2-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "sha256": "6d5a7ae004a2723ebf4427f6d6a639f30f86af4cf077075f6b35d04711154fc3",
+      "installed_files_checked": 3,
+      "matches_installed": true
+    },
+    {
+      "file": "alopex-0.8.16-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "sha256": "ac9f4b1fd2fa0e78d634334242de4290ae4b34bf700515b59937ea2c718a98c3",
+      "installed_files_checked": 12,
+      "matches_installed": true
+    },
+    {
+      "file": "polars-1.43.2-py3-none-any.whl",
+      "sha256": "22aa0cb92a1ee2d60d6a15a638b2e8e0dd99aea21ac0cd8fb29da8e382e075a9",
+      "installed_files_checked": 209,
+      "matches_installed": true
+    },
+    {
+      "file": "lmdb-2.0.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl",
+      "sha256": "a2bf2e443b047956716989f7ec27d5f77b36524c541dc5b66c4f083623d0f885",
+      "installed_files_checked": 8,
+      "matches_installed": true
+    }
+  ],
+  "server_crate_sha256": "30abbe35c585d54017bd94db38c8a9c9b6c438126bb3c5f9c49daa732935e45d",
+  "server_binary_sha256": "d0491d312993b2eacd8051b51c526abfa0e1ec72262f997e9df27d6f49562cfd",
+  "server_version": "alopex-server 0.8.16",
+  "server_build": {
+    "locked": true,
+    "offline": true,
+    "rust": "1.96.0",
+    "profile": "release opt-level=3",
+    "jobs": 2,
+    "incremental": false
+  },
+  "postgresql": {
+    "version": "16.14",
+    "image_digest": "sha256:95206741a5b214807675e14165369d05b93a9cf692223b616d07cca227e74b0b",
+    "fsync": "on",
+    "synchronous_commit": "on",
+    "ssl": "off",
+    "max_parallel_workers_per_gather": 0,
+    "client_prepare_threshold": null
+  },
+  "lmdb": {
+    "python_version": "2.0.0",
+    "library_version": "0.9.35",
+    "sync": true,
+    "metasync": true,
+    "writemap": false,
+    "map_async": false,
+    "buffers": false
+  },
+  "storage": "dedicated directories on same host filesystem; warm cache; no tmpfs",
+  "api_boundaries": {
+    "sql": "RemoteDatabase over HTTP vs psycopg over PostgreSQL wire; both server CPU0/client CPU1, no TLS/auth, reused connection",
+    "kv": "embedded native Python APIs on CPU0, copied bytes; no SQL/network",
+    "dataframe": "Python APIs on CPU0, POLARS_MAX_THREADS=1 and numerical threads=1"
+  }
+}

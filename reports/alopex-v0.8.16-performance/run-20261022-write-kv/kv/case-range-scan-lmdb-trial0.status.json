@@ -1,0 +1,8 @@
+{
+  "case": "range-scan",
+  "elapsed_seconds": 0.3187913380097598,
+  "engine": "lmdb",
+  "exit_code": 0,
+  "family": "kv",
+  "trial": 0
+}

@@ -1,0 +1,8 @@
+{
+  "case": "random-get-hit",
+  "elapsed_seconds": 9.32324543496361,
+  "engine": "alopex-server",
+  "exit_code": 0,
+  "family": "sql",
+  "trial": 2
+}

@@ -1,0 +1,8 @@
+{
+  "case": "random-delete-commit",
+  "elapsed_seconds": 8.127344692009501,
+  "engine": "alopex-server",
+  "exit_code": 0,
+  "family": "sql",
+  "trial": 1
+}

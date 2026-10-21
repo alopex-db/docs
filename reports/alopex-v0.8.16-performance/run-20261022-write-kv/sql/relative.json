@@ -1,0 +1,68 @@
+{
+  "cases": [
+    {
+      "case": "insert-commit",
+      "comparison_status": "valid",
+      "latency_ratio": 2.1453672242074626,
+      "paired_latency_ratio_range": [
+        2.036225285652247,
+        2.34957621415725
+      ],
+      "throughput_ratio": 0.4661206662973133
+    },
+    {
+      "case": "batch-insert-commit",
+      "comparison_status": "valid",
+      "latency_ratio": 3.3473707454861636,
+      "paired_latency_ratio_range": [
+        3.1281204657005706,
+        3.679038551953296
+      ],
+      "throughput_ratio": 0.29874193091651774
+    },
+    {
+      "case": "random-get-hit",
+      "comparison_status": "valid",
+      "latency_ratio": 2.472386304521369,
+      "paired_latency_ratio_range": [
+        2.450367011945983,
+        2.4866046071564383
+      ],
+      "throughput_ratio": 0.4044675373630945
+    },
+    {
+      "case": "random-get-miss",
+      "comparison_status": "valid",
+      "latency_ratio": 2.6429186493750834,
+      "paired_latency_ratio_range": [
+        2.276581756643623,
+        2.663555588443165
+      ],
+      "throughput_ratio": 0.37836957268300686
+    },
+    {
+      "case": "random-update-commit",
+      "comparison_status": "valid",
+      "latency_ratio": 2.523945037063822,
+      "paired_latency_ratio_range": [
+        2.485131535091324,
+        2.6125895998776127
+      ],
+      "throughput_ratio": 0.3962051412828422
+    },
+    {
+      "case": "random-delete-commit",
+      "comparison_status": "valid",
+      "latency_ratio": 50.05318913624086,
+      "paired_latency_ratio_range": [
+        46.869031586253556,
+        55.228201960183014
+      ],
+      "throughput_ratio": 0.019978746954126707
+    }
+  ],
+  "family": "sql",
+  "reference": "postgresql",
+  "schema": "alopex.performance-comparison/v1",
+  "subject": "alopex-server"
+}

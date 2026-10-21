@@ -1,0 +1,18 @@
+{
+  "case": "random-update-commit",
+  "elapsed_seconds": 3.133163825958036,
+  "engine": "alopex-server",
+  "exit_code": 0,
+  "family": "sql",
+  "final_rows": 10000,
+  "fixture_rows": 10000,
+  "input_sha256": "c311a8fc83e03b6f3fd55112706b5cadb94e383bebb256a89a5b32f2d0c6e629",
+  "latency_p50_ms": 10.891739977523685,
+  "operations_per_sample": 1,
+  "result_sha256": "51d1c5bf38de03a117a06e8cb922988dab59f2fb9bae204a593e2f3ff18197c5",
+  "samples": 21,
+  "server_client": true,
+  "trial": 1,
+  "validation": "every sample plus complete state after client reconnect",
+  "warmups": 3
+}

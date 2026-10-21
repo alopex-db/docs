@@ -1,0 +1,8 @@
+{
+  "case": "put-commit",
+  "elapsed_seconds": 0.7763351420289837,
+  "engine": "alopex-kv",
+  "exit_code": 0,
+  "family": "kv",
+  "trial": 2
+}

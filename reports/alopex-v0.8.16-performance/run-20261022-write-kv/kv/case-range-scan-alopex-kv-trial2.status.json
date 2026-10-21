@@ -1,0 +1,8 @@
+{
+  "case": "range-scan",
+  "elapsed_seconds": 0.9825784789863974,
+  "engine": "alopex-kv",
+  "exit_code": 0,
+  "family": "kv",
+  "trial": 2
+}

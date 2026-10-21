@@ -1,12 +1,12 @@
 # Alopex v0.8.16 性能比較
 
-本レポートは、v0.8.16の公開Python wheelを既存の製品比較ハーネスで再測定し、参照製品・ライブラリを1とする相対値を示す。測定日は2026年10月21日。対象は単一ホストのPython APIであり、Rust APIや分散処理の比較は含まない。
+本レポートは、v0.8.16の公開Python wheelを既存の製品比較ハーネスで再測定し、参照製品・ライブラリを1とする相対値を示す。初回測定日は2026年10月21日、書込・KV・DataFrame区分別の追加測定日は10月22日（JST）。対象は単一ホストのPython APIであり、Rust APIや分散処理の比較は含まない。
 
 ## 再測定の結果
 
 全45 worker processは正常終了し、DataFrame / SQLの全6ケースで製品間・trial間の結果checksumが一致した。これらの成功は実行と結果照合を示すが、PostgreSQLとの比較成立を示さない。PostgreSQL比較はAlopex embeddedとPostgreSQL serverで実行境界が異なるため無効とし、両製品のserver/client APIによる再測定では、Alopex serverが既存の複合ケースの`DROP SEQUENCE`を拒否した。この複合ケースは未成立だが、独立した読取SQLは比較できる。HNSWの全45設定点もrecall 0.99以上を満たした。
 
-Alopexの所要時間は、Polars eagerの既存複合操作列で参照の**0.135倍**、SQLite curatedで**9.551倍**、DataFusion SQL streamingで**46.522倍**だった。HNSWはrecall≥0.99の最速点で、hnswlibの**3.015倍**、Faiss HNSWの**2.683倍**の検索時間だった。今回の固定ケースでは、SQL streamingとSQLite curatedが相対的に大きな差として表れた。
+Alopexの所要時間は、SQLite curatedで参照の**9.551倍**、DataFusion SQL streamingで**46.522倍**だった。旧Polars複合操作列の**0.135倍**は構築・計算・Python変換を含み、計算だけの速度比ではない。追加の区分別測定では、構築はPolarsの**0.033倍**だが、計算は**1.645倍**だった。HNSWはrecall≥0.99の最速点で、hnswlibの**3.015倍**、Faiss HNSWの**2.683倍**の検索時間だった。今回の固定ケースでは、SQL streamingとSQLite curatedが相対的に大きな差として表れた。
 
 以下の「時間比」は **Alopex / 参照**で、小さいほど速い。「処理量比」は同じ仕事量に対する **Alopex / 参照**で、大きいほど高い。参照製品をすべて1.000とする。
 
@@ -16,7 +16,7 @@ Alopexの所要時間は、Polars eagerの既存複合操作列で参照の**0.1
 
 | 既存ケース | 比較対象 | 時間比 ↓ | 処理量比 ↑ | trial別時間比の範囲 |
 |---|---|---:|---:|---:|
-| DataFrame eager 複合操作 | Polars | 0.135 | 7.380 | 0.107–0.162 |
+| 旧DataFrame複合操作（構築込み） | Polars | 0.135 | 7.380 | 0.107–0.162 |
 | CSV streaming 全消費 | Polars | 2.301 | 0.435 | 1.329–2.853 |
 | Parquet streaming 全消費 | Polars | 1.039 | 0.962 | 0.674–1.160 |
 | SQL curated 複合操作 | SQLite | 9.551 | 0.105 | 8.505–11.051 |
@@ -52,6 +52,48 @@ Parquetの時間比は1をまたぐ幅があり、この3 trialsから優劣を�
 | faiss-hnsw | 64 | 2.367 | 0.430 | 2.311–2.872 | 0.9995 / 0.9995 |
 | faiss-hnsw | 128 | 2.383 | 0.403 | 2.285–2.832 | 0.9995 / 0.9995 |
 | faiss-hnsw | 256 | 2.022 | 0.513 | 2.003–2.486 | 0.9995 / 0.9995 |
+
+## 追加評価：書込・ランダムアクセス・KV
+
+CodexはSQLの耐久write・random point readを6ケース、embedded KVをLMDBと比較する8ケース、DataFrameの区分別比較を4ケース追加した。全108 process・2,268 samplesは成功し、各ケースの入力と完全な結果が製品間・全3 trialsで一致した。以下は主な結果であり、[全18ケースの表・条件・再実行手順](alopex-v0.8.16-performance/run-20261022-write-kv/report.md)に全数値と証跡をまとめる。
+
+| API境界・ケース | 比較対象 | 時間比 ↓ |
+|---|---|---:|
+| SQL server/client・単件INSERT＋commit | PostgreSQL | 2.145 |
+| SQL server/client・100行INSERT＋commit | PostgreSQL | 3.347 |
+| SQL server/client・random get hit | PostgreSQL | 2.472 |
+| SQL server/client・random get miss | PostgreSQL | 2.643 |
+| SQL server/client・random UPDATE＋commit | PostgreSQL | 2.524 |
+| SQL server/client・random DELETE＋commit | PostgreSQL | 50.053 |
+| embedded KV・単件PUT＋commit | LMDB | 0.466 |
+| embedded KV・順次100件PUT＋commit | LMDB | 0.778 |
+| embedded KV・100件の投入順shuffle＋commit | LMDB | 0.782 |
+| embedded KV・random get hit | LMDB | 6.700 |
+| embedded KV・random get miss | LMDB | 1.334 |
+| embedded KV・random overwrite＋commit | LMDB | 0.415 |
+| embedded KV・random DELETE＋commit | LMDB | 0.455 |
+| embedded KV・範囲1,000件の全値取得 | LMDB | 17.538 |
+
+Codexは初期10,000件の専用データを使い、writeは明示beginから永続commit完了までを計測した。KVは10byte key・32byte value、read transactionの開始・終了も含み、最後のclose/reopen後に全key/valueを照合した。SQLは32文字TEXTとINTEGER主キーで、各sampleと新しいclient接続からの最終全件を照合した。SQLserver再起動による耐久性試験は行っていない。両群は同じhost filesystemを使い、KVはAlopexのWAL force-syncとLMDBのsync/metasync有効を確認した。
+
+今回のrandomアクセスはwarm cacheでのAPI応答性能であり、cold disk I/O、並行負荷、メモリを超える規模の評価ではない。SQLとKVはそれぞれ同じ責務の製品と比較し、両API境界の倍率を混ぜない。既知のDROP SEQUENCEは実行していない。SQL random DELETEとKV point read/rangeの差は[性能改善Issue #712](https://github.com/alopex-db/alopex/issues/712)の調査対象とする。
+
+## DataFrame：旧0.135倍と計算性能の区別
+
+旧比較は、**両製品ともメモリ上のデータからDataFrameを構築する時間を含む**。ファイルからのデータロードは含まない。Codexは旧最終12列と返却tupleを独立Python oracleから再生成し、保存された全6 processのchecksumと一致することを確認した。旧計測は空結果や未評価planだけを測ったものではないが、explode/concatは件数だけ、next_idは未使用、全sampleの中間値は未照合だった。
+
+Codexは同じ34,250行について構築・計算・Python変換を分離し、全warmup/sampleで入力全列・next_id・explode・concat・最終12列の型、NULL、順序、全値を独立oracleへ照合した。
+
+| 新しい比較区分（Polars=1） | 時間比 ↓ | trial別時間比の範囲 |
+|---|---:|---:|
+| 事前生成PythonデータからのDataFrame構築 | 0.033 | 0.030–0.033 |
+| 構築済みDataFrameからの12列計算・collect | 1.645 | 1.627–1.766 |
+| 計算済み結果のPython dictへの変換 | 0.987 | 0.959–1.032 |
+| 構築＋全中間結果・最終結果の具体化 | 0.277 | 0.269–0.278 |
+
+**構築はAlopexが速い一方、今回の計算区分はPolarsが速い。旧0.135倍から計算性能の優位を主張しない。** Python変換の幅は1をまたぐため優劣を断定しない。新しい全体区分は旧ケースより多くの結果を具体化するので、0.135→0.277を同じ仕事量での改善・退行とは扱わない。Codexは両製品の論理型の対応を確認したが、内部の物理表現を同一とは主張しない。filterは全行通過の固定ケースであり、一般的な全DataFrame演算への優位は主張しない。
+
+[区分ごとの厳密な計測範囲と再実行](alopex-v0.8.16-performance/run-20261022-write-kv/report.md)と[機能回帰・旧比較の監査記録](alopex-v0.8.16-performance/run-20261022-write-kv/verification.json)を参照する。
 
 ## PostgreSQL：独立した読取・書込ケース
 

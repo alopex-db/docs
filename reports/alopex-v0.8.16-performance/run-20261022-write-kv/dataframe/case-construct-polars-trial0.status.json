@@ -1,0 +1,8 @@
+{
+  "case": "construct",
+  "elapsed_seconds": 28.64286105701467,
+  "engine": "polars",
+  "exit_code": 0,
+  "family": "dataframe",
+  "trial": 0
+}

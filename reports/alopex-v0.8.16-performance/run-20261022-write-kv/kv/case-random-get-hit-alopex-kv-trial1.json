@@ -1,0 +1,23 @@
+{
+  "case": "random-get-hit",
+  "client_peak_rss_bytes": 40779776,
+  "elapsed_seconds": 0.7744370939908549,
+  "engine": "alopex-kv",
+  "exit_code": 0,
+  "family": "kv",
+  "final_rows": 10000,
+  "fixture_rows": 10000,
+  "input_sha256": "39d3609cfe5e3339e393ea6df3848f1697029add872eb2628b5e8a76109ce81e",
+  "key_bytes": 10,
+  "latency_p50_ms": 1.2572339619509876,
+  "operations_per_sample": 100,
+  "result_sha256": "23c37ed64e597036d558eafb7ef5dfe67dfdcba26f066724542ad7e8b2245375",
+  "samples": 21,
+  "server_client": false,
+  "store_allocated_bytes": 1429504,
+  "store_logical_bytes": 538252904,
+  "trial": 1,
+  "validation": "every sample and complete bytes/order after close/reopen",
+  "value_bytes": 32,
+  "warmups": 3
+}

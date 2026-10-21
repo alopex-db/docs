@@ -1,0 +1,8 @@
+{
+  "case": "random-delete-commit",
+  "elapsed_seconds": 0.9777360440348275,
+  "engine": "postgresql",
+  "exit_code": 0,
+  "family": "sql",
+  "trial": 1
+}

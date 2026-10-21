@@ -1,0 +1,170 @@
+{
+  "valid_processes": 108,
+  "measured_samples": 2268,
+  "all_status_zero": true,
+  "checks": [
+    {
+      "family": "sql",
+      "case": "insert-commit",
+      "processes": 6,
+      "samples": 126,
+      "inputs_match": true,
+      "complete_results_match": true,
+      "raw_ratio": 2.1453672242074626
+    },
+    {
+      "family": "sql",
+      "case": "batch-insert-commit",
+      "processes": 6,
+      "samples": 126,
+      "inputs_match": true,
+      "complete_results_match": true,
+      "raw_ratio": 3.3473707454861636
+    },
+    {
+      "family": "sql",
+      "case": "random-get-hit",
+      "processes": 6,
+      "samples": 126,
+      "inputs_match": true,
+      "complete_results_match": true,
+      "raw_ratio": 2.472386304521369
+    },
+    {
+      "family": "sql",
+      "case": "random-get-miss",
+      "processes": 6,
+      "samples": 126,
+      "inputs_match": true,
+      "complete_results_match": true,
+      "raw_ratio": 2.6429186493750834
+    },
+    {
+      "family": "sql",
+      "case": "random-update-commit",
+      "processes": 6,
+      "samples": 126,
+      "inputs_match": true,
+      "complete_results_match": true,
+      "raw_ratio": 2.523945037063822
+    },
+    {
+      "family": "sql",
+      "case": "random-delete-commit",
+      "processes": 6,
+      "samples": 126,
+      "inputs_match": true,
+      "complete_results_match": true,
+      "raw_ratio": 50.05318913624086
+    },
+    {
+      "family": "kv",
+      "case": "put-commit",
+      "processes": 6,
+      "samples": 126,
+      "inputs_match": true,
+      "complete_results_match": true,
+      "raw_ratio": 0.4659883498779707
+    },
+    {
+      "family": "kv",
+      "case": "sequential-batch-put",
+      "processes": 6,
+      "samples": 126,
+      "inputs_match": true,
+      "complete_results_match": true,
+      "raw_ratio": 0.7784324917258186
+    },
+    {
+      "family": "kv",
+      "case": "random-batch-put",
+      "processes": 6,
+      "samples": 126,
+      "inputs_match": true,
+      "complete_results_match": true,
+      "raw_ratio": 0.7820707576253542
+    },
+    {
+      "family": "kv",
+      "case": "random-get-hit",
+      "processes": 6,
+      "samples": 126,
+      "inputs_match": true,
+      "complete_results_match": true,
+      "raw_ratio": 6.699888826919271
+    },
+    {
+      "family": "kv",
+      "case": "random-get-miss",
+      "processes": 6,
+      "samples": 126,
+      "inputs_match": true,
+      "complete_results_match": true,
+      "raw_ratio": 1.3340809941945386
+    },
+    {
+      "family": "kv",
+      "case": "random-overwrite-commit",
+      "processes": 6,
+      "samples": 126,
+      "inputs_match": true,
+      "complete_results_match": true,
+      "raw_ratio": 0.414532288985824
+    },
+    {
+      "family": "kv",
+      "case": "random-delete-commit",
+      "processes": 6,
+      "samples": 126,
+      "inputs_match": true,
+      "complete_results_match": true,
+      "raw_ratio": 0.45527079008909493
+    },
+    {
+      "family": "kv",
+      "case": "range-scan",
+      "processes": 6,
+      "samples": 126,
+      "inputs_match": true,
+      "complete_results_match": true,
+      "raw_ratio": 17.53803450979373
+    },
+    {
+      "family": "dataframe",
+      "case": "construct",
+      "processes": 6,
+      "samples": 126,
+      "inputs_match": true,
+      "complete_results_match": true,
+      "raw_ratio": 0.032784636066671834
+    },
+    {
+      "family": "dataframe",
+      "case": "compute",
+      "processes": 6,
+      "samples": 126,
+      "inputs_match": true,
+      "complete_results_match": true,
+      "raw_ratio": 1.6446462079036257
+    },
+    {
+      "family": "dataframe",
+      "case": "convert",
+      "processes": 6,
+      "samples": 126,
+      "inputs_match": true,
+      "complete_results_match": true,
+      "raw_ratio": 0.9865202260882179
+    },
+    {
+      "family": "dataframe",
+      "case": "complete",
+      "processes": 6,
+      "samples": 126,
+      "inputs_match": true,
+      "complete_results_match": true,
+      "raw_ratio": 0.2766795787878634
+    }
+  ],
+  "independent_review": "all 18 raw ratios, 108 status0 processes, 2268 samples, input/result digests, ranges and throughput reproduced"
+}

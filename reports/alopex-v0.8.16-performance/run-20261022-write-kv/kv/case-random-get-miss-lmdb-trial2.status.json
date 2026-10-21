@@ -1,0 +1,8 @@
+{
+  "case": "random-get-miss",
+  "elapsed_seconds": 0.267638191988226,
+  "engine": "lmdb",
+  "exit_code": 0,
+  "family": "kv",
+  "trial": 2
+}

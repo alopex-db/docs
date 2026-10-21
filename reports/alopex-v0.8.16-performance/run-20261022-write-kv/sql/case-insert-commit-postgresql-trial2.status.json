@@ -1,0 +1,8 @@
+{
+  "case": "insert-commit",
+  "elapsed_seconds": 0.8765037219855003,
+  "engine": "postgresql",
+  "exit_code": 0,
+  "family": "sql",
+  "trial": 2
+}

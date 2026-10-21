@@ -1,0 +1,23 @@
+{
+  "case": "random-delete-commit",
+  "client_peak_rss_bytes": 39743488,
+  "elapsed_seconds": 0.7801779910223559,
+  "engine": "alopex-kv",
+  "exit_code": 0,
+  "family": "kv",
+  "final_rows": 9999,
+  "fixture_rows": 10000,
+  "input_sha256": "af877c6dafcadeb1785059128fab90c9eb7e540d024908368aeada250a151189",
+  "key_bytes": 10,
+  "latency_p50_ms": 1.054902037139982,
+  "operations_per_sample": 1,
+  "result_sha256": "f2c767e6a260d4a8b58744d24d18f7cf263f461ce38b071f19a602d5bc23dfa6",
+  "samples": 21,
+  "server_client": false,
+  "store_allocated_bytes": 1437696,
+  "store_logical_bytes": 538256510,
+  "trial": 0,
+  "validation": "every sample and complete bytes/order after close/reopen",
+  "value_bytes": 32,
+  "warmups": 3
+}

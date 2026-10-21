@@ -1,0 +1,48 @@
+{
+  "cases": [
+    {
+      "case": "construct",
+      "comparison_status": "valid",
+      "latency_ratio": 0.032784636066671834,
+      "paired_latency_ratio_range": [
+        0.029722700992840193,
+        0.03306885506464909
+      ],
+      "throughput_ratio": 30.502092442520013
+    },
+    {
+      "case": "compute",
+      "comparison_status": "valid",
+      "latency_ratio": 1.6446462079036257,
+      "paired_latency_ratio_range": [
+        1.62705071400615,
+        1.7664474571574718
+      ],
+      "throughput_ratio": 0.6080335060478848
+    },
+    {
+      "case": "convert",
+      "comparison_status": "valid",
+      "latency_ratio": 0.9865202260882179,
+      "paired_latency_ratio_range": [
+        0.9588959098766207,
+        1.0318308704630417
+      ],
+      "throughput_ratio": 1.013663961017031
+    },
+    {
+      "case": "complete",
+      "comparison_status": "valid",
+      "latency_ratio": 0.2766795787878634,
+      "paired_latency_ratio_range": [
+        0.26882441867050116,
+        0.2776572735962644
+      ],
+      "throughput_ratio": 3.614289151302789
+    }
+  ],
+  "family": "dataframe",
+  "reference": "polars",
+  "schema": "alopex.performance-comparison/v1",
+  "subject": "alopex"
+}
