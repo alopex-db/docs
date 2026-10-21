@@ -2,6 +2,10 @@
 
 ## 事前検証後の行列追加
 
+Codexは初回行列の実行中に文書lint依存の導入を並行実行してしまったため、初回数値を最終比較には採用しない。Codexは初回証跡を保持し、依存導入後に`confirmed/`で独立した確認runを実行する。Codexは確認run中に依存導入やテストを行わない。確認runの既定行列は成功可能な4ケースと入口6probeであり、既知のParquet文字列2ケースは既定スキップとする。再実行者は`--case parquet-collect`または`--case parquet-batches`を明示した場合だけ診断を再試行できる。
+
+Codexは確認runでprocess全体のpeak RSSと`/proc/self/io`も保存する。ただし両指標はfixture読み込み・Python oracle生成・全値照合・raw保存を含み、engine内部だけの資源コストとは扱わない。Codexは資源の観測と時間比を別々に示す。
+
 Codexの17行fixture事前検証は、CSVの12列計算で成功した一方、Parquetの12列計算ではcollect/batches両方が`type mismatch: expected Utf8, got LargeUtf8`で失敗した。Codexはこの失敗ケースを行列へ残し、相対値を算出しない。Codexは同じParquet入力から独立した数値・比較・論理11列のcollect/batchesを追加し、文字列の機能不足で他の計算比較を停止しない。今回の性能行列は6ケース、入口probeは6ケースとする。Codexはこの追加を性能測定前に確定した。
 
 独立検証者の指摘により、CodexはLazyFrame直接構築と、Series構築に依存しない演算probeも追加する。後者だけは既存DataFrameからSeriesを取り出して演算を試み、直接構築不可と演算不可を区別する診断であり、性能測定ではない。Codexは親runner初期化でimportlibのlocal変数参照エラーを1回検出し、importをmodule先頭へ移動した。Codexはこの時点でworker・測定値が未生成であることを確認した。

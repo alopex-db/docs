@@ -9,6 +9,7 @@ import math
 import os
 from pathlib import Path
 import platform
+import resource
 import statistics
 import subprocess
 import sys
@@ -18,6 +19,7 @@ from dataframe_phases_v0816 import Operations, assert_equal, inputs, oracle, _ha
 
 CASES = ("csv-collect", "parquet-collect", "csv-batches", "parquet-batches",
          "parquet-numeric-collect", "parquet-numeric-batches")
+DEFAULT_CASES = tuple(case for case in CASES if case not in ("parquet-collect", "parquet-batches"))
 PROBES = ("module-select", "series-constructor", "series-arithmetic", "lazy-constructor",
           "module-scan-csv", "module-scan-parquet")
 ENGINES = ("alopex", "polars")
@@ -134,10 +136,14 @@ def main():
             value = measure(args.engine, args.case, data, Path(os.environ["ALOPEX_PERF_RAW_PATH"]))
         else:
             parser.error("Worker requires --case")
+        value["process_peak_rss_bytes"] = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024
+        value["process_io"] = {key: int(value) for line in Path("/proc/self/io").read_text().splitlines()
+                               for key, value in [line.split(":", 1)]}
         print(json.dumps(value, allow_nan=False))
         return
-    if args.case:
-        parser.error("Parent executes the complete fixed matrix")
+    if args.case in PROBES:
+        parser.error("Parent --case selects a measurement case")
+    cases = (args.case,) if args.case else DEFAULT_CASES
     output.mkdir(parents=True, exist_ok=True)
     if (output / "environment.json").exists() or any(output.glob("case-*")):
         raise RuntimeError("Use a new output directory; previous evidence is immutable")
@@ -161,7 +167,7 @@ def main():
             for f in dist.files if (p := Path(dist.locate_file(f))).is_file() and p.suffix != ".pyc"}
             for name in ("alopex", "polars", "polars-runtime-32") for dist in [importlib.metadata.distribution(name)]}})
     results, probes = [], []
-    for case in PROBES + CASES:
+    for case in PROBES + cases:
         for trial in range(1 if case in PROBES else 3):
             for engine in (ENGINES if trial % 2 == 0 else tuple(reversed(ENGINES))):
                 name = f"case-{case}-{engine}-trial{trial}"
@@ -187,15 +193,19 @@ def main():
                         row = dict(status)
                 (probes if case in PROBES else results).append(row)
                 print(json.dumps(status), flush=True)
-    summary = shared.relative(results, CASES, ENGINES)
+    summary = shared.relative(results, cases, ENGINES)
     for cell in summary:
+        if cell["comparison_status"] != "valid":
+            cell["reason"] = "worker_failure_or_result_mismatch"
+            continue
         hashes = {r.get("input_sha256") for r in results if r["case"] == cell["case"]}
         if len(hashes) != 1 or None in hashes:
             case = cell["case"]
             cell.clear()
             cell.update(case=case, comparison_status="failed", reason="input_digest_mismatch_or_missing")
     shared.save(output / "capabilities.json", {"probes": probes})
-    shared.save(output / "relative.json", {"schema": "alopex.performance-comparison/v1", "subject": "alopex", "reference": "polars", "cases": summary})
+    shared.save(output / "relative.json", {"schema": "alopex.performance-comparison/v1", "subject": "alopex", "reference": "polars", "cases": summary,
+                "default_skips": {case: "Known Utf8/LargeUtf8 failure; explicit --case required" for case in CASES if case not in DEFAULT_CASES}})
 
 
 if __name__ == "__main__":
