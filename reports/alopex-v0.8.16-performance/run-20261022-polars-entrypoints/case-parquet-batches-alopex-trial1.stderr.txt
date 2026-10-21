@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "<docs-worktree>/scripts/performance/polars_entrypoints_v0816.py", line 202, in <module>
+    main()
+  File "<docs-worktree>/scripts/performance/polars_entrypoints_v0816.py", line 134, in main
+    value = measure(args.engine, args.case, data, Path(os.environ["ALOPEX_PERF_RAW_PATH"]))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<docs-worktree>/scripts/performance/polars_entrypoints_v0816.py", line 91, in measure
+    with plan.collect_batches(chunk_size=8192) as stream:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+crate::error.PyAlopexError: type mismatch: expected Utf8, got LargeUtf8

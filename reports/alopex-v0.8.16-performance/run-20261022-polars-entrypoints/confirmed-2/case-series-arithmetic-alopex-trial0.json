@@ -1,0 +1,15 @@
+{
+  "case": "series-arithmetic",
+  "elapsed_seconds": 0.22074073000112548,
+  "engine": "alopex",
+  "exception": "TypeError",
+  "exit_code": 0,
+  "message": "unsupported operand type(s) for +: 'builtins.Series' and 'int'",
+  "process_io": {
+    "input_blocks": 0,
+    "output_blocks": 0
+  },
+  "process_peak_rss_bytes": 290029568,
+  "status": "capability-gap",
+  "trial": 0
+}

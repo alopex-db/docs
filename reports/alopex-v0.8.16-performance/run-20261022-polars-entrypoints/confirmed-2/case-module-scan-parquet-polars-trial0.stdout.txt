@@ -1,0 +1,1 @@
+{"engine": "polars", "case": "module-scan-parquet", "status": "supported", "result_sha256": "98afeb725a4f51925adec4ad654a07088175c9652d7ec7c29d8a19bf475f5707", "process_peak_rss_bytes": 290029568, "process_io": {"input_blocks": 0, "output_blocks": 0}}

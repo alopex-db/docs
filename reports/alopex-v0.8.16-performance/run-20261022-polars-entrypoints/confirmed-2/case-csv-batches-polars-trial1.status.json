@@ -1,0 +1,7 @@
+{
+  "case": "csv-batches",
+  "elapsed_seconds": 5.215373418992385,
+  "engine": "polars",
+  "exit_code": 0,
+  "trial": 1
+}

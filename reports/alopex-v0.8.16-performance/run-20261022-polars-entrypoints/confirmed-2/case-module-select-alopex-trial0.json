@@ -1,0 +1,15 @@
+{
+  "case": "module-select",
+  "elapsed_seconds": 0.21522602497134358,
+  "engine": "alopex",
+  "exception": "AttributeError",
+  "exit_code": 0,
+  "message": "module 'alopex' has no attribute 'select'",
+  "process_io": {
+    "input_blocks": 0,
+    "output_blocks": 0
+  },
+  "process_peak_rss_bytes": 290029568,
+  "status": "capability-gap",
+  "trial": 0
+}

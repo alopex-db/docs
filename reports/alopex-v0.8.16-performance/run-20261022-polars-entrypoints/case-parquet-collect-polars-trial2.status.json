@@ -1,0 +1,7 @@
+{
+  "case": "parquet-collect",
+  "elapsed_seconds": 5.270934505038895,
+  "engine": "polars",
+  "exit_code": 0,
+  "trial": 2
+}

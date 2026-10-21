@@ -1,0 +1,1 @@
+{"engine": "polars", "case": "module-select", "status": "supported", "result_sha256": "248bd0b8c68aafa6dc8a1937e158e674cd812a04aea16d6becf7ae7fb9b5051e"}

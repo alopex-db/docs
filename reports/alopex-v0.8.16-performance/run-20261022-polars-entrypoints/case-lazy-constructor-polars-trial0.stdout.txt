@@ -1,0 +1,1 @@
+{"engine": "polars", "case": "lazy-constructor", "status": "supported", "result_sha256": "c7cfad29b116f660aefb27874901b61b956414e851c6401d5f0b98fa3f7d039d"}

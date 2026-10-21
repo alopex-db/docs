@@ -1,0 +1,118 @@
+{
+  "probes": [
+    {
+      "case": "module-select",
+      "elapsed_seconds": 0.26812129403697327,
+      "engine": "alopex",
+      "exception": "AttributeError",
+      "exit_code": 0,
+      "message": "module 'alopex' has no attribute 'select'",
+      "status": "capability-gap",
+      "trial": 0
+    },
+    {
+      "case": "module-select",
+      "elapsed_seconds": 0.520158058963716,
+      "engine": "polars",
+      "exit_code": 0,
+      "result_sha256": "248bd0b8c68aafa6dc8a1937e158e674cd812a04aea16d6becf7ae7fb9b5051e",
+      "status": "supported",
+      "trial": 0
+    },
+    {
+      "case": "series-constructor",
+      "elapsed_seconds": 0.21722432295791805,
+      "engine": "alopex",
+      "exception": "TypeError",
+      "exit_code": 0,
+      "message": "cannot create 'builtins.Series' instances",
+      "status": "capability-gap",
+      "trial": 0
+    },
+    {
+      "case": "series-constructor",
+      "elapsed_seconds": 0.5215277579845861,
+      "engine": "polars",
+      "exit_code": 0,
+      "result_sha256": "ac246202475c42c60482ee5c4c00ec842afcfa4a445dfb7123818415d5fac626",
+      "status": "supported",
+      "trial": 0
+    },
+    {
+      "case": "series-arithmetic",
+      "elapsed_seconds": 0.2672269030008465,
+      "engine": "alopex",
+      "exception": "TypeError",
+      "exit_code": 0,
+      "message": "unsupported operand type(s) for +: 'builtins.Series' and 'int'",
+      "status": "capability-gap",
+      "trial": 0
+    },
+    {
+      "case": "series-arithmetic",
+      "elapsed_seconds": 0.5216262739850208,
+      "engine": "polars",
+      "exit_code": 0,
+      "result_sha256": "a0fbc1c637076d2fa194b0c42d6c4f5e44e73449b877c0061ecb27a22e1ea983",
+      "status": "supported",
+      "trial": 0
+    },
+    {
+      "case": "lazy-constructor",
+      "elapsed_seconds": 0.2708408699836582,
+      "engine": "alopex",
+      "exception": "TypeError",
+      "exit_code": 0,
+      "message": "cannot create 'builtins.LazyFrame' instances",
+      "status": "capability-gap",
+      "trial": 0
+    },
+    {
+      "case": "lazy-constructor",
+      "elapsed_seconds": 0.47053031501127407,
+      "engine": "polars",
+      "exit_code": 0,
+      "result_sha256": "c7cfad29b116f660aefb27874901b61b956414e851c6401d5f0b98fa3f7d039d",
+      "status": "supported",
+      "trial": 0
+    },
+    {
+      "case": "module-scan-csv",
+      "elapsed_seconds": 0.21992325299652293,
+      "engine": "alopex",
+      "exception": "AttributeError",
+      "exit_code": 0,
+      "message": "module 'alopex' has no attribute 'scan_csv'",
+      "status": "capability-gap",
+      "trial": 0
+    },
+    {
+      "case": "module-scan-csv",
+      "elapsed_seconds": 0.6197940279962495,
+      "engine": "polars",
+      "exit_code": 0,
+      "result_sha256": "98afeb725a4f51925adec4ad654a07088175c9652d7ec7c29d8a19bf475f5707",
+      "status": "supported",
+      "trial": 0
+    },
+    {
+      "case": "module-scan-parquet",
+      "elapsed_seconds": 0.21527502301614732,
+      "engine": "alopex",
+      "exception": "AttributeError",
+      "exit_code": 0,
+      "message": "module 'alopex' has no attribute 'scan_parquet'",
+      "status": "capability-gap",
+      "trial": 0
+    },
+    {
+      "case": "module-scan-parquet",
+      "elapsed_seconds": 0.5663639470003545,
+      "engine": "polars",
+      "exit_code": 0,
+      "result_sha256": "98afeb725a4f51925adec4ad654a07088175c9652d7ec7c29d8a19bf475f5707",
+      "status": "supported",
+      "trial": 0
+    }
+  ]
+}

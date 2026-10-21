@@ -1,0 +1,9 @@
+{
+  "case": "module-scan-parquet",
+  "elapsed_seconds": 0.5663639470003545,
+  "engine": "polars",
+  "exit_code": 0,
+  "result_sha256": "98afeb725a4f51925adec4ad654a07088175c9652d7ec7c29d8a19bf475f5707",
+  "status": "supported",
+  "trial": 0
+}

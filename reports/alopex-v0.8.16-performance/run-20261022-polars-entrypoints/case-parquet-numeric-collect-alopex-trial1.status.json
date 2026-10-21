@@ -1,0 +1,7 @@
+{
+  "case": "parquet-numeric-collect",
+  "elapsed_seconds": 3.8402371929842047,
+  "engine": "alopex",
+  "exit_code": 0,
+  "trial": 1
+}

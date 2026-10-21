@@ -72,12 +72,21 @@ class Operations:
         return self.api.DataFrame(columns)
 
     def next_frame(self, frame):
+        return self.next_plan(frame.lazy())
+
+    def next_plan(self, plan):
         col, lit = self.api.col, self.api.lit
-        return frame.lazy().filter(col("id").ge(lit(0))).with_columns(col("id").add(lit(1)).alias("next_id"))
+        return plan.filter(col("id").ge(lit(0))).with_columns(col("id").add(lit(1)).alias("next_id"))
 
     def compute(self, frame):
+        return self.select_plan(self.next_frame(frame)).collect()
+
+    def select_plan(self, plan):
+        return plan.select(*self.expressions())
+
+    def expressions(self):
         col, lit, concat_str = self.api.col, self.api.lit, self.api.concat_str
-        return self.next_frame(frame).select(
+        return (
             col("id").add(1).alias("add"), col("id").sub(1).alias("sub"),
             col("id").mul(2).alias("mul"), col("id").eq(0).alias("eq"),
             col("id").ge(0).alias("ge"), col("id").gt(-1).alias("gt"),
@@ -85,7 +94,7 @@ class Operations:
             col("id").ge(0).and_(col("id").lt(self.rows)).alias("and"),
             col("id").lt(0).or_(col("id").ge(0)).alias("or"),
             col("id").lt(0).not_().alias("not"),
-            concat_str("label", lit("!"), separator="").alias("joined")).collect()
+            concat_str("label", lit("!"), separator="").alias("joined"))
 
     def snapshot(self, frame, result=None, converted=None):
         series = frame.to_dict()

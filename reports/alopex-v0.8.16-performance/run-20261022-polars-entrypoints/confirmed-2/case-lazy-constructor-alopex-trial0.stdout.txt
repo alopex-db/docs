@@ -1,0 +1,1 @@
+{"engine": "alopex", "case": "lazy-constructor", "status": "capability-gap", "exception": "TypeError", "message": "cannot create 'builtins.LazyFrame' instances", "process_peak_rss_bytes": 290029568, "process_io": {"input_blocks": 0, "output_blocks": 0}}

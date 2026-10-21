@@ -1,0 +1,1 @@
+{"engine": "alopex", "case": "lazy-constructor", "status": "capability-gap", "exception": "TypeError", "message": "cannot create 'builtins.LazyFrame' instances"}

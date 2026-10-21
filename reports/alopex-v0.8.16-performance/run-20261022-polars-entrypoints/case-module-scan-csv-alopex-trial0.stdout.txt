@@ -1,0 +1,1 @@
+{"engine": "alopex", "case": "module-scan-csv", "status": "capability-gap", "exception": "AttributeError", "message": "module 'alopex' has no attribute 'scan_csv'"}

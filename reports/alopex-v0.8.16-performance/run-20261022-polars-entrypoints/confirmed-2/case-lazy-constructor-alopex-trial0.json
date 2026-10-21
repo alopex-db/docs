@@ -1,0 +1,15 @@
+{
+  "case": "lazy-constructor",
+  "elapsed_seconds": 0.22039216698613018,
+  "engine": "alopex",
+  "exception": "TypeError",
+  "exit_code": 0,
+  "message": "cannot create 'builtins.LazyFrame' instances",
+  "process_io": {
+    "input_blocks": 0,
+    "output_blocks": 0
+  },
+  "process_peak_rss_bytes": 290029568,
+  "status": "capability-gap",
+  "trial": 0
+}

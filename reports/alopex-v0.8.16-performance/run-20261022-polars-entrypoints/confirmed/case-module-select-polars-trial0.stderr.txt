@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "<docs-worktree>/scripts/performance/polars_entrypoints_v0816.py", line 212, in <module>
+    main()
+  File "<docs-worktree>/scripts/performance/polars_entrypoints_v0816.py", line 140, in main
+    value["process_io"] = {key: int(value) for line in Path("/proc/self/io").read_text().splitlines()
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<python-install>/lib/python3.11/pathlib.py", line 1058, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<python-install>/lib/python3.11/pathlib.py", line 1044, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/proc/self/io'

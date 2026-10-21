@@ -1,0 +1,7 @@
+{
+  "case": "csv-collect",
+  "elapsed_seconds": 4.812174473016057,
+  "engine": "polars",
+  "exit_code": 0,
+  "trial": 2
+}
