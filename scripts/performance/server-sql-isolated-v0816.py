@@ -13,7 +13,7 @@ import subprocess
 import sys
 import time
 
-CASES = ("aggregate", "ordered", "select-all", "insert-rollback", "drop-sequence")
+CASES = ("drop-sequence", "aggregate", "ordered", "select-all", "insert-rollback")
 ROWS = 34250
 
 

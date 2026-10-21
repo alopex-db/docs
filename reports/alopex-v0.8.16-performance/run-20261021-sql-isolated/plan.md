@@ -16,3 +16,5 @@ Codexは接続生成とfixture投入を計測外、既存接続のrequest/respon
 Codexはordered SELECTのCOALESCE列へAS valueを付け、両APIの列名付き結果を揃える。CodexはPostgreSQLにdict_rowを指定し、Alopexのlist[dict]と同じPython表現まで取得する。Codexは全結果取得をstreaming API同士の比較とは呼ばない。各case processは300秒を上限とし、timeoutも失敗として保存して次のcaseへ進む。
 
 Codexはpsycopgのprepare_threshold=Noneを指定し、Alopex RemoteDatabaseと同様に明示prepared statementなしでSQL文字列を送る。両製品の接続は再利用する。
+
+Codexは既知の失敗を持つDROP SEQUENCEケースを最初に実行し、その失敗後も独立した読取・書込ケースが実行されることを公開runで示す。
