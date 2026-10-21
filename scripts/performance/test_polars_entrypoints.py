@@ -1,4 +1,7 @@
 import tempfile
+import json
+import subprocess
+import sys
 from pathlib import Path
 import unittest
 
@@ -6,6 +9,17 @@ import polars_entrypoints_v0816 as subject
 
 
 class EntrypointTests(unittest.TestCase):
+    def test_worker_cli_publishes_capability_and_resources(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = subprocess.run([sys.executable, "-B", subject.__file__, "--output", directory,
+                                     "--data", directory, "--engine", "polars", "--case", "module-select"],
+                                    capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            value = json.loads(result.stdout)
+            self.assertEqual(value["status"], "supported")
+            self.assertGreater(value["process_peak_rss_bytes"], 0)
+            self.assertIn("input_blocks", value["process_io"])
+
     def test_public_entrypoints_do_not_fall_back_to_dataframe(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory) / "data"

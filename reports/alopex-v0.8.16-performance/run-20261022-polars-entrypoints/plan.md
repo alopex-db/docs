@@ -4,7 +4,9 @@
 
 Codexは初回行列の実行中に文書lint依存の導入を並行実行してしまったため、初回数値を最終比較には採用しない。Codexは初回証跡を保持し、依存導入後に`confirmed/`で独立した確認runを実行する。Codexは確認run中に依存導入やテストを行わない。確認runの既定行列は成功可能な4ケースと入口6probeであり、既知のParquet文字列2ケースは既定スキップとする。再実行者は`--case parquet-collect`または`--case parquet-batches`を明示した場合だけ診断を再試行できる。
 
-Codexは確認runでprocess全体のpeak RSSと`/proc/self/io`も保存する。ただし両指標はfixture読み込み・Python oracle生成・全値照合・raw保存を含み、engine内部だけの資源コストとは扱わない。Codexは資源の観測と時間比を別々に示す。
+Codexは確認runでprocess全体のpeak RSSとgetrusageのinput/output block数も保存する。ただし両指標はfixture読み込み・Python oracle生成・全値照合・raw保存を含み、engine内部だけの資源コストとは扱わない。Codexは資源の観測と時間比を別々に示す。
+
+Codexは最初の確認runで、資源取得に使った`/proc/self/io`がこの実行環境にはなく、workerが結果出力前に失敗する問題を検出してrunを停止した。Codexはこの失敗をconfirmed/へ保持し、CLI回帰testでREDを再現した。Codexはgetrusageのblock数へ変更して同じtestを通し、最終確認runをconfirmed-2/へ保存する。
 
 Codexの17行fixture事前検証は、CSVの12列計算で成功した一方、Parquetの12列計算ではcollect/batches両方が`type mismatch: expected Utf8, got LargeUtf8`で失敗した。Codexはこの失敗ケースを行列へ残し、相対値を算出しない。Codexは同じParquet入力から独立した数値・比較・論理11列のcollect/batchesを追加し、文字列の機能不足で他の計算比較を停止しない。今回の性能行列は6ケース、入口probeは6ケースとする。Codexはこの追加を性能測定前に確定した。
 

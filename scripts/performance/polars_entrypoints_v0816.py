@@ -136,9 +136,9 @@ def main():
             value = measure(args.engine, args.case, data, Path(os.environ["ALOPEX_PERF_RAW_PATH"]))
         else:
             parser.error("Worker requires --case")
-        value["process_peak_rss_bytes"] = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024
-        value["process_io"] = {key: int(value) for line in Path("/proc/self/io").read_text().splitlines()
-                               for key, value in [line.split(":", 1)]}
+        usage = resource.getrusage(resource.RUSAGE_SELF)
+        value["process_peak_rss_bytes"] = usage.ru_maxrss * 1024
+        value["process_io"] = {"input_blocks": usage.ru_inblock, "output_blocks": usage.ru_oublock}
         print(json.dumps(value, allow_nan=False))
         return
     if args.case in PROBES:
