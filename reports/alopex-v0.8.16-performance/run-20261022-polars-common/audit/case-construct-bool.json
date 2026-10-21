@@ -1,0 +1,49 @@
+{
+  "case": "construct-bool",
+  "family": "construction",
+  "expected_error": false,
+  "status": "failed",
+  "kind": "match",
+  "values": "mismatch",
+  "schema": "unverified",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": [
+        [
+          "x",
+          "Boolean"
+        ]
+      ],
+      "values": [
+        [
+          "x",
+          [
+            true,
+            false,
+            null
+          ]
+        ]
+      ]
+    }
+  },
+  "subject": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": null,
+      "values": [
+        [
+          "x",
+          [
+            1,
+            0,
+            null
+          ]
+        ]
+      ],
+      "schema_error": "AttributeError"
+    }
+  }
+}

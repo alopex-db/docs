@@ -1,0 +1,1 @@
+{"execution": "ok", "observation": {"kind": "DataFrame", "schema": [["x", "Date"]], "values": [["x", [{"python_type": "date", "iso": "2024-02-29"}, null]]]}}

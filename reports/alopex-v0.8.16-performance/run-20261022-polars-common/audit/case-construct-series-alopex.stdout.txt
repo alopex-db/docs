@@ -1,0 +1,1 @@
+{"execution": "error", "exception": "TypeError", "message": "cannot create 'builtins.Series' instances"}

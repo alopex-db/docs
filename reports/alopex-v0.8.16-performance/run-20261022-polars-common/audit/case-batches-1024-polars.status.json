@@ -1,0 +1,5 @@
+{
+  "case": "batches-1024",
+  "engine": "polars",
+  "exit_code": 0
+}

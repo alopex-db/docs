@@ -1,0 +1,1 @@
+{"execution": "error", "exception": "ShapeError", "message": "could not create a new DataFrame: height of column 'b' (2) does not match height of column 'a' (1)"}

@@ -1,0 +1,27 @@
+{
+  "audit_source_commit": "02bb9f9ef5007408f9001bb9c8e8a4ef6d8f28d1",
+  "proposed_ci_commit": "e076969002ec10288ebe72e194ad52ab5ca2987c",
+  "source_pr": "https://github.com/alopex-db/alopex/pull/724",
+  "source_pr_state": "draft; candidate CI not qualified; not merged",
+  "worker_processes": 298,
+  "reference_valid_cases": 149,
+  "case_count": 149,
+  "families": 13,
+  "subject_execution_ok": 20,
+  "subject_execution_error": 129,
+  "value_matches": 19,
+  "schema_unverified": 20,
+  "complete_contract_passes": 0,
+  "audit_exit_code": 1,
+  "classifier_unit_tests": 5,
+  "classifier_result": "passed",
+  "workflow_yaml_parser": "passed (PyYAML 6.0.3); not proof of candidate CI success",
+  "independent_review": "all raw, reference validity, 20/19/20 classification, bool mismatch, source hash and CI failure propagation checked",
+  "preserved_failures": [
+    "Initial unit RED: module missing",
+    "Expected-reference-error classification RED then fixed; 5 tests GREEN",
+    "One initial Polars reference used absent DataFrame.implode; corrected to Expr.implode; initial reference result retained",
+    "Global YAML parser lacked PyYAML; isolated dependency installed and parser passed"
+  ],
+  "diagnostic_redaction": "one local prefix in Polars deprecation warning replaced; message retained"
+}

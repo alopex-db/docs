@@ -1,0 +1,73 @@
+{
+  "case": "lazy-select-name",
+  "family": "selection",
+  "expected_error": false,
+  "status": "failed",
+  "kind": "match",
+  "values": "match",
+  "schema": "unverified",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": [
+        [
+          "id",
+          "Int64"
+        ],
+        [
+          "label",
+          "String"
+        ]
+      ],
+      "values": [
+        [
+          "id",
+          [
+            1,
+            2,
+            3,
+            4
+          ]
+        ],
+        [
+          "label",
+          [
+            "One",
+            null,
+            "三",
+            "Four"
+          ]
+        ]
+      ]
+    }
+  },
+  "subject": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": null,
+      "values": [
+        [
+          "id",
+          [
+            1,
+            2,
+            3,
+            4
+          ]
+        ],
+        [
+          "label",
+          [
+            "One",
+            null,
+            "三",
+            "Four"
+          ]
+        ]
+      ],
+      "schema_error": "AttributeError"
+    }
+  }
+}

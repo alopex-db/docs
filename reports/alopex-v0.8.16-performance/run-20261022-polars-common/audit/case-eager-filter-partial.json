@@ -1,0 +1,80 @@
+{
+  "case": "eager-filter-partial",
+  "family": "selection",
+  "expected_error": false,
+  "status": "failed",
+  "reason": "execution_error",
+  "exception": "AttributeError",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": [
+        [
+          "id",
+          "Int64"
+        ],
+        [
+          "group",
+          "String"
+        ],
+        [
+          "value",
+          "Int64"
+        ],
+        [
+          "label",
+          "String"
+        ],
+        [
+          "items",
+          "List(String)"
+        ]
+      ],
+      "values": [
+        [
+          "id",
+          [
+            3,
+            4
+          ]
+        ],
+        [
+          "group",
+          [
+            "b",
+            "b"
+          ]
+        ],
+        [
+          "value",
+          [
+            null,
+            40
+          ]
+        ],
+        [
+          "label",
+          [
+            "三",
+            "Four"
+          ]
+        ],
+        [
+          "items",
+          [
+            null,
+            [
+              "c"
+            ]
+          ]
+        ]
+      ]
+    }
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "AttributeError",
+    "message": "'builtins.DataFrame' object has no attribute 'filter'"
+  }
+}

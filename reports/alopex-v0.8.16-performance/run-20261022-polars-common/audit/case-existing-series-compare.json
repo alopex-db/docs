@@ -1,0 +1,30 @@
+{
+  "case": "existing-series-compare",
+  "family": "series-diagnostic",
+  "expected_error": false,
+  "status": "failed",
+  "reason": "execution_error",
+  "exception": "TypeError",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "Series",
+      "schema": [
+        [
+          "x",
+          "Boolean"
+        ]
+      ],
+      "values": [
+        false,
+        null,
+        true
+      ]
+    }
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "TypeError",
+    "message": "'>' not supported between instances of 'builtins.Series' and 'int'"
+  }
+}

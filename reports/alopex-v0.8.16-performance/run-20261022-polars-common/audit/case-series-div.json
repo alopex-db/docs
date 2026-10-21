@@ -1,0 +1,30 @@
+{
+  "case": "series-div",
+  "family": "series",
+  "expected_error": false,
+  "status": "failed",
+  "reason": "execution_error",
+  "exception": "TypeError",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "Series",
+      "schema": [
+        [
+          "x",
+          "Float64"
+        ]
+      ],
+      "values": [
+        0.5,
+        null,
+        1.5
+      ]
+    }
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "TypeError",
+    "message": "cannot create 'builtins.Series' instances"
+  }
+}

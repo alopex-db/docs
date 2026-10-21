@@ -1,0 +1,1 @@
+{"execution": "error", "exception": "NotImplementedError", "message": "Alopex does not yet implement Polars option non-default collect engine"}

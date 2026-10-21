@@ -1,0 +1,36 @@
+{
+  "case": "list-null-element",
+  "family": "types-and-shapes",
+  "expected_error": false,
+  "status": "failed",
+  "reason": "execution_error",
+  "exception": "NotImplementedError",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": [
+        [
+          "items",
+          "String"
+        ]
+      ],
+      "values": [
+        [
+          "items",
+          [
+            "a",
+            null,
+            null,
+            null
+          ]
+        ]
+      ]
+    }
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "NotImplementedError",
+    "message": "Alopex does not yet implement Polars option empty_as_null"
+  }
+}

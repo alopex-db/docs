@@ -1,0 +1,51 @@
+{
+  "case": "expr-add-method",
+  "family": "expression",
+  "expected_error": false,
+  "status": "failed",
+  "kind": "match",
+  "values": "match",
+  "schema": "unverified",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": [
+        [
+          "result",
+          "Int64"
+        ]
+      ],
+      "values": [
+        [
+          "result",
+          [
+            11,
+            21,
+            null,
+            41
+          ]
+        ]
+      ]
+    }
+  },
+  "subject": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": null,
+      "values": [
+        [
+          "result",
+          [
+            11,
+            21,
+            null,
+            41
+          ]
+        ]
+      ],
+      "schema_error": "AttributeError"
+    }
+  }
+}

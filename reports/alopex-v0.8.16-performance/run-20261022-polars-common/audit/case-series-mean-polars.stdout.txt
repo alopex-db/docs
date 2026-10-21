@@ -1,0 +1,1 @@
+{"execution": "ok", "observation": {"kind": "float", "schema": null, "values": 2.0}}

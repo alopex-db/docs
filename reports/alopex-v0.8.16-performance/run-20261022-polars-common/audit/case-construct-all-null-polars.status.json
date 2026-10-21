@@ -1,0 +1,5 @@
+{
+  "case": "construct-all-null",
+  "engine": "polars",
+  "exit_code": 0
+}

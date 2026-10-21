@@ -1,0 +1,37 @@
+{
+  "case": "construct-datetimes",
+  "family": "construction",
+  "expected_error": false,
+  "status": "failed",
+  "reason": "execution_error",
+  "exception": "TypeError",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": [
+        [
+          "x",
+          "Datetime(time_unit='us', time_zone=None)"
+        ]
+      ],
+      "values": [
+        [
+          "x",
+          [
+            {
+              "python_type": "datetime",
+              "iso": "2024-02-29T23:59:00"
+            },
+            null
+          ]
+        ]
+      ]
+    }
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "TypeError",
+    "message": "'datetime' object is not an instance of 'str'"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "case": "lazy-filter-null-predicate",
+  "engine": "polars",
+  "exit_code": 0
+}

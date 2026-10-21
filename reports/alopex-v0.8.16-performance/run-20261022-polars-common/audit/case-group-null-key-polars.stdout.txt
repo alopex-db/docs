@@ -1,0 +1,1 @@
+{"execution": "ok", "observation": {"kind": "DataFrame", "schema": [["key", "String"], ["value", "Int64"]], "values": [["key", ["a", null]], ["value", [1, 6]]]}}

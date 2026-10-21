@@ -1,0 +1,5 @@
+{
+  "case": "join-full",
+  "engine": "polars",
+  "exit_code": 0
+}

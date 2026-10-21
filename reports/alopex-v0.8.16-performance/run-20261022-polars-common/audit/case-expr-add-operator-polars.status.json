@@ -1,0 +1,5 @@
+{
+  "case": "expr-add-operator",
+  "engine": "polars",
+  "exit_code": 0
+}

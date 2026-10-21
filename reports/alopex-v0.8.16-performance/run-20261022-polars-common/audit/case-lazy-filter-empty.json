@@ -1,0 +1,89 @@
+{
+  "case": "lazy-filter-empty",
+  "family": "selection",
+  "expected_error": false,
+  "status": "failed",
+  "kind": "match",
+  "values": "match",
+  "schema": "unverified",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": [
+        [
+          "id",
+          "Int64"
+        ],
+        [
+          "group",
+          "String"
+        ],
+        [
+          "value",
+          "Int64"
+        ],
+        [
+          "label",
+          "String"
+        ],
+        [
+          "items",
+          "List(String)"
+        ]
+      ],
+      "values": [
+        [
+          "id",
+          []
+        ],
+        [
+          "group",
+          []
+        ],
+        [
+          "value",
+          []
+        ],
+        [
+          "label",
+          []
+        ],
+        [
+          "items",
+          []
+        ]
+      ]
+    }
+  },
+  "subject": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": null,
+      "values": [
+        [
+          "id",
+          []
+        ],
+        [
+          "group",
+          []
+        ],
+        [
+          "value",
+          []
+        ],
+        [
+          "label",
+          []
+        ],
+        [
+          "items",
+          []
+        ]
+      ],
+      "schema_error": "AttributeError"
+    }
+  }
+}

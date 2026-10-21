@@ -1,0 +1,1 @@
+{"execution": "error", "exception": "AttributeError", "message": "'builtins.Expr' object has no attribute 'mean'"}

@@ -1,0 +1,21 @@
+{
+  "case": "series-mean",
+  "family": "series",
+  "expected_error": false,
+  "status": "failed",
+  "reason": "execution_error",
+  "exception": "TypeError",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "float",
+      "schema": null,
+      "values": 2.0
+    }
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "TypeError",
+    "message": "cannot create 'builtins.Series' instances"
+  }
+}
