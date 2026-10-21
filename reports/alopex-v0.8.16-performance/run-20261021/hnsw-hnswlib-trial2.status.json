@@ -1,0 +1,7 @@
+{
+  "case": "hnsw",
+  "elapsed_seconds": 18.87619351799367,
+  "engine": "hnswlib",
+  "exit_code": 0,
+  "trial": 2
+}

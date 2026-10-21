@@ -1,0 +1,13 @@
+{
+  "vectors_shape": [
+    9171,
+    128
+  ],
+  "queries_shape": [
+    200,
+    128
+  ],
+  "dtype": "float32",
+  "vectors_sha256": "64505f3a0215659414f1c762a9d98095d384f352d0772eb9e77b5ea3d239923f",
+  "queries_sha256": "5893a0dcd9cf17ee36a146eb229bd25e13fd3a4dfda46f1f9564feb9faad49e6"
+}

@@ -1,0 +1,51 @@
+{
+  "base_commit": "d9ff8783b8d18a63d167204e55902ea6cd90dcd1",
+  "patch_sha256": "9b2dde147fce3a1ce820c65fb91627595d75832820cce34526f7abb575abd68b",
+  "focused_unittest": {
+    "passed": 6,
+    "failed": 0
+  },
+  "existing_gate_unittest": {
+    "passed": 16,
+    "failed": 0
+  },
+  "real_wheel_smoke": {
+    "rows": 20,
+    "cases": 6,
+    "paired_result_checksums": "equal"
+  },
+  "retained_initial_failures": [
+    "focused regression 4 failures before correction",
+    "existing streaming fake 1 error before test adapter correction",
+    "PostgreSQL container cpuset controller unavailable; entrypoint taskset used",
+    "sandbox socket creation denied; localhost smoke rerun with sandbox escalation"
+  ],
+  "post_measurement_retest": {
+    "command": "python -B -m unittest scripts.performance.test_parity_v0816_measure scripts.performance.test_parity_v0811_gate",
+    "passed": 22,
+    "failed": 0
+  },
+  "measurement_processes": {
+    "passed": 45,
+    "failed": 0
+  },
+  "artifact_validation": "render-v0816.py: sample counts, result hashes, positive finite timings, HNSW recall/query count/duration validated",
+  "postgres_image_digest": "sha256:95206741a5b214807675e14165369d05b93a9cf692223b616d07cca227e74b0b",
+  "independent_review": {
+    "status": "ready",
+    "method": "independent stdlib calculation from raw samples; renderer not reused",
+    "tabular_rows_reproduced": 6,
+    "hnsw_fixed_ef_rows_reproduced": 10,
+    "hnsw_recall_rows_reproduced": 4,
+    "case_statuses_verified": 45,
+    "links": "all local report links exist"
+  },
+  "documentation_lint": {
+    "tool": "natural-japanese lint.py --genre tech",
+    "findings": 0,
+    "initial_missing_dependency": "sudachipy; isolated pinned dependencies installed and lint rerun successfully"
+  },
+  "patch_format": "zero-context unified diff; git apply --unidiff-zero",
+  "patch_tree_identity_verified": "48c3d53c48c9d74d6911a76800df8c56fa897fcf",
+  "initial_document_diff_check": "failed on whitespace-only patch context; zero-context serialization preserves identical applied tree and passes diff check"
+}

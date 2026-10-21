@@ -1,0 +1,23 @@
+{"phase": "validation", "result_sha256": "21ba6f82aea60080fd1954d75db9867878031cd0f0ae05d526d73edae34d5837"}
+{"phase": "samples", "sample": 0, "seconds": 1.763076976989396}
+{"phase": "samples", "sample": 1, "seconds": 1.0257494709803723}
+{"phase": "samples", "sample": 2, "seconds": 1.1570767230005004}
+{"phase": "samples", "sample": 3, "seconds": 1.975899969052989}
+{"phase": "samples", "sample": 4, "seconds": 1.2573962490423582}
+{"phase": "samples", "sample": 5, "seconds": 1.2803749670274556}
+{"phase": "samples", "sample": 6, "seconds": 0.9201156889903359}
+{"phase": "samples", "sample": 7, "seconds": 1.0088777659693733}
+{"phase": "samples", "sample": 8, "seconds": 1.2040692589944229}
+{"phase": "samples", "sample": 9, "seconds": 1.4106051870039664}
+{"phase": "samples", "sample": 10, "seconds": 1.433875355985947}
+{"phase": "samples", "sample": 11, "seconds": 1.37949026201386}
+{"phase": "samples", "sample": 12, "seconds": 1.4603390420088544}
+{"phase": "samples", "sample": 13, "seconds": 1.264225549006369}
+{"phase": "samples", "sample": 14, "seconds": 1.3205521230120212}
+{"phase": "samples", "sample": 15, "seconds": 1.2800932709942572}
+{"phase": "samples", "sample": 16, "seconds": 1.2950569959939457}
+{"phase": "samples", "sample": 17, "seconds": 1.0560888550244272}
+{"phase": "samples", "sample": 18, "seconds": 1.1295672930427827}
+{"phase": "samples", "sample": 19, "seconds": 1.1609429629752412}
+{"phase": "samples", "sample": 20, "seconds": 0.9747767280205153}
+{"phase": "validation", "result_sha256": "21ba6f82aea60080fd1954d75db9867878031cd0f0ae05d526d73edae34d5837"}

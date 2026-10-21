@@ -1,0 +1,7 @@
+{
+  "case": "polars-csv-streaming",
+  "elapsed_seconds": 0.8337796919513494,
+  "engine": "alopex",
+  "exit_code": 0,
+  "trial": 0
+}

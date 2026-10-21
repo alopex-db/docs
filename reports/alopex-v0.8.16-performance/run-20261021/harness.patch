@@ -1,0 +1,304 @@
+diff --git a/scripts/performance/parity_v0811_measure.py b/scripts/performance/parity_v0811_measure.py
+index d2d81d85..8dbbe2dd 100644
+--- a/scripts/performance/parity_v0811_measure.py
++++ b/scripts/performance/parity_v0811_measure.py
+@@ -175,0 +176,15 @@ def _environment() -> dict[str, object]:
++def _record_raw(record: dict[str, object]) -> None:
++    path = os.environ.get("ALOPEX_PERF_RAW_PATH")
++    if path:
++        with Path(path).open("a", encoding="utf-8") as stream:
++            stream.write(json.dumps(record, sort_keys=True) + "\n")
++            stream.flush()
++
++
++def _result_checksum(result) -> str:
++    encoded = json.dumps(result, sort_keys=True, separators=(",", ":"))
++    checksum = hashlib.sha256(encoded.encode()).hexdigest()
++    _record_raw({"phase": "validation", "result_sha256": checksum})
++    return checksum
++
++
+@@ -180 +195 @@ def _samples(operation, warmups: int, runs: int) -> list[float]:
+-    for _ in range(runs):
++    for sample in range(runs):
+@@ -183 +198,3 @@ def _samples(operation, warmups: int, runs: int) -> list[float]:
+-        durations.append(time.perf_counter() - started)
++        duration = time.perf_counter() - started
++        durations.append(duration)
++        _record_raw({"phase": "samples", "sample": sample, "seconds": duration})
+@@ -270,0 +288 @@ def _eager(engine: str, rows: int, warmups: int, runs: int) -> dict[str, float]:
++    checksum = _result_checksum(operation())
+@@ -271,0 +290,3 @@ def _eager(engine: str, rows: int, warmups: int, runs: int) -> dict[str, float]:
++    if _result_checksum(operation()) != checksum:
++        raise RuntimeError(f"{engine} eager results changed during measurement")
++    metrics["result_sha256"] = checksum
+@@ -312,0 +334 @@ def _streaming(
++    checksum = _result_checksum(build().collect().to_dict(as_series=False))
+@@ -320 +342 @@ def _streaming(
+-    for _ in range(runs):
++    for sample in range(runs):
+@@ -326,0 +349,4 @@ def _streaming(
++        _record_raw({"phase": "streaming", "sample": sample, "first_seconds": first,
++                     "total_seconds": total, "rows": count, "first_rows": first_rows})
++    if _result_checksum(build().collect().to_dict(as_series=False)) != checksum:
++        raise RuntimeError(f"{engine} streaming results changed during measurement")
+@@ -328,0 +355 @@ def _streaming(
++        "result_sha256": checksum,
+@@ -363,0 +391,7 @@ def _populate_sql(connection, engine: str, rows: int) -> None:
++def _execute(connection, engine: str, sql: str):
++    if engine == "alopex":
++        return connection.execute_sql(sql)
++    cursor = connection.execute(sql)
++    return cursor.fetchall() if cursor.description else None
++
++
+@@ -370 +404,6 @@ def _sql_script(connection, engine: str, sql: str) -> None:
+-        connection.execute(sql)
++        cursor = connection.execute(sql)
++        while True:
++            if cursor.description:
++                cursor.fetchall()
++            if not cursor.nextset():
++                break
+@@ -380 +419 @@ def _sql_transaction(connection, engine: str, statements: list[str]) -> None:
+-                transaction.execute_sql(statement)
++                _execute(transaction, engine, statement)
+@@ -384 +423,6 @@ def _sql_transaction(connection, engine: str, statements: list[str]) -> None:
+-    _sql_script(connection, engine, f"BEGIN; {'; '.join(statements)}; ROLLBACK")
++    connection.execute("BEGIN")
++    try:
++        for statement in statements:
++            _execute(connection, engine, statement)
++    finally:
++        connection.rollback()
+@@ -415 +459 @@ def _sql_workload(connection, engine: str, workload: str, rows: int) -> None:
+-    execute = connection.execute_sql if engine == "alopex" else connection.execute
++    execute = lambda sql: _execute(connection, engine, sql)
+@@ -421,8 +465,11 @@ def _sql_workload(connection, engine: str, workload: str, rows: int) -> None:
+-            _sql_transaction(
+-                connection,
+-                engine,
+-                [
+-                    f"INSERT INTO bench VALUES ({rows + 1}, 1.0, true)",
+-                    "UPDATE bench SET value = 2.0 WHERE id = 0",
+-                ],
+-            )
++            from alopex import TxnMode
++
++            transaction = connection.begin(TxnMode.READ_WRITE)
++            try:
++                transaction.execute_sql(f"INSERT INTO bench VALUES ({rows + 1}, 1.0, true)")
++                transaction.savepoint("perf_savepoint")
++                transaction.execute_sql("UPDATE bench SET value = 2.0 WHERE id = 0")
++                transaction.rollback_to("perf_savepoint")
++                transaction.release("perf_savepoint")
++            finally:
++                transaction.rollback()
+@@ -490,0 +538,25 @@ def _sql_workload(connection, engine: str, workload: str, rows: int) -> None:
++def _validate_sql_state(connection, engine: str, workload: str, rows: int) -> str:
++    def tuples(sql):
++        result = _execute(connection, engine, sql)
++        return [tuple(row.values()) if isinstance(row, dict) else tuple(row) for row in result]
++
++    state = tuples("SELECT id, value, enabled FROM bench ORDER BY id")
++    expected = [(index, float(index), index % 2 == 0) for index in range(rows)]
++    count_query = SQL_AGGREGATE_QUERY.replace("true", "1") if engine == "sqlite" else SQL_AGGREGATE_QUERY
++    if state != expected or tuples(count_query) != [((rows + 1) // 2,)]:
++        raise RuntimeError(f"{engine} bench result or rollback state differs from fixture")
++    if workload == "sql-sqlite-curated":
++        auxiliary = tuples("SELECT id, parent_id, quantity FROM perf_child ORDER BY id")
++        if auxiliary:
++            raise RuntimeError(f"{engine} child insert was not rolled back")
++    else:
++        auxiliary = tuples("SELECT id, value FROM perf_items ORDER BY id")
++        if auxiliary != [(1, "old")]:
++            raise RuntimeError(f"{engine} DML was not rolled back")
++        if tuples("SELECT id, value FROM perf_source ORDER BY id") != [(1, "new"), (2, "second")]:
++            raise RuntimeError(f"{engine} source fixture changed")
++    # Normalize SQLite's integer booleans before comparing cross-engine hashes.
++    return _result_checksum({"bench": [(a, float(b), bool(c)) for a, b, c in state],
++                             "auxiliary": auxiliary})
++
++
+@@ -523,0 +596 @@ def _sql(
++    checksum = _validate_sql_state(connection, engine, workload, rows)
+@@ -529,0 +603,2 @@ def _sql(
++    if _validate_sql_state(connection, engine, workload, rows) != checksum:
++        raise RuntimeError(f"{engine} SQL results changed during measurement")
+@@ -531,0 +607 @@ def _sql(
++            "result_sha256": checksum,
+@@ -566,0 +643,4 @@ def _sql_streaming(engine: str, rows: int, warmups: int, runs: int) -> dict[str,
++        def validate_stream():
++            with open_stream() as stream:
++                return [tuple(row.values()) for row in stream]
++
+@@ -604,0 +685,11 @@ def _sql_streaming(engine: str, rows: int, warmups: int, runs: int) -> dict[str,
++        def validate_stream():
++            return [tuple(row.values()) for batch in build().execute_stream()
++                    for row in batch.to_pyarrow().to_pylist()]
++
++    def validate():
++        result = sorted(validate_stream())
++        if result != [(index, float(index)) for index in range(0, rows, 2)]:
++            raise RuntimeError(f"{engine} SQL streaming values differ from fixture")
++        return _result_checksum(result)
++
++    checksum = validate()
+@@ -611 +702 @@ def _sql_streaming(engine: str, rows: int, warmups: int, runs: int) -> dict[str,
+-    for _ in range(runs):
++    for sample in range(runs):
+@@ -619,0 +711,2 @@ def _sql_streaming(engine: str, rows: int, warmups: int, runs: int) -> dict[str,
++        _record_raw({"phase": "sql-streaming", "sample": sample, "first_seconds": first,
++                     "total_seconds": total, "rows": count, "first_rows": first_rows})
+@@ -620,0 +714,2 @@ def _sql_streaming(engine: str, rows: int, warmups: int, runs: int) -> dict[str,
++    if validate() != checksum:
++        raise RuntimeError(f"{engine} SQL streaming values changed during measurement")
+@@ -623,0 +719 @@ def _sql_streaming(engine: str, rows: int, warmups: int, runs: int) -> dict[str,
++        "result_sha256": checksum,
+@@ -762,0 +859,2 @@ def main(argv: list[str] | None = None) -> int:
++            if subject["result_sha256"] != reference["result_sha256"]:
++                raise RuntimeError(f"{evidence} result checksums differ between engines")
+diff --git a/scripts/performance/test_parity_v0811_gate.py b/scripts/performance/test_parity_v0811_gate.py
+index d805929c..98ab9c63 100644
+--- a/scripts/performance/test_parity_v0811_gate.py
++++ b/scripts/performance/test_parity_v0811_gate.py
+@@ -33,0 +34,3 @@ class PerformanceParityGateTests(unittest.TestCase):
++            def to_dict(self, *, as_series: bool):
++                return {"id": list(range(self.height))}
++
+diff --git a/scripts/performance/test_parity_v0816_measure.py b/scripts/performance/test_parity_v0816_measure.py
+new file mode 100644
+index 00000000..a13aea0c
+--- /dev/null
++++ b/scripts/performance/test_parity_v0816_measure.py
+@@ -0,0 +1,130 @@
++import json
++import os
++from pathlib import Path
++import sqlite3
++import sys
++import tempfile
++import types
++import unittest
++from unittest.mock import patch
++
++sys.path.insert(0, str(Path(__file__).parent))
++import parity_v0811_measure as measure
++
++
++class Transaction:
++    def __init__(self, connection):
++        self.connection = connection
++        self.connection.execute("BEGIN")
++
++    def execute_sql(self, sql):
++        return self.connection.execute_sql(sql)
++
++    def savepoint(self, name):
++        self.connection.actions.append("savepoint")
++        self.connection.execute(f"SAVEPOINT {name}")
++
++    def rollback_to(self, name):
++        self.connection.actions.append("rollback_to")
++        self.connection.execute(f"ROLLBACK TO {name}")
++
++    def release(self, name):
++        self.connection.savepoint_state = self.connection.execute(
++            "SELECT value FROM bench WHERE id = 0"
++        ).fetchone()
++        self.connection.actions.append("release")
++        self.connection.execute(f"RELEASE {name}")
++
++    def rollback(self):
++        self.connection.rollback()
++
++
++class EmbeddedAdapter:
++    def __init__(self):
++        self.connection = sqlite3.connect(":memory:", isolation_level=None)
++        self.actions = []
++
++    def execute(self, sql):
++        return self.connection.execute(sql)
++
++    def execute_sql(self, sql):
++        cursor = self.execute(sql)
++        if cursor.description:
++            columns = [item[0] for item in cursor.description]
++            return [dict(zip(columns, row)) for row in cursor.fetchall()]
++        return cursor.rowcount
++
++    def prepare(self, sql):
++        connection = self
++        class Prepared:
++            def bind(self, position, value):
++                self.value = value
++            def execute(self):
++                return connection.execute_sql(sql.replace("?", str(self.value)))
++            def finalize(self):
++                pass
++        return Prepared()
++
++    def begin(self, mode):
++        return Transaction(self)
++
++    def rollback(self):
++        self.connection.rollback()
++
++
++class MeasureTests(unittest.TestCase):
++    def test_embedded_sqlite_contract_uses_savepoints_and_preserves_state(self):
++        connection = EmbeddedAdapter()
++        measure._populate_sql(connection, "alopex", 10)
++        measure._prepare_sql_workload(connection, "alopex", "sql-sqlite-curated")
++        module = types.SimpleNamespace(TxnMode=types.SimpleNamespace(READ_WRITE=1))
++        with patch.dict(sys.modules, alopex=module):
++            measure._validate_sql_state(connection, "alopex", "sql-sqlite-curated", 10)
++            measure._sql_workload(connection, "alopex", "sql-sqlite-curated", 10)
++            measure._validate_sql_state(connection, "alopex", "sql-sqlite-curated", 10)
++        self.assertEqual(connection.actions, ["savepoint", "rollback_to", "release"])
++        self.assertEqual(connection.savepoint_state, (0.0,))
++
++    def test_sqlite_workload_preserves_fixture_after_rollback(self):
++        connection = sqlite3.connect(":memory:", isolation_level=None)
++        measure._populate_sql(connection, "sqlite", 10)
++        measure._prepare_sql_workload(connection, "sqlite", "sql-sqlite-curated")
++        before = measure._validate_sql_state(connection, "sqlite", "sql-sqlite-curated", 10)
++        measure._sql_workload(connection, "sqlite", "sql-sqlite-curated", 10)
++        self.assertEqual(measure._validate_sql_state(connection, "sqlite", "sql-sqlite-curated", 10), before)
++
++    def test_checksum_normalizes_sequence_containers(self):
++        self.assertEqual(measure._result_checksum({"id": [1, 2]}),
++                         measure._result_checksum({"id": (1, 2)}))
++
++    def test_execute_consumes_returning_cursor(self):
++        connection = sqlite3.connect(":memory:")
++        connection.execute("CREATE TABLE items (id INTEGER)")
++        self.assertEqual(measure._execute(connection, "sqlite", "INSERT INTO items VALUES (1) RETURNING id"), [(1,)])
++        self.assertEqual(measure._execute(connection, "sqlite", "SELECT id FROM items"), [(1,)])
++
++    def test_state_validation_rejects_changed_data(self):
++        connection = sqlite3.connect(":memory:", isolation_level=None)
++        measure._populate_sql(connection, "sqlite", 10)
++        measure._prepare_sql_workload(connection, "sqlite", "sql-sqlite-curated")
++        measure._validate_sql_state(connection, "sqlite", "sql-sqlite-curated", 10)
++        connection.execute("UPDATE bench SET value = 99 WHERE id = 0")
++        with self.assertRaises(RuntimeError):
++            measure._validate_sql_state(connection, "sqlite", "sql-sqlite-curated", 10)
++
++    def test_samples_flush_ndjson_after_each_sample(self):
++        with tempfile.TemporaryDirectory() as directory:
++            path = Path(directory) / "case.ndjson"
++            observations = []
++            def operation():
++                observations.append(len(path.read_text().splitlines()) if path.exists() else 0)
++            with patch.dict(os.environ, ALOPEX_PERF_RAW_PATH=str(path)):
++                samples = measure._samples(operation, 1, 3)
++            records = [json.loads(line) for line in path.read_text().splitlines()]
++            self.assertEqual(observations, [0, 0, 1, 2])
++            self.assertEqual([row["seconds"] for row in records], samples)
++            self.assertEqual([row["sample"] for row in records], [0, 1, 2])
++
++
++if __name__ == "__main__":
++    unittest.main()

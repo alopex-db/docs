@@ -1,0 +1,7 @@
+{
+  "build_time_seconds": 4.74913996696705,
+  "engine": "alopex-hnsw",
+  "index_size_bytes": 13733888,
+  "node_count": 9171,
+  "note": "Build/persistence boundaries differ; these are diagnostic values, not speed ratios."
+}

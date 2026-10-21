@@ -1,0 +1,2 @@
+[local-path]: DeprecationWarning: In Polars 2.0, the default behavior for `empty_as_null` will change to `False`. To keep the current behavior, explicitly set `empty_as_null=True`.
+  frame.explode("items").height,

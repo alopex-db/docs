@@ -1,0 +1,7 @@
+{
+  "case": "sql-postgresql-curated",
+  "elapsed_seconds": 2.851959473977331,
+  "engine": "alopex",
+  "exit_code": 0,
+  "trial": 0
+}

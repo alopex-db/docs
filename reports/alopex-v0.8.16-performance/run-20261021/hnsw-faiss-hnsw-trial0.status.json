@@ -1,0 +1,7 @@
+{
+  "case": "hnsw",
+  "elapsed_seconds": 16.805986223975196,
+  "engine": "faiss-hnsw",
+  "exit_code": 0,
+  "trial": 0
+}

@@ -1,0 +1,242 @@
+{
+  "hnsw_fixed_ef": [
+    {
+      "ef_search": 16,
+      "latency_ratio": 3.0152768433134125,
+      "paired_latency_ratio_range": [
+        2.8083995620793125,
+        3.3414220842098232
+      ],
+      "reference": "hnswlib",
+      "reference_recall": 0.998,
+      "subject_recall": 0.9975,
+      "throughput_ratio": 0.3829970567928135
+    },
+    {
+      "ef_search": 32,
+      "latency_ratio": 2.630026912725875,
+      "paired_latency_ratio_range": [
+        2.365244136870434,
+        2.760851579053577
+      ],
+      "reference": "hnswlib",
+      "reference_recall": 0.9990000000000001,
+      "subject_recall": 0.9990000000000001,
+      "throughput_ratio": 0.43416053076094285
+    },
+    {
+      "ef_search": 64,
+      "latency_ratio": 2.584730603988699,
+      "paired_latency_ratio_range": [
+        2.4081810800489096,
+        2.584730603988699
+      ],
+      "reference": "hnswlib",
+      "reference_recall": 0.9995,
+      "subject_recall": 0.9995,
+      "throughput_ratio": 0.39991962350183674
+    },
+    {
+      "ef_search": 128,
+      "latency_ratio": 2.661949984395056,
+      "paired_latency_ratio_range": [
+        2.2061877379419648,
+        2.7367412865107688
+      ],
+      "reference": "hnswlib",
+      "reference_recall": 0.9995,
+      "subject_recall": 0.9995,
+      "throughput_ratio": 0.355921137759231
+    },
+    {
+      "ef_search": 256,
+      "latency_ratio": 2.277791705749915,
+      "paired_latency_ratio_range": [
+        2.0287648633543633,
+        2.475892236856605
+      ],
+      "reference": "hnswlib",
+      "reference_recall": 0.9995,
+      "subject_recall": 0.9995,
+      "throughput_ratio": 0.4622438503955355
+    },
+    {
+      "ef_search": 16,
+      "latency_ratio": 2.683113224159183,
+      "paired_latency_ratio_range": [
+        2.4391882373657334,
+        3.5513689515055806
+      ],
+      "reference": "faiss-hnsw",
+      "reference_recall": 0.9965,
+      "subject_recall": 0.9975,
+      "throughput_ratio": 0.4192345626950369
+    },
+    {
+      "ef_search": 32,
+      "latency_ratio": 2.5958283791646637,
+      "paired_latency_ratio_range": [
+        2.399165288145104,
+        2.6671810569455334
+      ],
+      "reference": "faiss-hnsw",
+      "reference_recall": 0.9984999999999999,
+      "subject_recall": 0.9990000000000001,
+      "throughput_ratio": 0.3919733448862853
+    },
+    {
+      "ef_search": 64,
+      "latency_ratio": 2.366737462449534,
+      "paired_latency_ratio_range": [
+        2.3105034089847765,
+        2.8715611426822036
+      ],
+      "reference": "faiss-hnsw",
+      "reference_recall": 0.9995,
+      "subject_recall": 0.9995,
+      "throughput_ratio": 0.4297868890403323
+    },
+    {
+      "ef_search": 128,
+      "latency_ratio": 2.382639890947967,
+      "paired_latency_ratio_range": [
+        2.2850779936135734,
+        2.8315590046452885
+      ],
+      "reference": "faiss-hnsw",
+      "reference_recall": 0.9995,
+      "subject_recall": 0.9995,
+      "throughput_ratio": 0.40261861999885135
+    },
+    {
+      "ef_search": 256,
+      "latency_ratio": 2.021588379395417,
+      "paired_latency_ratio_range": [
+        2.003094745332525,
+        2.4864495541565543
+      ],
+      "reference": "faiss-hnsw",
+      "reference_recall": 0.9995,
+      "subject_recall": 0.9995,
+      "throughput_ratio": 0.5129957537436334
+    }
+  ],
+  "hnsw_matched_recall": [
+    {
+      "latency_ratio": 3.0152768433134125,
+      "recall_threshold": 0.95,
+      "reference": "hnswlib",
+      "reference_ef": 16,
+      "reference_recall": 0.998,
+      "subject_ef": 16,
+      "subject_recall": 0.9975,
+      "throughput_ratio": 0.3829970567928135
+    },
+    {
+      "latency_ratio": 3.0152768433134125,
+      "recall_threshold": 0.99,
+      "reference": "hnswlib",
+      "reference_ef": 16,
+      "reference_recall": 0.998,
+      "subject_ef": 16,
+      "subject_recall": 0.9975,
+      "throughput_ratio": 0.3829970567928135
+    },
+    {
+      "latency_ratio": 2.683113224159183,
+      "recall_threshold": 0.95,
+      "reference": "faiss-hnsw",
+      "reference_ef": 16,
+      "reference_recall": 0.9965,
+      "subject_ef": 16,
+      "subject_recall": 0.9975,
+      "throughput_ratio": 0.4192345626950369
+    },
+    {
+      "latency_ratio": 2.683113224159183,
+      "recall_threshold": 0.99,
+      "reference": "faiss-hnsw",
+      "reference_ef": 16,
+      "reference_recall": 0.9965,
+      "subject_ef": 16,
+      "subject_recall": 0.9975,
+      "throughput_ratio": 0.4192345626950369
+    }
+  ],
+  "run_id": "20261021",
+  "schema": "alopex.relative-performance-report/v1",
+  "tabular": [
+    {
+      "case": "polars-eager-api",
+      "latency_ratio": 0.13549223724027115,
+      "metric": "latency_p50_ms",
+      "paired_latency_ratio_range": [
+        0.10712022590426194,
+        0.16218484731099775
+      ],
+      "reference": "polars",
+      "result_sha256": "21ba6f82aea60080fd1954d75db9867878031cd0f0ae05d526d73edae34d5837",
+      "throughput_ratio": 7.380496627468625
+    },
+    {
+      "case": "polars-csv-streaming",
+      "latency_ratio": 2.3013530512459224,
+      "metric": "total_p50_ms",
+      "paired_latency_ratio_range": [
+        1.3290557595444075,
+        2.852547528466169
+      ],
+      "reference": "polars",
+      "result_sha256": "98afeb725a4f51925adec4ad654a07088175c9652d7ec7c29d8a19bf475f5707",
+      "throughput_ratio": 0.43452698379269233
+    },
+    {
+      "case": "polars-parquet-streaming",
+      "latency_ratio": 1.0393524637923854,
+      "metric": "total_p50_ms",
+      "paired_latency_ratio_range": [
+        0.6742911651767461,
+        1.1601036715054074
+      ],
+      "reference": "polars",
+      "result_sha256": "98afeb725a4f51925adec4ad654a07088175c9652d7ec7c29d8a19bf475f5707",
+      "throughput_ratio": 0.9621375181535662
+    },
+    {
+      "case": "sql-sqlite-curated",
+      "latency_ratio": 9.551122407449212,
+      "metric": "latency_p50_ms",
+      "paired_latency_ratio_range": [
+        8.504617045823267,
+        11.05104357224455
+      ],
+      "reference": "sqlite",
+      "result_sha256": "bdb0d074606282cb84cbb4445c7bb6c7544057d81fd2ee0dc98f3ea834e3840b",
+      "throughput_ratio": 0.10469973656918788
+    },
+    {
+      "case": "sql-postgresql-curated",
+      "latency_ratio": 0.0505783116306615,
+      "metric": "latency_p50_ms",
+      "paired_latency_ratio_range": [
+        0.04849302747147225,
+        0.09473689253263431
+      ],
+      "reference": "postgresql",
+      "result_sha256": "b2d1cc21089b933bfdec8735b7fb36bc402cdb6ab23509bb5375490dda0264dd",
+      "throughput_ratio": 19.771320310221302
+    },
+    {
+      "case": "sql-streaming",
+      "latency_ratio": 46.522305054031456,
+      "metric": "total_p50_ms",
+      "paired_latency_ratio_range": [
+        45.569310927907495,
+        48.608231634213226
+      ],
+      "reference": "datafusion",
+      "result_sha256": "4d7a1b6245b9bb00e2b0193a8c29f3b1ff3e82a3d8e753af545f177e40f24402",
+      "throughput_ratio": 0.021495065621503284
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "case": "sql-sqlite-curated",
+  "elapsed_seconds": 0.9401591310161166,
+  "engine": "sqlite",
+  "exit_code": 0,
+  "trial": 0
+}

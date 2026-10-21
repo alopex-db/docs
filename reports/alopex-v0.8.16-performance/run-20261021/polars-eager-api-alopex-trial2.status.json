@@ -1,0 +1,7 @@
+{
+  "case": "polars-eager-api",
+  "elapsed_seconds": 6.745056470972486,
+  "engine": "alopex",
+  "exit_code": 0,
+  "trial": 2
+}

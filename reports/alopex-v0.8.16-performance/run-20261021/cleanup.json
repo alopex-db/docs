@@ -1,0 +1,24 @@
+{
+  "before_cleanup_total_bytes": 2589547287,
+  "after_measurement_cleanup_workspace_bytes": 1204890241,
+  "deleted": [
+    "isolated measurement venv",
+    "downloaded wheel and source dataset/embedding inputs",
+    "isolated documentation lint venv",
+    "task PostgreSQL container and tmpfs",
+    "measurement source worktree after exact patch/tree preservation"
+  ],
+  "retained": {
+    "owner": "Codex / v0.8.16 performance report",
+    "paths": [
+      "reports/alopex-v0.8.16-performance/run-20261021",
+      "scripts/performance/reproduce-v0816.py",
+      "scripts/performance/render-v0816.py"
+    ],
+    "reason": "public raw evidence and reproducible comparison procedure"
+  },
+  "owned_persistent_processes": 0,
+  "owned_containers": 0,
+  "new_cargo_targets": 0,
+  "limit_bytes": 53687091200
+}

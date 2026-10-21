@@ -1,0 +1,7 @@
+{
+  "case": "sql-sqlite-curated",
+  "elapsed_seconds": 2.944741523009725,
+  "engine": "alopex",
+  "exit_code": 0,
+  "trial": 2
+}

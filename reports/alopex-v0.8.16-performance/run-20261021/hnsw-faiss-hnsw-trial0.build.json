@@ -1,0 +1,7 @@
+{
+  "build_time_seconds": 3.2722812719875947,
+  "engine": "faiss-hnsw",
+  "index_size_bytes": 6016286,
+  "node_count": 9171,
+  "note": "Build/persistence boundaries differ; these are diagnostic values, not speed ratios."
+}

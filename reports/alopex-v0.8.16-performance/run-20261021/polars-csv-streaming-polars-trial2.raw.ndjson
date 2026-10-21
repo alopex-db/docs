@@ -1,0 +1,65 @@
+{"phase": "validation", "result_sha256": "98afeb725a4f51925adec4ad654a07088175c9652d7ec7c29d8a19bf475f5707"}
+{"phase": "samples", "sample": 0, "seconds": 0.00017400196520611644}
+{"phase": "samples", "sample": 1, "seconds": 0.000539149041287601}
+{"phase": "samples", "sample": 2, "seconds": 0.00033448898466303945}
+{"phase": "samples", "sample": 3, "seconds": 0.0006575650186277926}
+{"phase": "samples", "sample": 4, "seconds": 0.0003506150096654892}
+{"phase": "samples", "sample": 5, "seconds": 0.00037435395643115044}
+{"phase": "samples", "sample": 6, "seconds": 0.0002895829966291785}
+{"phase": "samples", "sample": 7, "seconds": 0.0005871540051884949}
+{"phase": "samples", "sample": 8, "seconds": 0.00029240804724395275}
+{"phase": "samples", "sample": 9, "seconds": 0.00032806600211188197}
+{"phase": "samples", "sample": 10, "seconds": 0.00030776200583204627}
+{"phase": "samples", "sample": 11, "seconds": 0.00028022401966154575}
+{"phase": "samples", "sample": 12, "seconds": 0.0002544739982113242}
+{"phase": "samples", "sample": 13, "seconds": 0.00016521202633157372}
+{"phase": "samples", "sample": 14, "seconds": 0.0001538110082037747}
+{"phase": "samples", "sample": 15, "seconds": 0.00025874102720990777}
+{"phase": "samples", "sample": 16, "seconds": 0.00016287504695355892}
+{"phase": "samples", "sample": 17, "seconds": 0.0001370839891023934}
+{"phase": "samples", "sample": 18, "seconds": 0.00012737902579829097}
+{"phase": "samples", "sample": 19, "seconds": 0.0003444569883868098}
+{"phase": "samples", "sample": 20, "seconds": 0.00026586500462144613}
+{"phase": "samples", "sample": 0, "seconds": 0.01431130594573915}
+{"phase": "samples", "sample": 1, "seconds": 0.011168516997713596}
+{"phase": "samples", "sample": 2, "seconds": 0.012186182022560388}
+{"phase": "samples", "sample": 3, "seconds": 0.011525030015036464}
+{"phase": "samples", "sample": 4, "seconds": 0.012521131022367626}
+{"phase": "samples", "sample": 5, "seconds": 0.010876854008529335}
+{"phase": "samples", "sample": 6, "seconds": 0.014200232981238514}
+{"phase": "samples", "sample": 7, "seconds": 0.012408888025674969}
+{"phase": "samples", "sample": 8, "seconds": 0.011125117947813123}
+{"phase": "samples", "sample": 9, "seconds": 0.01252122997539118}
+{"phase": "samples", "sample": 10, "seconds": 0.013527369999792427}
+{"phase": "samples", "sample": 11, "seconds": 0.011779188003856689}
+{"phase": "samples", "sample": 12, "seconds": 0.014676848019007593}
+{"phase": "samples", "sample": 13, "seconds": 0.012968858995009214}
+{"phase": "samples", "sample": 14, "seconds": 0.010159323050174862}
+{"phase": "samples", "sample": 15, "seconds": 0.011057893978431821}
+{"phase": "samples", "sample": 16, "seconds": 0.011642057972494513}
+{"phase": "samples", "sample": 17, "seconds": 0.01360363099956885}
+{"phase": "samples", "sample": 18, "seconds": 0.011615113995503634}
+{"phase": "samples", "sample": 19, "seconds": 0.010286946955602616}
+{"phase": "samples", "sample": 20, "seconds": 0.010222082957625389}
+{"first_rows": 8192, "first_seconds": 0.01064175902865827, "phase": "streaming", "rows": 34250, "sample": 0, "total_seconds": 0.01133879303233698}
+{"first_rows": 8192, "first_seconds": 0.01320945203769952, "phase": "streaming", "rows": 34250, "sample": 1, "total_seconds": 0.014394551049917936}
+{"first_rows": 8192, "first_seconds": 0.016143748012837023, "phase": "streaming", "rows": 34250, "sample": 2, "total_seconds": 0.023234892985783517}
+{"first_rows": 8192, "first_seconds": 0.011887805012520403, "phase": "streaming", "rows": 34250, "sample": 3, "total_seconds": 0.012956469028722495}
+{"first_rows": 8192, "first_seconds": 0.013390438980422914, "phase": "streaming", "rows": 34250, "sample": 4, "total_seconds": 0.014539747964590788}
+{"first_rows": 8192, "first_seconds": 0.010820932977367193, "phase": "streaming", "rows": 34250, "sample": 5, "total_seconds": 0.01297848200192675}
+{"first_rows": 8192, "first_seconds": 0.010219665011391044, "phase": "streaming", "rows": 34250, "sample": 6, "total_seconds": 0.011807124014012516}
+{"first_rows": 8192, "first_seconds": 0.012342903995886445, "phase": "streaming", "rows": 34250, "sample": 7, "total_seconds": 0.01316403498640284}
+{"first_rows": 8192, "first_seconds": 0.013173500017728657, "phase": "streaming", "rows": 34250, "sample": 8, "total_seconds": 0.014257011003792286}
+{"first_rows": 8192, "first_seconds": 0.015857005026191473, "phase": "streaming", "rows": 34250, "sample": 9, "total_seconds": 0.016822931997012347}
+{"first_rows": 8192, "first_seconds": 0.010973604978062212, "phase": "streaming", "rows": 34250, "sample": 10, "total_seconds": 0.011807092989329249}
+{"first_rows": 8192, "first_seconds": 0.01196881604846567, "phase": "streaming", "rows": 34250, "sample": 11, "total_seconds": 0.012489724031183869}
+{"first_rows": 8192, "first_seconds": 0.012012546008918434, "phase": "streaming", "rows": 34250, "sample": 12, "total_seconds": 0.012638712010812014}
+{"first_rows": 8192, "first_seconds": 0.011121521994937211, "phase": "streaming", "rows": 34250, "sample": 13, "total_seconds": 0.011933019035495818}
+{"first_rows": 8192, "first_seconds": 0.010227499005850405, "phase": "streaming", "rows": 34250, "sample": 14, "total_seconds": 0.011176965024787933}
+{"first_rows": 8192, "first_seconds": 0.010785527992993593, "phase": "streaming", "rows": 34250, "sample": 15, "total_seconds": 0.0115393060259521}
+{"first_rows": 8192, "first_seconds": 0.009615632006898522, "phase": "streaming", "rows": 34250, "sample": 16, "total_seconds": 0.010153094015549868}
+{"first_rows": 8192, "first_seconds": 0.010667900030966848, "phase": "streaming", "rows": 34250, "sample": 17, "total_seconds": 0.011238500010222197}
+{"first_rows": 8192, "first_seconds": 0.010706805041991174, "phase": "streaming", "rows": 34250, "sample": 18, "total_seconds": 0.011403707030694932}
+{"first_rows": 8192, "first_seconds": 0.011820614978205413, "phase": "streaming", "rows": 34250, "sample": 19, "total_seconds": 0.013094467984046787}
+{"first_rows": 8192, "first_seconds": 0.013131926010828465, "phase": "streaming", "rows": 34250, "sample": 20, "total_seconds": 0.014253575005568564}
+{"phase": "validation", "result_sha256": "98afeb725a4f51925adec4ad654a07088175c9652d7ec7c29d8a19bf475f5707"}
