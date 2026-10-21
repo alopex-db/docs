@@ -1,7 +1,7 @@
 {
   "native_kv_regression": "RED module missing; GREEN 2 tests covering 8 cases x 2 real APIs with small fixture",
   "sql_regression": "4 fake-client tests passed; real server measurement pending",
-  "dataframe_regression": "5 original tests passed, snapshot destructor timed-region regression RED then 6 tests passed after releasing validation result outside timer",
+  "dataframe_regression": "5 original tests passed; initial destructor-test adapter retained arguments and failed twice even with fix; adapter corrected; genuine RED [true,false] reproduced without release, GREEN 6 tests passed with explicit release outside timer",
   "shared_summary_regression": "5 existing isolated SQL tests passed after engine-pair generalization",
   "independent_static_review": "no major issue in sync/commit, server/client API, input seeds, every-sample validation, final complete state or relative aggregation",
   "legacy_dataframe_audit": {

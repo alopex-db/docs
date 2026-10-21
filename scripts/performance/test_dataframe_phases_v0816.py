@@ -39,6 +39,7 @@ class FakeOperations:
 class FunctionalTest(unittest.TestCase):
     def test_validation_snapshot_is_released_outside_next_sample_timer(self):
         timing = [False]
+        ticks = [0]
         destruction = []
 
         class Snapshot:
@@ -51,9 +52,10 @@ class FunctionalTest(unittest.TestCase):
 
         def clock():
             timing[0] = not timing[0]
-            return float(len(destruction) + int(timing[0]))
+            ticks[0] += 1
+            return float(ticks[0])
 
-        with tempfile.TemporaryDirectory() as directory, patch.object(workload, "Operations", Operations), patch.object(workload, "assert_equal"), patch.object(workload.time, "perf_counter", side_effect=clock):
+        with tempfile.TemporaryDirectory() as directory, patch.object(workload, "Operations", Operations), patch.object(workload, "assert_equal", new=lambda *args: None), patch.object(workload.time, "perf_counter", side_effect=clock):
             workload.run("alopex", "construct", Path(directory) / "raw.ndjson", rows=4, warmups=0, runs=2)
         self.assertEqual(destruction, [False, False])
 
