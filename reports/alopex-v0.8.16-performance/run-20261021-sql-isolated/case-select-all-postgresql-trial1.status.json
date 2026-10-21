@@ -1,0 +1,7 @@
+{
+  "case": "select-all",
+  "elapsed_seconds": 5.31594647601014,
+  "engine": "postgresql",
+  "exit_code": 0,
+  "trial": 1
+}

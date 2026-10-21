@@ -4,5 +4,8 @@
   "independent_review_finding": "Alopex successful DDL returns None, PostgreSQL helper returns []; normalize no-row success",
   "regression_red": "test_successful_remote_ddl_has_no_result_rows failed before correction",
   "regression_green": "4 tests passed",
-  "product_code_changed": false
+  "product_code_changed": false,
+  "default_skip_red": "missing selected_cases before skip implementation",
+  "default_skip_green": "5 tests passed including known DDL skipped by default",
+  "performance_acceptance": "4 independent cases valid, 24 processes, 504 samples, checksum matches"
 }

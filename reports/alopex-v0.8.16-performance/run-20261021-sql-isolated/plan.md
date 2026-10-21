@@ -18,3 +18,7 @@ Codexはordered SELECTのCOALESCE列へAS valueを付け、両APIの列名付き
 Codexはpsycopgのprepare_threshold=Noneを指定し、Alopex RemoteDatabaseと同様に明示prepared statementなしでSQL文字列を送る。両製品の接続は再利用する。
 
 Codexは既知の失敗を持つDROP SEQUENCEケースを最初に実行し、その失敗後も独立した読取・書込ケースが実行されることを公開runで示す。
+
+## 測定中の指示変更
+
+ユーザーは既知のDROP SEQUENCE失敗の再実行を不要とし、スキップを要求した。Codexは同診断の終了後にこの指示を受け、進行中の独立ケースを完走した。Codexは既存診断を削除せず、性能集計から除外し、runnerの既定を4つの比較可能ケースに変更した。CodexはDDLを再試行していない。個別ケースの計測コード・入力・計測区間はこの変更では変えていない。

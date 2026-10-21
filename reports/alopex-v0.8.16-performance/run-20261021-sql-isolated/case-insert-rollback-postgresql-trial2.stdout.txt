@@ -1,0 +1,1 @@
+{"case": "insert-rollback", "engine": "postgresql", "server_client": true, "sql": "INSERT INTO perf_items VALUES (3, 'returning') RETURNING id", "fixture_rows": 1, "warmups": 3, "samples": 21, "result_sha256": "de6a5226a697486b6e5ee096b40f268ed6ac2fd925ff358fb5e06d922f037c73", "latency_p50_ms": 2.9482190147973597, "client_peak_rss_bytes": 39030784}

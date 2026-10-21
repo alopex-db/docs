@@ -9,6 +9,10 @@ spec.loader.exec_module(module)
 
 
 class IsolatedSqlTest(unittest.TestCase):
+    def test_known_ddl_defect_is_skipped_by_default(self):
+        self.assertEqual(module.selected_cases(None), ("aggregate", "ordered", "select-all", "insert-rollback"))
+        self.assertEqual(module.selected_cases("aggregate"), ("aggregate",))
+
     def test_successful_remote_ddl_has_no_result_rows(self):
         import types
         from unittest.mock import patch

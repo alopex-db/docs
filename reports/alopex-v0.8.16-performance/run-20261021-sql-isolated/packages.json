@@ -23,5 +23,7 @@
     1
   ],
   "storage": "dedicated directories on same host filesystem; no tmpfs",
-  "client_protocols": "Alopex HTTP / PostgreSQL wire; no TLS/auth; connections reused"
+  "client_protocols": "Alopex HTTP / PostgreSQL wire; no TLS/auth; connections reused",
+  "server_binary_sha256": "d0491d312993b2eacd8051b51c526abfa0e1ec72262f997e9df27d6f49562cfd",
+  "installed_server_version": "alopex-server 0.8.16"
 }

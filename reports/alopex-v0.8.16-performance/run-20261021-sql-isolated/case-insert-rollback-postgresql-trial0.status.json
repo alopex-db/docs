@@ -1,0 +1,7 @@
+{
+  "case": "insert-rollback",
+  "elapsed_seconds": 0.6725061249453574,
+  "engine": "postgresql",
+  "exit_code": 0,
+  "trial": 0
+}

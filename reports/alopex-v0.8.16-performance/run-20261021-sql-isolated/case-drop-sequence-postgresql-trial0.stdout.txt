@@ -1,0 +1,1 @@
+{"case": "drop-sequence", "engine": "postgresql", "server_client": true, "sql": "DROP SEQUENCE IF EXISTS perf_sequence", "fixture_rows": 0, "warmups": 3, "samples": 21, "result_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945", "latency_p50_ms": 1.2942120083607733, "client_peak_rss_bytes": 39059456}

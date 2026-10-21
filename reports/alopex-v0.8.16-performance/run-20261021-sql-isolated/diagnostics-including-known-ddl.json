@@ -1,0 +1,51 @@
+{
+  "cases": [
+    {
+      "case": "drop-sequence",
+      "comparison_status": "failed"
+    },
+    {
+      "case": "aggregate",
+      "comparison_status": "valid",
+      "latency_ratio": 13.501257069011787,
+      "paired_latency_ratio_range": [
+        12.861514580146654,
+        15.265420631952738
+      ],
+      "throughput_ratio": 0.07406717721827617
+    },
+    {
+      "case": "ordered",
+      "comparison_status": "valid",
+      "latency_ratio": 27.13200357286968,
+      "paired_latency_ratio_range": [
+        25.37776907071788,
+        31.53852841431997
+      ],
+      "throughput_ratio": 0.03685684314887596
+    },
+    {
+      "case": "select-all",
+      "comparison_status": "valid",
+      "latency_ratio": 5.714840542784868,
+      "paired_latency_ratio_range": [
+        4.454066991664751,
+        6.082489031968696
+      ],
+      "throughput_ratio": 0.17498301002685462
+    },
+    {
+      "case": "insert-rollback",
+      "comparison_status": "valid",
+      "latency_ratio": 1.7939325272092208,
+      "paired_latency_ratio_range": [
+        1.2824110586611912,
+        1.8844382916631401
+      ],
+      "throughput_ratio": 0.5574345661459613
+    }
+  ],
+  "reference": "PostgreSQL 16.14 = 1",
+  "schema": "alopex.isolated-server-sql/v1",
+  "subject": "AlopexDB server 0.8.16 via RemoteDatabase"
+}

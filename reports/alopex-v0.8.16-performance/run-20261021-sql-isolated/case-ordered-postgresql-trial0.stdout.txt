@@ -1,0 +1,1 @@
+{"case": "ordered", "engine": "postgresql", "server_client": true, "sql": "SELECT id, COALESCE(value, 0) AS value FROM bench WHERE id >= 0 ORDER BY id LIMIT 16", "fixture_rows": 34250, "warmups": 3, "samples": 21, "result_sha256": "04ecfc3159f09b1f84e104801fd8c7bfa98469cd91072a47d60baf0b049c962f", "latency_p50_ms": 1.352560007944703, "client_peak_rss_bytes": 38924288}

@@ -1,0 +1,15 @@
+{
+  "case": "insert-rollback",
+  "client_peak_rss_bytes": 30162944,
+  "elapsed_seconds": 0.3669818500056863,
+  "engine": "alopex-server",
+  "exit_code": 0,
+  "fixture_rows": 1,
+  "latency_p50_ms": 5.361154035199434,
+  "result_sha256": "de6a5226a697486b6e5ee096b40f268ed6ac2fd925ff358fb5e06d922f037c73",
+  "samples": 21,
+  "server_client": true,
+  "sql": "INSERT INTO perf_items VALUES (3, 'returning') RETURNING id",
+  "trial": 2,
+  "warmups": 3
+}

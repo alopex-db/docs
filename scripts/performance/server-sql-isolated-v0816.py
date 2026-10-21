@@ -17,6 +17,10 @@ CASES = ("drop-sequence", "aggregate", "ordered", "select-all", "insert-rollback
 ROWS = 34250
 
 
+def selected_cases(requested):
+    return (requested,) if requested else tuple(case for case in CASES if case != "drop-sequence")
+
+
 def save(path, value):
     path.write_text(json.dumps(value, indent=2, sort_keys=True, allow_nan=False) + "\n")
 
@@ -171,7 +175,7 @@ def main():
          "harness_sha256": hashlib.sha256((root / "scripts/performance/parity_v0811_measure.py").read_bytes()).hexdigest(),
          "runner_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()})
     results = []
-    cases = (args.case,) if args.case else CASES
+    cases = selected_cases(args.case)
     for case in cases:
         for trial in range(3):
             engines = ("alopex-server", "postgresql") if trial % 2 == 0 else ("postgresql", "alopex-server")
@@ -188,7 +192,8 @@ def main():
                     save(output / f"{name}.json", row)
                 results.append(row)
     save(output / "relative.json", {"schema": "alopex.isolated-server-sql/v1", "reference": "PostgreSQL 16.14 = 1",
-         "subject": "AlopexDB server 0.8.16 via RemoteDatabase", "cases": relative(results, cases)})
+         "subject": "AlopexDB server 0.8.16 via RemoteDatabase", "cases": relative(results, cases),
+         "default_skips": {"drop-sequence": "Known server defect, alopex-db/alopex#720; explicit --case required"}})
 
 
 if __name__ == "__main__":
