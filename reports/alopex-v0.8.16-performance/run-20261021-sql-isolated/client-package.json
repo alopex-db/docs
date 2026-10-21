@@ -2,10 +2,6 @@
   "version": "0.8.16",
   "installed_files_sha256": {
     "alopex/__init__.py": "ca72d826c6159d2574edf737cb46922c2f10453ab75b057db431c68bb5c56a55",
-    "alopex/__pycache__/__init__.cpython-311.pyc": "530ff701aafbf116622e0aa9b86fc9a4de1cba2292b602d0446aeb066449daaf",
-    "alopex/__pycache__/asyncio.cpython-311.pyc": "e442e2fe8e72237fe26232cbfc3ea652e80bf9b548f6e886a8ac2786aad26a62",
-    "alopex/__pycache__/protocols.cpython-311.pyc": "c6a2e5398785e569d3028c70bf3a7e051865dacdfc3aa630fc89703808bcdc06",
-    "alopex/__pycache__/remote.cpython-311.pyc": "5872660f71956bdfe2a175aeff443747612b91aed35652254ab350bd9e18c309",
     "alopex/_alopex.abi3.so": "3b6f36b66d3a0e7da2b68936383390341093577a5a61144c355726e52d68d7a4",
     "alopex/_alopex.pyi": "e692a526086460bcff869d3db00cac3fcd3ceb33c8b4ce4776539e68e7a1c7c1",
     "alopex/asyncio.py": "860c32d4df7ede172fb3d0d05d785f5e3187996a16319adfd716a6c98a02bf8e",
@@ -17,5 +13,8 @@
     "alopex/py.typed": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "alopex/remote.py": "639166ea88dd6657729011f6f8731646439fec3abc8e33fc2726c3c6da4e1be6",
     "alopex/remote.pyi": "034eb5456000cbbfa791a9163f9fa29fd3f59c97c4c133024c3c642c0ad95340"
-  }
+  },
+  "wheel_file": "alopex-0.8.16-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+  "wheel_sha256": "ac9f4b1fd2fa0e78d634334242de4290ae4b34bf700515b59937ea2c718a98c3",
+  "wheel_matches_installed_files": true
 }

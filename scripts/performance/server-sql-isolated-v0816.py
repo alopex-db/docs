@@ -42,8 +42,13 @@ def validate(case, result, rows):
 def run_process(command, output, name, metadata):
     started = time.monotonic()
     with (output / f"{name}.stdout.txt").open("w") as stdout, (output / f"{name}.stderr.txt").open("w") as stderr:
-        process = subprocess.run(command, stdout=stdout, stderr=stderr)
-    status = dict(metadata, exit_code=process.returncode, elapsed_seconds=time.monotonic() - started)
+        try:
+            process = subprocess.run(command, stdout=stdout, stderr=stderr, timeout=300)
+            exit_code = process.returncode
+        except subprocess.TimeoutExpired:
+            exit_code = 124
+            stderr.write("Case process exceeded 300 second budget\n")
+    status = dict(metadata, exit_code=exit_code, elapsed_seconds=time.monotonic() - started)
     save(output / f"{name}.status.json", status)
     return status
 
@@ -162,6 +167,7 @@ def main():
          "client_cpu_affinity": sorted(os.sched_getaffinity(0)), "server_cpu_affinity": [0],
          "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
          "harness_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip(),
+         "runner_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=Path(__file__).resolve().parents[2], text=True).strip(),
          "harness_sha256": hashlib.sha256((root / "scripts/performance/parity_v0811_measure.py").read_bytes()).hexdigest(),
          "runner_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()})
     results = []

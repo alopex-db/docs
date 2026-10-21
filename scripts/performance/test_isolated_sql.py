@@ -35,10 +35,15 @@ class IsolatedSqlTest(unittest.TestCase):
 
     def test_failed_process_does_not_stop_next_case(self):
         import sys
+        import subprocess
+        from unittest.mock import patch
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory)
             failed = module.run_process([sys.executable, "-c", "raise SystemExit(7)"], path, "failed", {})
             passed = module.run_process([sys.executable, "-c", "print(123)"], path, "next", {})
+            with patch.object(module.subprocess, "run", side_effect=subprocess.TimeoutExpired("case", 300)):
+                timeout = module.run_process(["case"], path, "timeout", {})
+            self.assertEqual(timeout["exit_code"], 124)
             self.assertEqual(failed["exit_code"], 7)
             self.assertEqual(passed["exit_code"], 0)
             self.assertEqual((path / "next.stdout.txt").read_text().strip(), "123")
