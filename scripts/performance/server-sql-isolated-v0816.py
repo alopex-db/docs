@@ -80,7 +80,7 @@ def measure(module, engine, case, raw_path):
     else:
         import psycopg
         from psycopg.rows import dict_row
-        connection = psycopg.connect(os.environ["ALOPEX_PERF_POSTGRES_DSN"], autocommit=True, row_factory=dict_row)
+        connection = psycopg.connect(os.environ["ALOPEX_PERF_POSTGRES_DSN"], autocommit=True, row_factory=dict_row, prepare_threshold=None)
         assert connection.execute("SHOW server_version").fetchone()["server_version"].startswith("16.14")
         driver = "postgresql"
 
