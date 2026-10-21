@@ -1,0 +1,26 @@
+Traceback (most recent call last):
+  File "[local-path]", line 195, in <module>
+    main()
+  File "[local-path]", line 160, in main
+    print(json.dumps(measure(module, args.engine, args.case, Path(os.environ["ALOPEX_PERF_RAW_PATH"])), allow_nan=False))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[local-path]", line 121, in measure
+    checksum = validate(case, operation(), ROWS)
+                              ^^^^^^^^^^^
+  File "[local-path]", line 120, in <lambda>
+    operation = lambda: execute(sql)
+                        ^^^^^^^^^^^^
+  File "[local-path]", line 90, in execute
+    return target.execute_sql(sql) or []
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "[temporary-path]", line 946, in execute_sql
+    return self._execute_sql(sql, params, session_id=None, timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[temporary-path]", line 1048, in _execute_sql
+    body = self._request_json(
+           ^^^^^^^^^^^^^^^^^^^
+  File "[temporary-path]", line 1112, in _request_json
+    _raise_for_error(status, text)
+  File "[temporary-path]", line 336, in _raise_for_error
+    raise _alopex_error(
+crate::error.PyAlopexError: sql error: error[ALOPEX-E999]: unsupported operation: unsupported query plan: DropSequence(DropSequence { if_exists: true, name: "perf_sequence", span: Span { start: Location { line: 1, column: 1 }, end: Location { line: 1, column: 4 } } })

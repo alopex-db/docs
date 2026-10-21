@@ -4,11 +4,13 @@
 
 ## 再測定の結果
 
-全45 worker processは正常終了し、DataFrame / SQLの全6ケースで製品間・trial間の結果checksumが一致した。これらの成功は実行と結果照合を示すが、PostgreSQLとの比較成立を示さない。PostgreSQL比較はAlopex embeddedとPostgreSQL serverで実行境界が異なるため無効とし、両製品のserver/client APIによる再測定では、Alopex serverが既存ケースの`DROP SEQUENCE`を拒否したため、性能比較は成立しなかった。HNSWの全45設定点もrecall 0.99以上を満たした。
+全45 worker processは正常終了し、DataFrame / SQLの全6ケースで製品間・trial間の結果checksumが一致した。これらの成功は実行と結果照合を示すが、PostgreSQLとの比較成立を示さない。PostgreSQL比較はAlopex embeddedとPostgreSQL serverで実行境界が異なるため無効とし、両製品のserver/client APIによる再測定では、Alopex serverが既存の複合ケースの`DROP SEQUENCE`を拒否した。この複合ケースは未成立だが、独立した読取SQLは比較できる。HNSWの全45設定点もrecall 0.99以上を満たした。
 
 Alopexの所要時間は、Polars eagerの既存複合操作列で参照の**0.135倍**、SQLite curatedで**9.551倍**、DataFusion SQL streamingで**46.522倍**だった。HNSWはrecall≥0.99の最速点で、hnswlibの**3.015倍**、Faiss HNSWの**2.683倍**の検索時間だった。今回の固定ケースでは、SQL streamingとSQLite curatedが相対的に大きな差として表れた。
 
 以下の「時間比」は **Alopex / 参照**で、小さいほど速い。「処理量比」は同じ仕事量に対する **Alopex / 参照**で、大きいほど高い。参照製品をすべて1.000とする。
+
+独立したserver/client SQL比較では、Alopexの時間比はPostgreSQLに対してCOUNTが**13.501倍**、16行SELECTが**27.132倍**、17,125行の全結果取得が**5.715倍**だった。読取3ケースは全て比較が成立した。INSERT＋rollbackの時間比は**1.794倍**だった。Codexは既知の`DROP SEQUENCE`不具合を既定でスキップし、これらの性能集計から除外する。
 
 ### DataFrame / SQL
 
@@ -18,7 +20,7 @@ Alopexの所要時間は、Polars eagerの既存複合操作列で参照の**0.1
 | CSV streaming 全消費 | Polars | 2.301 | 0.435 | 1.329–2.853 |
 | Parquet streaming 全消費 | Polars | 1.039 | 0.962 | 0.674–1.160 |
 | SQL curated 複合操作 | SQLite | 9.551 | 0.105 | 8.505–11.051 |
-| SQL curated 複合操作 | PostgreSQL | 比較不成立（server機能差） | — | — |
+| SQL curated 複合操作 | PostgreSQL | この複合ケースは不成立（server実装漏れ） | — | — |
 | SQL streaming 全消費 | DataFusion | 46.522 | 0.021 | 45.569–48.608 |
 
 Parquetの時間比は1をまたぐ幅があり、この3 trialsから優劣を断定しない。PostgreSQL行は、server/client APIを揃えた事前検証の失敗により比較不成立とする。旧時間比0.051倍はAlopexの性能優位を示す結論から除外する。
@@ -51,11 +53,46 @@ Parquetの時間比は1をまたぐ幅があり、この3 trialsから優劣を�
 | faiss-hnsw | 128 | 2.383 | 0.403 | 2.285–2.832 | 0.9995 / 0.9995 |
 | faiss-hnsw | 256 | 2.022 | 0.513 | 2.003–2.486 | 0.9995 / 0.9995 |
 
-## PostgreSQL：server/client APIでの再評価
+## PostgreSQL：独立した読取・書込ケース
+
+Codexは既存ハーネスのfixtureとSQLを使い、読取3ケースとINSERT＋rollbackを個別に再測定した。両製品のAPIはserver/client境界で揃えた。機能が成立するケースの比較は、既存の複合ケースにある`DROP SEQUENCE`の修正を待つ必要がない。
+
+| 独立ケース | PostgreSQLを1とする時間比 ↓ | 処理量比 ↑ | trial別時間比の範囲 |
+|---|---:|---:|---:|
+| COUNT、enabled=trueの17,125行を集計 | 13.501 | 0.074 | 12.862–15.265 |
+| ORDER BY id LIMIT 16 | 27.132 | 0.037 | 25.378–31.539 |
+| 偶数IDの17,125行を全結果取得 | 5.715 | 0.175 | 4.454–6.082 |
+| begin・INSERT RETURNING・rollback | 1.794 | 0.557 | 1.282–1.884 |
+
+全24 performance processと504 samplesは成功し、各ケースの全3 trials・製品間で結果checksumが一致した。Codexは値・型を照合し、順序付きSELECTは順序、全結果取得は重複も含めた全行を計測外で検証した。時間比は各processのp50を3 trialsで中央値にした値の比率であり、複数SQLケースをまとめた総合倍率ではない。
+
+| 条件 | 設定 |
+|---|---|
+| 製品・クライアント | 公開alopex-server 0.8.16＋公開alopex 0.8.16のRemoteDatabase対PostgreSQL 16.14＋psycopg 3.2.10 |
+| API境界 | Alopex execute_sql対PostgreSQL execute＋fetchall。両群とも列名付きPython行を全取得し、既存接続を再利用 |
+| 入力 | 読取は既存34,250行fixture。書込は既存curatedの1行perf_items fixtureに対するINSERT RETURNING＋rollback |
+| 実行 | 同一ホストloopback、server CPU0 / client CPU1、数値thread1、TLS/authなし、3 warmups / 21 samples / 3 trials |
+| 設定 | 両serverは同じhost filesystemへ永続化。PostgreSQLはfsync / synchronous_commit有効、並列query無効、クライアントの自動prepared statement化を無効 |
+| 計測範囲 | 接続生成・fixture投入・結果照合は計測外。request/responseと全結果取得を計測内。書込ケースはtransaction begin/rollbackも計測内 |
+| 既知不具合 | runnerはDROP SEQUENCEを既定でスキップ。再実行者が明示的に--case drop-sequenceを指定した場合だけ診断として実行 |
+
+全結果取得のSQLは既存`SQL_STREAM_QUERY`だが、この比較はbufferedなexecute_sql/fetchallによるもので、streaming API同士の比較ではない。書込ケースは永続commitを測定していない。HTTPとPostgreSQL wireの違いも時間に含むため、今回の数値はクライアントから見たSQL応答性能であり、engine内部だけの差ではない。rawのclient RSSはserverを含まず、製品全体のメモリ比較には使わない。
+
+Codexは[相対値](alopex-v0.8.16-performance/run-20261021-sql-isolated/relative.json)、[raw照合結果](alopex-v0.8.16-performance/run-20261021-sql-isolated/result-verification.json)、[実行環境](alopex-v0.8.16-performance/run-20261021-sql-isolated/environment.json)、[サーバー識別・設定](alopex-v0.8.16-performance/run-20261021-sql-isolated/packages.json)、[公開wheel照合](alopex-v0.8.16-performance/run-20261021-sql-isolated/client-package.json)を保存した。Codexはスキップ指示前に実行した既知DDLの診断を監査用に保持するが、性能集計には含めず、再試行もしない。Codexは以前のrunとrawを変更しない。
+
+再実行者は公開ソース`d9ff8783b8d18a63d167204e55902ea6cd90dcd1`と公開クライアントを用意し、上記条件で両serverを起動する。再実行者は`ALOPEX_PERF_SERVER_URL`と`ALOPEX_PERF_POSTGRES_DSN`を設定し、[server-sql-isolated-v0816.py](../scripts/performance/server-sql-isolated-v0816.py)を実行する。今回の独立ケースは元ソースのfixture生成・SQL定数を使い、harness.patchは必要としない。ordered SELECTのCOALESCE列には、両APIで列名を揃えるためAS valueを追加した。
+
+```bash
+rtk proxy python -B scripts/performance/server-sql-isolated-v0816.py --harness-root <alopex-checkout> --output <new-run-directory>
+```
+
+[事前計画と測定中の指示変更](alopex-v0.8.16-performance/run-20261021-sql-isolated/plan.md)と[回帰検証](alopex-v0.8.16-performance/run-20261021-sql-isolated/harness-verification.json)は、条件・既定スキップ・失敗履歴を記録する。再実行者は新しいrun directoryを使い、既存結果を上書きしない。
+
+### 既存複合ケースの訂正履歴
 
 Codexは、Alopex embedded対PostgreSQL serverの旧時間比**0.051倍を撤回する**。CodexはAlopexも公開サーバーと`alopex.RemoteDatabase`で起動し、PostgreSQLの`psycopg`と同じ既存操作列を実行した。Alopex server v0.8.16はfixture準備の`DROP SEQUENCE IF EXISTS perf_sequence`を`unsupported query plan: DropSequence`で拒否した。PostgreSQL 16.14は同じ事前検証の6項目を通過した。
 
-この結果は**server APIの機能差による比較不成立**であり、性能の合否や倍率ではない。Codexは時間測定を開始しておらず、未実行のSQL操作の対応状況も断定しない。改善担当者は既存ケースが要求するサーバーAPIの機能を実装し、結果の同等性を確認してから時間比を測定する。[改善Issue #712](https://github.com/alopex-db/alopex/issues/712)はこの受入条件を追跡する。
+この結果は**server側SQL実行経路の実装漏れによる比較不成立**であり、性能の合否や倍率ではない。この複合ケースではCodexは時間測定を開始しておらず、未実行のSQL操作の対応状況も断定しない。[不具合Issue #720](https://github.com/alopex-db/alopex/issues/720)はサーバー側の機能修正と回帰検証を所有する。[性能改善Issue #712](https://github.com/alopex-db/alopex/issues/712)は元の4対象の性能改善を所有し、この機能修正を受入条件に含めない。評価担当者はこの複合ケースの機能同等性を確認してから同ケースの時間比を測定する。独立した読取SQLの比較はこの修正を前提にしない。
 
 | 再評価の条件 | 設定 |
 |---|---|
@@ -106,6 +143,8 @@ DataFrame / SQLの元ハーネスは [`parity_v0811_measure.py`](https://github.
 
 HNSWの元ハーネスは [`hnsw_v0811_contract.py`](https://github.com/alopex-db/alopex/blob/d9ff8783b8d18a63d167204e55902ea6cd90dcd1/scripts/performance/hnsw_v0811_contract.py)。Codexは既存のembedding生成・oracle・engine builder・`measure_setting`をそのまま使い、各engineを独立processで実行した。検索時間はPython呼び出しとtop-10のID取得までを含む。構築時間は検索の相対値に含めない。
 
+Polars eagerのケースはメモリ上のデータ構築・変換・演算を測り、永続データの読取・書込を含まない。一方、CSV / Parquet streamingはファイル読取と全結果消費を含む。PostgreSQL比較でも、独立した読取SQLの計測に書込やDDLの実行成功を要求する必要はない。
+
 ## 結果の照合とハーネス補正
 
 既存SQLハーネスには、SQLite側だけがsavepointを実行し、参照製品側のSELECT / RETURNING結果を全消費しない差があった。CodexはAlopexの既存Transaction APIにも同じsavepoint操作を追加し、参照製品のcursorを全消費した。製品コードは変更していない。
@@ -118,7 +157,7 @@ Codexは計測外でDataFrameの全結果checksum、SQL streamingの全値、SQL
 
 - 相対時間は各processの中央値を3 trialsで再度中央値にした値の比率。trialごとの比率幅も示す。統計的有意差や本番SLOを認定する試験ではない。
 - DataFrame eager / curated SQLのthroughputは既存の複合操作列の周回速度。単独SQLのQPSや一般的な全APIの性能を表さない。
-- PostgreSQLの旧比較は実行境界が異なるため無効であり、優劣の判断に使わない。CodexはAlopexもserver/client APIへそろえて実行したが、Alopex serverの機能差により性能測定へ進めなかった。
+- PostgreSQLの旧比較は実行境界が異なるため無効であり、優劣の判断に使わない。CodexはAlopexもserver/client APIへそろえて実行したが、Alopex server側の実装漏れにより、この複合ケースの性能測定へ進めなかった。
 - SQL streamingはAlopexがPython行、DataFusionがArrow batchを返す。完全消費時間には各APIの返却形式のコストが含まれる。最初の1行と最初の1batchの到着時間は別の境界なので相対表に含めない。
 - HNSWの構築・更新・削除はAlopexの永続transactionと参照ライブラリのmemory indexで責務が異なる。保存サイズも割当disk blocksとserialized bytesの違いがあるため、これらの直接倍率を性能結論に使わない。
 - rawのRSSはprocess全体の最大値で、初期化・結果照合も含む。PostgreSQL clientの値はserverを含まない。raw保存によるI/Oもあるため、`temporary_io_bytes`を製品I/Oの比較に使わない。

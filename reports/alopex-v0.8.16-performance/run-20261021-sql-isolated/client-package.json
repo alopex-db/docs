@@ -1,0 +1,20 @@
+{
+  "version": "0.8.16",
+  "installed_files_sha256": {
+    "alopex/__init__.py": "ca72d826c6159d2574edf737cb46922c2f10453ab75b057db431c68bb5c56a55",
+    "alopex/_alopex.abi3.so": "3b6f36b66d3a0e7da2b68936383390341093577a5a61144c355726e52d68d7a4",
+    "alopex/_alopex.pyi": "e692a526086460bcff869d3db00cac3fcd3ceb33c8b4ce4776539e68e7a1c7c1",
+    "alopex/asyncio.py": "860c32d4df7ede172fb3d0d05d785f5e3187996a16319adfd716a6c98a02bf8e",
+    "alopex/asyncio.pyi": "8e7ebae29b79f9d14c9a6af7aaca0f343cc2d014df0844b227775784d42b0374",
+    "alopex/native/CONTRACT_VERSION": "a80bff70756ff2e0f528e9b6844fcb5fe4baea4c6f257257c4aea3a38ab31222",
+    "alopex/native/SHA256SUMS": "d1ec78c4519d73de11f309099cd2b508c28c80c87773cf5c630ab4ef070459ce",
+    "alopex/native/libalopex_sql_parser.so": "9783ccecfc061c3bb1c7c6919ffce6a3ba2fadebb7726ecde4018c0170e880ae",
+    "alopex/protocols.py": "ac50bf120298d7b679881ee1081ec3c7cc4c7265863d9046ff4a5957419e571f",
+    "alopex/py.typed": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "alopex/remote.py": "639166ea88dd6657729011f6f8731646439fec3abc8e33fc2726c3c6da4e1be6",
+    "alopex/remote.pyi": "034eb5456000cbbfa791a9163f9fa29fd3f59c97c4c133024c3c642c0ad95340"
+  },
+  "wheel_file": "alopex-0.8.16-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+  "wheel_sha256": "ac9f4b1fd2fa0e78d634334242de4290ae4b34bf700515b59937ea2c718a98c3",
+  "wheel_matches_installed_files": true
+}

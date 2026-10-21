@@ -1,0 +1,20 @@
+{
+  "client_cpu_affinity": [
+    1
+  ],
+  "harness_commit": "d9ff8783b8d18a63d167204e55902ea6cd90dcd1",
+  "harness_sha256": "e6b9f9544763f482ff4236f11d044a63cd058a6fdd51fb07cca37ff959c7bab3",
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.11.11",
+  "runner_commit": "51ea4726e2cc4bac62c5bdbd7fe59af1dc49d264",
+  "runner_sha256": "ecd4b31011056e74b331e0e2ace52da30dce230dafb85173568620ad23e5fd8e",
+  "server_cpu_affinity": [
+    0
+  ],
+  "started_utc": "2026-10-21T14:08:59Z",
+  "versions": {
+    "alopex": "0.8.16",
+    "psycopg": "3.2.10",
+    "psycopg-binary": "3.2.10"
+  }
+}

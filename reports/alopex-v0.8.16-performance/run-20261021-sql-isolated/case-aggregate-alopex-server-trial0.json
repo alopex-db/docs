@@ -1,0 +1,15 @@
+{
+  "case": "aggregate",
+  "client_peak_rss_bytes": 30031872,
+  "elapsed_seconds": 8.361450520984363,
+  "engine": "alopex-server",
+  "exit_code": 0,
+  "fixture_rows": 34250,
+  "latency_p50_ms": 70.39720600005239,
+  "result_sha256": "9526c7a7b4705e368f15fcc97fe25199d4cb2472b331236b560383d20c9807de",
+  "samples": 21,
+  "server_client": true,
+  "sql": "SELECT COUNT(*) AS count FROM bench WHERE enabled = true",
+  "trial": 0,
+  "warmups": 3
+}

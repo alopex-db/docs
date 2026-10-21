@@ -1,0 +1,7 @@
+{
+  "case": "insert-rollback",
+  "elapsed_seconds": 0.3669818500056863,
+  "engine": "alopex-server",
+  "exit_code": 0,
+  "trial": 2
+}

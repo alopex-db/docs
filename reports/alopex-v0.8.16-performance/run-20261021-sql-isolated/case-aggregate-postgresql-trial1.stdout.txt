@@ -1,0 +1,1 @@
+{"case": "aggregate", "engine": "postgresql", "server_client": true, "sql": "SELECT COUNT(*) AS count FROM bench WHERE enabled = true", "fixture_rows": 34250, "warmups": 3, "samples": 21, "result_sha256": "9526c7a7b4705e368f15fcc97fe25199d4cb2472b331236b560383d20c9807de", "latency_p50_ms": 5.619438015855849, "client_peak_rss_bytes": 38957056}

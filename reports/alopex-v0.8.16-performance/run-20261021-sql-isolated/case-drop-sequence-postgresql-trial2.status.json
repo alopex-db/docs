@@ -1,0 +1,7 @@
+{
+  "case": "drop-sequence",
+  "elapsed_seconds": 0.4706489160307683,
+  "engine": "postgresql",
+  "exit_code": 0,
+  "trial": 2
+}

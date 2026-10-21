@@ -1,0 +1,15 @@
+{
+  "case": "ordered",
+  "client_peak_rss_bytes": 30085120,
+  "elapsed_seconds": 13.535908980004024,
+  "engine": "alopex-server",
+  "exit_code": 0,
+  "fixture_rows": 34250,
+  "latency_p50_ms": 33.98342104628682,
+  "result_sha256": "04ecfc3159f09b1f84e104801fd8c7bfa98469cd91072a47d60baf0b049c962f",
+  "samples": 21,
+  "server_client": true,
+  "sql": "SELECT id, COALESCE(value, 0) AS value FROM bench WHERE id >= 0 ORDER BY id LIMIT 16",
+  "trial": 1,
+  "warmups": 3
+}

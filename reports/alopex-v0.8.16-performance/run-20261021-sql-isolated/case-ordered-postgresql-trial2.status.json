@@ -1,0 +1,7 @@
+{
+  "case": "ordered",
+  "elapsed_seconds": 2.083823587046936,
+  "engine": "postgresql",
+  "exit_code": 0,
+  "trial": 2
+}

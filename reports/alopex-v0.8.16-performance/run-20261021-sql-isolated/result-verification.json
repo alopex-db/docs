@@ -1,0 +1,38 @@
+{
+  "valid_performance_processes": 24,
+  "valid_performance_samples": 504,
+  "checks": [
+    {
+      "case": "aggregate",
+      "processes": 6,
+      "samples": 126,
+      "all_result_checksums_equal": true,
+      "raw_ratio_verified": 13.501257069011787
+    },
+    {
+      "case": "ordered",
+      "processes": 6,
+      "samples": 126,
+      "all_result_checksums_equal": true,
+      "raw_ratio_verified": 27.13200357286968
+    },
+    {
+      "case": "select-all",
+      "processes": 6,
+      "samples": 126,
+      "all_result_checksums_equal": true,
+      "raw_ratio_verified": 5.714840542784868
+    },
+    {
+      "case": "insert-rollback",
+      "processes": 6,
+      "samples": 126,
+      "all_result_checksums_equal": true,
+      "raw_ratio_verified": 1.7939325272092208
+    }
+  ],
+  "known_ddl_default": "skipped; earlier diagnostic retained outside performance summary",
+  "independent_review": "4 ratios, trial ranges, throughput, 24 processes/504 samples, result checksums, report text and links independently verified",
+  "default_skip_regression": "5 tests passed",
+  "documentation_lint": "informational repetition of explicit subjects and fixed technical terms only; manually reviewed"
+}

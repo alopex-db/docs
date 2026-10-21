@@ -1,0 +1,1 @@
+{"case": "select-all", "engine": "postgresql", "server_client": true, "sql": "SELECT id, value FROM bench WHERE enabled = true", "fixture_rows": 34250, "warmups": 3, "samples": 21, "result_sha256": "4557b37739b5fd2599843788b04a3ece1943e7ba36a8581306bef9bcea2ccd7b", "latency_p50_ms": 38.79004396731034, "client_peak_rss_bytes": 52686848}
