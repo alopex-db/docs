@@ -1,0 +1,8 @@
+{
+  "case": "random-update-commit",
+  "elapsed_seconds": 0.8749002839904279,
+  "engine": "postgresql",
+  "exit_code": 0,
+  "family": "sql",
+  "trial": 0
+}

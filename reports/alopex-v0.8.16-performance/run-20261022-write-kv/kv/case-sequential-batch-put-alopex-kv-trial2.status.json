@@ -1,0 +1,8 @@
+{
+  "case": "sequential-batch-put",
+  "elapsed_seconds": 0.8779836610192433,
+  "engine": "alopex-kv",
+  "exit_code": 0,
+  "family": "kv",
+  "trial": 2
+}

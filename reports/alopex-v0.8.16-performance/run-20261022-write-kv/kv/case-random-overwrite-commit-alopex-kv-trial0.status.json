@@ -1,0 +1,8 @@
+{
+  "case": "random-overwrite-commit",
+  "elapsed_seconds": 0.66890994500136,
+  "engine": "alopex-kv",
+  "exit_code": 0,
+  "family": "kv",
+  "trial": 0
+}

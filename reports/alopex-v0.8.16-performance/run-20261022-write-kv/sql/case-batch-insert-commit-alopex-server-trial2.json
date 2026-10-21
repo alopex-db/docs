@@ -1,0 +1,18 @@
+{
+  "case": "batch-insert-commit",
+  "elapsed_seconds": 5.8597834490356036,
+  "engine": "alopex-server",
+  "exit_code": 0,
+  "family": "sql",
+  "final_rows": 12400,
+  "fixture_rows": 10000,
+  "input_sha256": "96dc993e135fff6a56a565d791c4dc90375dc3e2138b7f5ce550a888574ae8f9",
+  "latency_p50_ms": 20.7538660033606,
+  "operations_per_sample": 100,
+  "result_sha256": "17952ff17c15d84a57185ec43817ea7e4b024076f1569a3eb7397955d54e9aee",
+  "samples": 21,
+  "server_client": true,
+  "trial": 2,
+  "validation": "every sample plus complete state after client reconnect",
+  "warmups": 3
+}

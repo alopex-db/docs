@@ -1,0 +1,8 @@
+{
+  "case": "random-get-hit",
+  "elapsed_seconds": 0.7283199450466782,
+  "engine": "alopex-kv",
+  "exit_code": 0,
+  "family": "kv",
+  "trial": 2
+}

@@ -1,0 +1,8 @@
+{
+  "case": "convert",
+  "elapsed_seconds": 15.830157093994785,
+  "engine": "polars",
+  "exit_code": 0,
+  "family": "dataframe",
+  "trial": 1
+}

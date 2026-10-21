@@ -1,0 +1,18 @@
+{
+  "case": "random-get-miss",
+  "elapsed_seconds": 9.186977090022992,
+  "engine": "alopex-server",
+  "exit_code": 0,
+  "family": "sql",
+  "final_rows": 10000,
+  "fixture_rows": 10000,
+  "input_sha256": "58c6d40825bcb41f7fb0e365697e8ea0bfb260bcdbd4d29be8b48df5b8487185",
+  "latency_p50_ms": 280.50222201272845,
+  "operations_per_sample": 100,
+  "result_sha256": "0985bbbaee2928efcadad1ec601a25a7b1903f0067b01b47b86af6768096744d",
+  "samples": 21,
+  "server_client": true,
+  "trial": 2,
+  "validation": "every sample plus complete state after client reconnect",
+  "warmups": 3
+}

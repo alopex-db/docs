@@ -1,0 +1,24 @@
+{
+  "case": "convert",
+  "complete_timing": "regenerates items Python lists inside timing, as legacy; additionally materializes input all columns, next_id, explode all rows, concat all rows, final 12 columns to Python",
+  "compute_limit": "next_id is checked outside timing; final select may prune unused next_id computation",
+  "elapsed_seconds": 15.221883791033179,
+  "engine": "polars",
+  "exit_code": 0,
+  "family": "dataframe",
+  "filter": "id >= 0 passes all input rows; no selective-filter claim",
+  "fixture_rows": 34250,
+  "initial_python_lists": "outside timing for every phase",
+  "input_sha256": "e38eea199cd9a08608bf187d2cbf192a471954a4446d7d23d02d5289a85ab2ca",
+  "latency_p50_ms": 10.149940033443272,
+  "logical_input_schema": {
+    "id": "integer",
+    "items": "list of string",
+    "label": "nullable string"
+  },
+  "result_sha256": "192ca140c6f172159190f46b6dc4b403f46050256391d169faa65083a2cc8b91",
+  "samples": 21,
+  "trial": 0,
+  "validation": "every warmup/sample compared with independent Python oracle, including Python types, NULL and order",
+  "warmups": 3
+}

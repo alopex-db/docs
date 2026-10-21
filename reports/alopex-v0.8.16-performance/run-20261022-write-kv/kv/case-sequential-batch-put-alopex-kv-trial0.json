@@ -1,0 +1,23 @@
+{
+  "case": "sequential-batch-put",
+  "client_peak_rss_bytes": 41869312,
+  "elapsed_seconds": 1.4361677179695107,
+  "engine": "alopex-kv",
+  "exit_code": 0,
+  "family": "kv",
+  "final_rows": 12400,
+  "fixture_rows": 10000,
+  "input_sha256": "8416ea1972b6cae46ecfd26a0bc946e6bbc0ba8b0a35b523ad0a431c1ab24a66",
+  "key_bytes": 10,
+  "latency_p50_ms": 4.528769990429282,
+  "operations_per_sample": 100,
+  "result_sha256": "82bcebbe080f8528ee58aec4e24702a6fbd1375677cd428943bdd5d031dfb752",
+  "samples": 21,
+  "server_client": false,
+  "store_allocated_bytes": 1765376,
+  "store_logical_bytes": 538584708,
+  "trial": 0,
+  "validation": "every sample and complete bytes/order after close/reopen",
+  "value_bytes": 32,
+  "warmups": 3
+}

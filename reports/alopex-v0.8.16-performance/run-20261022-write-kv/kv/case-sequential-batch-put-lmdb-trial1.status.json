@@ -1,0 +1,8 @@
+{
+  "case": "sequential-batch-put",
+  "elapsed_seconds": 0.4225209680153057,
+  "engine": "lmdb",
+  "exit_code": 0,
+  "family": "kv",
+  "trial": 1
+}

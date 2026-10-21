@@ -1,0 +1,8 @@
+{
+  "case": "random-get-miss",
+  "elapsed_seconds": 0.6741156380157918,
+  "engine": "alopex-kv",
+  "exit_code": 0,
+  "family": "kv",
+  "trial": 1
+}

@@ -1,0 +1,8 @@
+{
+  "case": "random-update-commit",
+  "elapsed_seconds": 3.3925267800223082,
+  "engine": "alopex-server",
+  "exit_code": 0,
+  "family": "sql",
+  "trial": 2
+}

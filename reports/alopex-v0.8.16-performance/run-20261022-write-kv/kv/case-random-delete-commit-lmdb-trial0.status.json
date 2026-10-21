@@ -1,0 +1,8 @@
+{
+  "case": "random-delete-commit",
+  "elapsed_seconds": 0.4737795449909754,
+  "engine": "lmdb",
+  "exit_code": 0,
+  "family": "kv",
+  "trial": 0
+}

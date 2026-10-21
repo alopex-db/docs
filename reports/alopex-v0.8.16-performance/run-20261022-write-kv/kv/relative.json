@@ -1,0 +1,88 @@
+{
+  "cases": [
+    {
+      "case": "put-commit",
+      "comparison_status": "valid",
+      "latency_ratio": 0.4659883498779707,
+      "paired_latency_ratio_range": [
+        0.4129570255569425,
+        0.6525418474367335
+      ],
+      "throughput_ratio": 2.145976396752992
+    },
+    {
+      "case": "sequential-batch-put",
+      "comparison_status": "valid",
+      "latency_ratio": 0.7784324917258186,
+      "paired_latency_ratio_range": [
+        0.6804715220948591,
+        0.8774863179977914
+      ],
+      "throughput_ratio": 1.2846329137456178
+    },
+    {
+      "case": "random-batch-put",
+      "comparison_status": "valid",
+      "latency_ratio": 0.7820707576253542,
+      "paired_latency_ratio_range": [
+        0.7820707576253542,
+        0.8114165810175663
+      ],
+      "throughput_ratio": 1.2786566819559355
+    },
+    {
+      "case": "random-get-hit",
+      "comparison_status": "valid",
+      "latency_ratio": 6.699888826919271,
+      "paired_latency_ratio_range": [
+        6.2578266283102995,
+        7.390355594537946
+      ],
+      "throughput_ratio": 0.1492562079511128
+    },
+    {
+      "case": "random-get-miss",
+      "comparison_status": "valid",
+      "latency_ratio": 1.3340809941945386,
+      "paired_latency_ratio_range": [
+        1.1253341032274653,
+        1.8028569227487141
+      ],
+      "throughput_ratio": 0.7495796764601669
+    },
+    {
+      "case": "random-overwrite-commit",
+      "comparison_status": "valid",
+      "latency_ratio": 0.414532288985824,
+      "paired_latency_ratio_range": [
+        0.38457576077714983,
+        0.4734138887610704
+      ],
+      "throughput_ratio": 2.4123573158717138
+    },
+    {
+      "case": "random-delete-commit",
+      "comparison_status": "valid",
+      "latency_ratio": 0.45527079008909493,
+      "paired_latency_ratio_range": [
+        0.4345130659430947,
+        0.5013626404914769
+      ],
+      "throughput_ratio": 2.196494969080497
+    },
+    {
+      "case": "range-scan",
+      "comparison_status": "valid",
+      "latency_ratio": 17.53803450979373,
+      "paired_latency_ratio_range": [
+        16.03365649516522,
+        18.97924505765083
+      ],
+      "throughput_ratio": 0.05701893216378221
+    }
+  ],
+  "family": "kv",
+  "reference": "lmdb",
+  "schema": "alopex.performance-comparison/v1",
+  "subject": "alopex-kv"
+}

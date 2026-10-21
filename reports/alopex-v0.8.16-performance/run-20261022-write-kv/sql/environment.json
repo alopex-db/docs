@@ -1,0 +1,31 @@
+{
+  "cpu_affinity": [
+    1
+  ],
+  "cpu_model": "AMD Ryzen 5 3500U with Radeon Vega Mobile Gfx",
+  "family": "sql",
+  "known_case_skips": {
+    "drop-sequence": "Known defect #720, never part of this matrix"
+  },
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.11.11",
+  "runner_commit": "bd76204020105ba13623763742fbb55c58604829",
+  "schema": "alopex.performance-environment/v1",
+  "server_cpu_affinity": [
+    0
+  ],
+  "source_sha256": {
+    "server-sql-isolated-v0816.py": "8ace19bb92921e330e284bda9d10fcf4fdebd67e9a2b6e451ae07fe61b1ca157",
+    "write-kv-v0816.py": "2b22aa3e07e25d230a8de5bfdfdbf9e0f2d247478438301bcc1d592ff2cb0b00",
+    "write_kv_sql.py": "65c2e2e90059216601205355b9022596b0b59370f93e4889c14f6969f3ff3828"
+  },
+  "started_utc": "2026-10-21T15:11:49Z",
+  "versions": {
+    "alopex": "0.8.16",
+    "lmdb": "2.0.0",
+    "polars": "1.43.2",
+    "polars-runtime-32": "1.43.2",
+    "psycopg": "3.2.10",
+    "psycopg-binary": "3.2.10"
+  }
+}

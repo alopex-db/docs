@@ -1,0 +1,18 @@
+{
+  "case": "random-get-miss",
+  "elapsed_seconds": 3.7505748090334237,
+  "engine": "postgresql",
+  "exit_code": 0,
+  "family": "sql",
+  "final_rows": 10000,
+  "fixture_rows": 10000,
+  "input_sha256": "58c6d40825bcb41f7fb0e365697e8ea0bfb260bcdbd4d29be8b48df5b8487185",
+  "latency_p50_ms": 124.32022800203413,
+  "operations_per_sample": 100,
+  "result_sha256": "0985bbbaee2928efcadad1ec601a25a7b1903f0067b01b47b86af6768096744d",
+  "samples": 21,
+  "server_client": true,
+  "trial": 1,
+  "validation": "every sample plus complete state after client reconnect",
+  "warmups": 3
+}

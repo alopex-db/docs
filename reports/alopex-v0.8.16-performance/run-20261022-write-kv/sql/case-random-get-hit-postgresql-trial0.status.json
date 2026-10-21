@@ -1,0 +1,8 @@
+{
+  "case": "random-get-hit",
+  "elapsed_seconds": 3.801496133033652,
+  "engine": "postgresql",
+  "exit_code": 0,
+  "family": "sql",
+  "trial": 0
+}

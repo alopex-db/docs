@@ -1,0 +1,23 @@
+{
+  "case": "range-scan",
+  "client_peak_rss_bytes": 39936000,
+  "elapsed_seconds": 0.9758937919978052,
+  "engine": "alopex-kv",
+  "exit_code": 0,
+  "family": "kv",
+  "final_rows": 10000,
+  "fixture_rows": 10000,
+  "input_sha256": "6f325b573b1aafeebd501a1a15c80ffe6e5f0380137ebd941c5e15caf9964d2b",
+  "key_bytes": 10,
+  "latency_p50_ms": 8.915956015698612,
+  "operations_per_sample": 1000,
+  "result_sha256": "23c37ed64e597036d558eafb7ef5dfe67dfdcba26f066724542ad7e8b2245375",
+  "samples": 21,
+  "server_client": false,
+  "store_allocated_bytes": 1429504,
+  "store_logical_bytes": 538252904,
+  "trial": 0,
+  "validation": "every sample and complete bytes/order after close/reopen",
+  "value_bytes": 32,
+  "warmups": 3
+}

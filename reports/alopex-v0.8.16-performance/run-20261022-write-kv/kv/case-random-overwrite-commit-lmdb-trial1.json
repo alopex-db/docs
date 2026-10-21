@@ -1,0 +1,23 @@
+{
+  "case": "random-overwrite-commit",
+  "client_peak_rss_bytes": 31432704,
+  "elapsed_seconds": 0.31823694601189345,
+  "engine": "lmdb",
+  "exit_code": 0,
+  "family": "kv",
+  "final_rows": 10000,
+  "fixture_rows": 10000,
+  "input_sha256": "af877c6dafcadeb1785059128fab90c9eb7e540d024908368aeada250a151189",
+  "key_bytes": 10,
+  "latency_p50_ms": 2.241546055302024,
+  "operations_per_sample": 1,
+  "result_sha256": "b2daf825da8e41cdfd18161c89f40c56a6dbd00c52a841ba5995b6410907d1fa",
+  "samples": 21,
+  "server_client": false,
+  "store_allocated_bytes": 577536,
+  "store_logical_bytes": 581632,
+  "trial": 1,
+  "validation": "every sample and complete bytes/order after close/reopen",
+  "value_bytes": 32,
+  "warmups": 3
+}
