@@ -1,0 +1,5 @@
+{
+  "case": "string-length",
+  "engine": "polars",
+  "exit_code": 0
+}

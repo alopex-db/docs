@@ -1,0 +1,5 @@
+{
+  "case": "string-contains",
+  "engine": "alopex",
+  "exit_code": 0
+}

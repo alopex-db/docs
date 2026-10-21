@@ -1,0 +1,5 @@
+{
+  "case": "boolean-null-logic",
+  "engine": "polars",
+  "exit_code": 0
+}

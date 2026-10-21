@@ -1,0 +1,5 @@
+{
+  "case": "read-csv-options",
+  "engine": "polars",
+  "exit_code": 0
+}

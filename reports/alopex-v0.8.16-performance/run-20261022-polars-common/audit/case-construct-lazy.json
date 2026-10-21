@@ -1,0 +1,35 @@
+{
+  "case": "construct-lazy",
+  "family": "construction",
+  "expected_error": false,
+  "status": "failed",
+  "reason": "execution_error",
+  "exception": "TypeError",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": [
+        [
+          "x",
+          "Int64"
+        ]
+      ],
+      "values": [
+        [
+          "x",
+          [
+            1,
+            null,
+            3
+          ]
+        ]
+      ]
+    }
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "TypeError",
+    "message": "cannot create 'builtins.LazyFrame' instances"
+  }
+}

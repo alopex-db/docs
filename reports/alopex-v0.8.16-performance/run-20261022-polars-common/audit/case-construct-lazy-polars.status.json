@@ -1,0 +1,5 @@
+{
+  "case": "construct-lazy",
+  "engine": "polars",
+  "exit_code": 0
+}

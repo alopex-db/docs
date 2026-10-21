@@ -1,0 +1,31 @@
+{
+  "case": "column-by-name",
+  "family": "construction",
+  "expected_error": false,
+  "status": "failed",
+  "reason": "execution_error",
+  "exception": "TypeError",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "Series",
+      "schema": [
+        [
+          "value",
+          "Int64"
+        ]
+      ],
+      "values": [
+        10,
+        20,
+        null,
+        40
+      ]
+    }
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "TypeError",
+    "message": "'builtins.DataFrame' object is not subscriptable"
+  }
+}

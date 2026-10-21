@@ -1,0 +1,5 @@
+{
+  "case": "group-null-key",
+  "engine": "polars",
+  "exit_code": 0
+}

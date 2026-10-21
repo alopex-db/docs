@@ -1,0 +1,30 @@
+{
+  "case": "existing-series-mul",
+  "family": "series-diagnostic",
+  "expected_error": false,
+  "status": "failed",
+  "reason": "execution_error",
+  "exception": "TypeError",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "Series",
+      "schema": [
+        [
+          "x",
+          "Int64"
+        ]
+      ],
+      "values": [
+        2,
+        null,
+        6
+      ]
+    }
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "TypeError",
+    "message": "unsupported operand type(s) for *: 'builtins.Series' and 'int'"
+  }
+}

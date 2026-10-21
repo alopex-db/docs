@@ -1,0 +1,5 @@
+{
+  "case": "join-semi",
+  "engine": "polars",
+  "exit_code": 0
+}

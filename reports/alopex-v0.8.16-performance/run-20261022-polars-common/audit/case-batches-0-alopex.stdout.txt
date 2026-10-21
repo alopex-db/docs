@@ -1,0 +1,1 @@
+{"execution": "error", "exception": "PyAlopexError", "message": "streaming unsupported for dataframe_scan: legacy_materialized_source"}

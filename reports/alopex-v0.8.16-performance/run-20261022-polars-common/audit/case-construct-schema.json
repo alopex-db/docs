@@ -1,0 +1,34 @@
+{
+  "case": "construct-schema",
+  "family": "construction",
+  "expected_error": false,
+  "status": "failed",
+  "reason": "execution_error",
+  "exception": "AttributeError",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": [
+        [
+          "x",
+          "Int64"
+        ]
+      ],
+      "values": [
+        [
+          "x",
+          [
+            1,
+            null
+          ]
+        ]
+      ]
+    }
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "AttributeError",
+    "message": "module 'alopex' has no attribute 'Int64'"
+  }
+}

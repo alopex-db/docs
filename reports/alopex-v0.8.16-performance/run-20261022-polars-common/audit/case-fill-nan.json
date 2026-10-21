@@ -1,0 +1,35 @@
+{
+  "case": "fill-nan",
+  "family": "types-and-shapes",
+  "expected_error": false,
+  "status": "failed",
+  "reason": "execution_error",
+  "exception": "TypeError",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": [
+        [
+          "x",
+          "Float64"
+        ]
+      ],
+      "values": [
+        [
+          "x",
+          [
+            1.0,
+            0.0,
+            null
+          ]
+        ]
+      ]
+    }
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "TypeError",
+    "message": "'float' object is not an instance of 'str'"
+  }
+}

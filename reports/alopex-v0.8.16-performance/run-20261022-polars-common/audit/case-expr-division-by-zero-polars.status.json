@@ -1,0 +1,5 @@
+{
+  "case": "expr-division-by-zero",
+  "engine": "polars",
+  "exit_code": 0
+}

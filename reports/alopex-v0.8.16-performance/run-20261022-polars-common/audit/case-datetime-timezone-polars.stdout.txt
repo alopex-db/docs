@@ -1,0 +1,1 @@
+{"execution": "ok", "observation": {"kind": "DataFrame", "schema": [["ts", "Datetime(time_unit='us', time_zone='Asia/Tokyo')"]], "values": [["ts", [{"python_type": "datetime", "iso": "2024-02-29T09:00:00+09:00"}, null]]]}}

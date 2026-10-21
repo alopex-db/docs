@@ -1,0 +1,5 @@
+{
+  "case": "scan-parquet",
+  "engine": "alopex",
+  "exit_code": 0
+}

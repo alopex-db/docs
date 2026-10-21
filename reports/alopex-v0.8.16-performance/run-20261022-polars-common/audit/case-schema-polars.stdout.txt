@@ -1,0 +1,1 @@
+{"execution": "ok", "observation": {"kind": "list", "schema": null, "values": [["id", {"python_type": "Int64", "value": "Int64"}], ["group", {"python_type": "String", "value": "String"}], ["value", {"python_type": "Int64", "value": "Int64"}], ["label", {"python_type": "String", "value": "String"}], ["items", {"python_type": "List", "value": "List(String)"}]]}}

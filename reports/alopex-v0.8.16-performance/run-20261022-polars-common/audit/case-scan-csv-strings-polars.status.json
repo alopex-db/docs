@@ -1,0 +1,5 @@
+{
+  "case": "scan-csv-strings",
+  "engine": "polars",
+  "exit_code": 0
+}

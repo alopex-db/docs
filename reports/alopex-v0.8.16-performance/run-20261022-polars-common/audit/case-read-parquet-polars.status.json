@@ -1,0 +1,5 @@
+{
+  "case": "read-parquet",
+  "engine": "polars",
+  "exit_code": 0
+}
