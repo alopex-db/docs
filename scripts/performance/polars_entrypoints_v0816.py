@@ -2,6 +2,7 @@
 import argparse
 import csv
 import hashlib
+import importlib.metadata
 import importlib.util
 import json
 import math
@@ -17,7 +18,8 @@ from dataframe_phases_v0816 import Operations, assert_equal, inputs, oracle, _ha
 
 CASES = ("csv-collect", "parquet-collect", "csv-batches", "parquet-batches",
          "parquet-numeric-collect", "parquet-numeric-batches")
-PROBES = ("module-select", "series-arithmetic", "module-scan-csv", "module-scan-parquet")
+PROBES = ("module-select", "series-constructor", "series-arithmetic", "lazy-constructor",
+          "module-scan-csv", "module-scan-parquet")
 ENGINES = ("alopex", "polars")
 
 
@@ -38,9 +40,17 @@ def probe(engine, case, directory, rows):
         if case == "module-select":
             actual = api.select(api.lit(2).add(1).alias("value")).to_dict(as_series=False)
             expected = {"value": [3]}
+        elif case == "series-constructor":
+            actual = api.Series("id", [0, 1, None]).to_list()
+            expected = [0, 1, None]
         elif case == "series-arithmetic":
-            actual = (api.Series("id", [0, 1, None]) + 1).to_list()
+            # Probe arithmetic independently of the unavailable direct constructor.
+            series = api.DataFrame({"id": [0, 1, None]}).to_dict()["id"]
+            actual = (series + 1).to_list()
             expected = [1, 2, None]
+        elif case == "lazy-constructor":
+            actual = api.LazyFrame({"id": [0, 1, None]}).collect().to_dict(as_series=False)
+            expected = {"id": [0, 1, None]}
         elif case in ("module-scan-csv", "module-scan-parquet"):
             extension = "csv" if case.endswith("csv") else "parquet"
             actual = getattr(api, f"scan_{extension}")(str(directory / f"rows.{extension}")).collect().to_dict(as_series=False)
@@ -135,7 +145,6 @@ def main():
     spec = importlib.util.spec_from_file_location("shared", Path(__file__).with_name("server-sql-isolated-v0816.py"))
     shared = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(shared)
-    import importlib.metadata
     import polars as pl
     source_files = [Path(__file__), Path(__file__).with_name("dataframe_phases_v0816.py"), Path(shared.__file__)]
     shared.save(output / "environment.json", {
