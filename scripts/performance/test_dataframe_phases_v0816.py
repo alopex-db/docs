@@ -37,6 +37,26 @@ class FakeOperations:
 
 
 class FunctionalTest(unittest.TestCase):
+    def test_validation_snapshot_is_released_outside_next_sample_timer(self):
+        timing = [False]
+        destruction = []
+
+        class Snapshot:
+            def __del__(self):
+                destruction.append(timing[0])
+
+        class Operations(FakeOperations):
+            def snapshot(self, *args, **kwargs):
+                return Snapshot()
+
+        def clock():
+            timing[0] = not timing[0]
+            return float(len(destruction) + int(timing[0]))
+
+        with tempfile.TemporaryDirectory() as directory, patch.object(workload, "Operations", Operations), patch.object(workload, "assert_equal"), patch.object(workload.time, "perf_counter", side_effect=clock):
+            workload.run("alopex", "construct", Path(directory) / "raw.ndjson", rows=4, warmups=0, runs=2)
+        self.assertEqual(destruction, [False, False])
+
     def test_oracle_explodes_every_row_and_preserves_null_and_order(self):
         result = workload.oracle(workload.inputs(4))
         self.assertEqual(result["next_id"], {"next_id": [1, 2, 3, 4]})

@@ -1,0 +1,13 @@
+{
+  "native_kv_regression": "RED module missing; GREEN 2 tests covering 8 cases x 2 real APIs with small fixture",
+  "sql_regression": "4 fake-client tests passed; real server measurement pending",
+  "dataframe_regression": "5 original tests passed, snapshot destructor timed-region regression RED then 6 tests passed after releasing validation result outside timer",
+  "shared_summary_regression": "5 existing isolated SQL tests passed after engine-pair generalization",
+  "independent_static_review": "no major issue in sync/commit, server/client API, input seeds, every-sample validation, final complete state or relative aggregation",
+  "legacy_dataframe_audit": {
+    "ratio_reproduced": 0.135492237,
+    "legacy_final_result_sha256_prefix": "21ba6f82",
+    "independent_oracle": "all 34250 rows and 12 final columns plus returned tuple match all 6 saved process checksums",
+    "limits": "legacy next_id was unused; explode/concat only heights, initial to_dict only id values; legacy validated only before/after timing; no pure-compute claim"
+  }
+}

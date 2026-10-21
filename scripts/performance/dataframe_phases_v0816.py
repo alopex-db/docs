@@ -139,6 +139,7 @@ def run(engine, case, raw_path, rows=34250, warmups=3, runs=21):
             elif case == "convert":
                 actual = operations.snapshot(frame, result=result, converted=actual)
             assert_equal(actual, expected)
+            actual = None
     return {"engine": engine, "case": case, "fixture_rows": rows, "warmups": warmups,
             "samples": runs, "latency_p50_ms": statistics.median(samples) * 1000,
             "result_sha256": _hash(expected), "input_sha256": _hash(columns),
