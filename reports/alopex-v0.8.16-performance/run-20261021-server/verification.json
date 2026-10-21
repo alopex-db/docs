@@ -1,0 +1,26 @@
+{
+  "base_product_commit": "d9ff8783b8d18a63d167204e55902ea6cd90dcd1",
+  "old_comparison": {
+    "status": "invalid",
+    "reason": "embedded Alopex versus PostgreSQL server",
+    "raw_retained": "run-20261021"
+  },
+  "connection_routing_regression": {
+    "before_correction": "ERROR: existing SQL worker cannot accept a supplied server connection",
+    "after_correction": "1 passed"
+  },
+  "existing_harness_regression": {
+    "passed": 22,
+    "failed": 0
+  },
+  "server_connection_patch_sha256": "a5ebf30f6b79d1f9fbca79e930a5d16f067a1365e751f50d3f665da2fca60c92",
+  "connection_injection_regression": {
+    "red": "unexpected keyword argument connection before harness change",
+    "green": "3 tests passed"
+  },
+  "server_preflight": "failed: unsupported DropSequence",
+  "postgresql_preflight": "passed: 6 checks",
+  "independent_review": "ready for correction handoff; performance acceptance blocked by capability parity",
+  "documentation_lint": "10 informational findings: repeated explicit subject required by project policy and fixed technical vocabulary; manually reviewed",
+  "cleanup": "owned servers stopped; PostgreSQL container removed; build output removed; temporary environments and databases removed before commit"
+}

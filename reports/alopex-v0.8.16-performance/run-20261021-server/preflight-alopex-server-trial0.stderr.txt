@@ -1,0 +1,24 @@
+Traceback (most recent call last):
+  File "[local-path]", line 161, in <module>
+    main()
+  File "[local-path]", line 111, in main
+    print(json.dumps(worker(module, args.engine, args.preflight), allow_nan=False))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[local-path]", line 86, in worker
+    return preflight(module, engine)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[local-path]", line 53, in preflight
+    module._prepare_sql_workload(connection, driver, "sql-postgresql-curated")
+  File "[local-path]", line 451, in _prepare_sql_workload
+    connection.execute_sql(statement)
+  File "[temporary-path]", line 946, in execute_sql
+    return self._execute_sql(sql, params, session_id=None, timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[temporary-path]", line 1048, in _execute_sql
+    body = self._request_json(
+           ^^^^^^^^^^^^^^^^^^^
+  File "[temporary-path]", line 1112, in _request_json
+    _raise_for_error(status, text)
+  File "[temporary-path]", line 336, in _raise_for_error
+    raise _alopex_error(
+crate::error.PyAlopexError: sql error: error[ALOPEX-E999]: unsupported operation: unsupported query plan: DropSequence(DropSequence { if_exists: true, name: "perf_sequence", span: Span { start: Location { line: 1, column: 1 }, end: Location { line: 1, column: 4 } } })
