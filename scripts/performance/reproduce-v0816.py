@@ -111,7 +111,6 @@ def main():
         ("polars-csv-streaming", ("alopex", "polars")),
         ("polars-parquet-streaming", ("alopex", "polars")),
         ("sql-sqlite-curated", ("alopex", "sqlite")),
-        ("sql-postgresql-curated", ("alopex", "postgresql")),
         ("sql-streaming", ("alopex", "datafusion")),
     ] if args.phase == "tabular" else [("hnsw", ("alopex-hnsw", "hnswlib", "faiss-hnsw"))]
     for case, engines in cases:

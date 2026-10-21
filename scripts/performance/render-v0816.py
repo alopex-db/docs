@@ -20,7 +20,6 @@ def render(root):
         ("polars-csv-streaming", "polars", "total_p50_ms"),
         ("polars-parquet-streaming", "polars", "total_p50_ms"),
         ("sql-sqlite-curated", "sqlite", "latency_p50_ms"),
-        ("sql-postgresql-curated", "postgresql", "latency_p50_ms"),
         ("sql-streaming", "datafusion", "total_p50_ms"),
     ]
     tabular = []
@@ -93,6 +92,7 @@ def render(root):
                             "throughput_ratio": subject["qps"] / other["qps"],
                             "subject_recall": subject["minimum_recall"], "reference_recall": other["minimum_recall"]})
     payload = {"schema": "alopex.relative-performance-report/v1", "run_id": "20261021",
+               "excluded_comparisons": [{"case": "sql-postgresql-curated", "reason": "Historical embedded/server comparison is invalid; use the separate matched server/client run."}],
                "tabular": tabular, "hnsw_fixed_ef": fixed, "hnsw_matched_recall": matched}
     (root / "relative.json").write_text(json.dumps(payload, indent=2, sort_keys=True, allow_nan=False) + "\n")
     print(json.dumps(payload, indent=2))
