@@ -18,7 +18,7 @@ Alopexの所要時間は、Polars eagerの既存複合操作列で参照の**0.1
 | CSV streaming 全消費 | Polars | 2.301 | 0.435 | 1.329–2.853 |
 | Parquet streaming 全消費 | Polars | 1.039 | 0.962 | 0.674–1.160 |
 | SQL curated 複合操作 | SQLite | 9.551 | 0.105 | 8.505–11.051 |
-| SQL curated 複合操作 | PostgreSQL | 比較不成立（server機能差） | — | — |
+| SQL curated 複合操作 | PostgreSQL | 比較不成立（server実装漏れ） | — | — |
 | SQL streaming 全消費 | DataFusion | 46.522 | 0.021 | 45.569–48.608 |
 
 Parquetの時間比は1をまたぐ幅があり、この3 trialsから優劣を断定しない。PostgreSQL行は、server/client APIを揃えた事前検証の失敗により比較不成立とする。旧時間比0.051倍はAlopexの性能優位を示す結論から除外する。
@@ -55,7 +55,7 @@ Parquetの時間比は1をまたぐ幅があり、この3 trialsから優劣を�
 
 Codexは、Alopex embedded対PostgreSQL serverの旧時間比**0.051倍を撤回する**。CodexはAlopexも公開サーバーと`alopex.RemoteDatabase`で起動し、PostgreSQLの`psycopg`と同じ既存操作列を実行した。Alopex server v0.8.16はfixture準備の`DROP SEQUENCE IF EXISTS perf_sequence`を`unsupported query plan: DropSequence`で拒否した。PostgreSQL 16.14は同じ事前検証の6項目を通過した。
 
-この結果は**server APIの機能差による比較不成立**であり、性能の合否や倍率ではない。Codexは時間測定を開始しておらず、未実行のSQL操作の対応状況も断定しない。改善担当者は既存ケースが要求するサーバーAPIの機能を実装し、結果の同等性を確認してから時間比を測定する。[改善Issue #712](https://github.com/alopex-db/alopex/issues/712)はこの受入条件を追跡する。
+この結果は**server側SQL実行経路の実装漏れによる比較不成立**であり、性能の合否や倍率ではない。Codexは時間測定を開始しておらず、未実行のSQL操作の対応状況も断定しない。[不具合Issue #720](https://github.com/alopex-db/alopex/issues/720)はサーバー側の機能修正と回帰検証を所有する。[性能改善Issue #712](https://github.com/alopex-db/alopex/issues/712)は元の4対象の性能改善を所有し、この機能修正を受入条件に含めない。評価担当者は機能同等性の確認後に、PostgreSQLとの時間比を別の評価として測定する。
 
 | 再評価の条件 | 設定 |
 |---|---|
@@ -118,7 +118,7 @@ Codexは計測外でDataFrameの全結果checksum、SQL streamingの全値、SQL
 
 - 相対時間は各processの中央値を3 trialsで再度中央値にした値の比率。trialごとの比率幅も示す。統計的有意差や本番SLOを認定する試験ではない。
 - DataFrame eager / curated SQLのthroughputは既存の複合操作列の周回速度。単独SQLのQPSや一般的な全APIの性能を表さない。
-- PostgreSQLの旧比較は実行境界が異なるため無効であり、優劣の判断に使わない。CodexはAlopexもserver/client APIへそろえて実行したが、Alopex serverの機能差により性能測定へ進めなかった。
+- PostgreSQLの旧比較は実行境界が異なるため無効であり、優劣の判断に使わない。CodexはAlopexもserver/client APIへそろえて実行したが、Alopex server側の実装漏れにより性能測定へ進めなかった。
 - SQL streamingはAlopexがPython行、DataFusionがArrow batchを返す。完全消費時間には各APIの返却形式のコストが含まれる。最初の1行と最初の1batchの到着時間は別の境界なので相対表に含めない。
 - HNSWの構築・更新・削除はAlopexの永続transactionと参照ライブラリのmemory indexで責務が異なる。保存サイズも割当disk blocksとserialized bytesの違いがあるため、これらの直接倍率を性能結論に使わない。
 - rawのRSSはprocess全体の最大値で、初期化・結果照合も含む。PostgreSQL clientの値はserverを含まない。raw保存によるI/Oもあるため、`temporary_io_bytes`を製品I/Oの比較に使わない。
