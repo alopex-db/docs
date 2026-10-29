@@ -15,3 +15,5 @@ jobs:
         uses: actions/checkout@v4
       - name: Check public surface contracts
         run: bash scripts/check-public-surface.sh
+      - name: Check release report ingestion
+        run: python3 -m unittest discover -s scripts/tests -p 'test_*release_reports.py'
