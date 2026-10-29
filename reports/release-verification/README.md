@@ -20,6 +20,13 @@ docs側の `GITHUB_TOKEN` でmainへ保存します。リポジトリ間の書�
 run/attempt、公開PythonタグのソースSHA、検証コードのSHAを確認します。レポートだけの保存ブランチでは、生成元Actions runのソースSHAと照合します。
 保存後に両ファイルのSHA-256を確認します。入力ブランチのコードは実行しません。
 
+保存失敗時は `report/verify-release-failure-vX.Y.Z-RUN-PUBLISH_ATTEMPT` から
+独立した `alopex-report-publication/v1` のJSON/Markdownを受信します。
+失敗段階と公開attemptを記録し、元の検証結果が取得できればその原本も変更せず保存します。
+原本が取得できない場合は未取得と明示します。原本のハッシュ、run/attempt、
+解決済みの公開タグ、全ファイルの衝突を検査してから書き込みます。
+この経路から全シナリオの正式レポートへ昇格することはありません。
+
 検証結果と保存処理の成否は別の記録です。過去の `*-publication-failure.*` は
 保存処理の障害記録であり、パッケージのシナリオが失敗したことを示しません。
 元のActions runの結論は履歴として残します。

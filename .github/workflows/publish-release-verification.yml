@@ -40,18 +40,10 @@ jobs:
           set -euo pipefail
           git remote add alopex https://github.com/alopex-db/alopex.git
 
-          if [[ -n "${REQUESTED_VERSION}" ]]; then
-            [[ "${REQUESTED_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
-            git fetch --force --quiet alopex \
-              "+refs/heads/report/verify-release-v${REQUESTED_VERSION}-*:refs/remotes/alopex/report/verify-release-v${REQUESTED_VERSION}-*"
-            mapfile -t refs < <(git for-each-ref \
-              --format='%(refname)' "refs/remotes/alopex/report/verify-release-v${REQUESTED_VERSION}-*")
-          else
-            git fetch --force --quiet alopex \
-              '+refs/heads/report/verify-release-v*:refs/remotes/alopex/report/verify-release-v*'
-            mapfile -t refs < <(git for-each-ref \
-              --format='%(refname)' 'refs/remotes/alopex/report/verify-release-v*')
-          fi
+          # Pull normal and independent publication-failure branches. The
+          # reviewed importer validates names, paths, schemas and exact bytes.
+          git fetch --force --quiet alopex \
+            '+refs/heads/report/verify-release-*:refs/remotes/alopex/report/verify-release-*'
 
           git fetch --force --quiet alopex \
             '+refs/tags/alopex-py-v*:refs/remotes/alopex/tags/alopex-py-v*'
@@ -68,7 +60,7 @@ jobs:
       - name: Run public documentation checks
         if: steps.reports.outputs.changed == 'true'
         run: |
-          python3 -m unittest discover -s scripts/tests -p test_import_release_reports.py
+          python3 -m unittest discover -s scripts/tests -p 'test_*release_reports.py'
           bash scripts/check-public-surface.sh
 
       - name: Publish verified reports to main
