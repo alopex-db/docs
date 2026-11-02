@@ -1,0 +1,19 @@
+{
+  "schema": "alopex-report-publication/v1",
+  "repository": "alopex-db/alopex",
+  "version": "unknown",
+  "run_id": "41421769379",
+  "publication_attempt": 2,
+  "publisher_commit": "db68ada78211c0d2f7361bc1b70ceac7a38b77a7",
+  "outcome": "failure",
+  "stage": "docs_ingestion",
+  "source_artifact": "release-verification-41421769379-1",
+  "verification": {
+    "producing_attempt": 1,
+    "outcome": "failure",
+    "sha256": {
+      "json": "535792756176168fc4591ebfdf5267db4d3efd3c8a0d8f8adc6ddfe31f89d4d3",
+      "md": "bb78f740a8f5775aeb5a0b0b43927ec821dac857a373024178cf72d63903ae83"
+    }
+  }
+}
