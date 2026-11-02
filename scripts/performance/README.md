@@ -118,12 +118,10 @@ owning issue's existing baseline evidence. Preserve distinct run directories.
 
 The engine driver paths in the last two rows are relative to a separately
 pinned engine checkout. Their existing `run_*_profile.py` supervisors are
-macOS diagnostics, not the Linux final-comparison supervisor. Before those rows
-run, bind the worker to the selected subject checker, record its complete source
-and environment, apply the same Linux CPU/thread topology, and provide bounded
-serial supervision, three trials, raw/status retention and storage cleanup.
-Do not reinterpret an old macOS diagnostic as a Linux final-candidate result.
-This README does not implement that supervision or claim those rows have run.
+macOS diagnostics, not the Linux final-comparison supervisor. Use the manual
+Linux supervisor described below for those rows. Do not reinterpret an old
+macOS diagnostic as a Linux final-candidate result. Implementing supervision
+does not establish that a real candidate comparison has run.
 
 Keep the six Polars entrypoint probes (`module-select`, `series-constructor`,
 `series-arithmetic`, `lazy-constructor`, `module-scan-csv`,
@@ -171,6 +169,57 @@ memory scan costs through final acceptance rather than omitting them from a
 summary of improvements. #712's full reference-parity goal remains open when
 only its v0.8.17 stage is accepted. A performance run never establishes RC
 package qualification, publication verification or the release-to-main merge.
+
+## Supplemental Linux supervision
+
+`supplemental_v0817.py` runs the existing engine streaming or SQLite worker in
+12 serial processes per family: two independent lanes, two engines, three
+trials with alternating engine order. It preserves 34,250 rows and the workers'
+3 warmups / 21 samples and oracles. It does not install/build products, start a
+server, or execute profiling. Both workers and supervisor reject CI execution.
+
+Prepare the subject manifest above and a separate JSON run plan. The plan must
+have schema `alopex.performance-run-plan/v1`, `family` (`streaming` or `sqlite`),
+the exact `harness_commit`, matching `subject_manifest_sha256`, `owner`,
+`comparison_subjects`, `metric`, `acceptance_rule`, `cleanup`, and a finite
+numeric `noise_fraction` in [0, 1). Fill these from the predeclared acceptance
+plan; the runner requires them but does not decide release acceptance. Record
+all applicable published/pre-change/candidate identities in comparison_subjects.
+
+After source, artifacts, reference versions, numerical criteria and host budget
+are established, the command shape is:
+
+```sh
+python -B scripts/performance/supplemental_v0817.py --manual \
+  --family streaming --harness-root <clean-pinned-engine-checkout> \
+  --harness-commit <full-commit> --plan <absolute-plan.json> \
+  --output <new-absolute-run-directory> \
+  --additional-bytes <bounded-growth-bytes> --case-seconds <bounded-seconds>
+```
+
+Use a separate plan/output for `--family sqlite`. Add `--storage-root` for each
+nonstandard Alopex location on the same physical host. The supervisor reuses the
+pinned engine's inclusive allocated-byte inventory, adding docs, the selected
+Python environment, complete Rust toolchains, pip/maturin caches and output.
+It requires declared growth to fit strictly below 40 GB, checks before/after
+every worker and at 15-second intervals, and stops the process group on resource
+or measurement failure. It also bounds each worker's elapsed time and output.
+Independent functional failures/timeouts retain raw/status and permit the
+remaining cells; a storage or inventory failure stops the whole run.
+
+Each worker verifies the selected subject before executing the existing driver.
+The supervisor pins CPU 0 and one thread, records source/artifact/plan identities,
+checks complete sample receipts, and compares full input/result digests across
+engines and trials within each lane. Existing workers enforce the value/type/
+state oracles; receipt validation does not replace them. Only owned per-case
+`work` directories are removed. Raw logs, status, summaries and inventory remain
+available on failures, and existing output directories are rejected.
+
+SQLite's historical worker emits Linux `ru_maxrss` in KiB under a bytes-labelled
+field. The supervisor preserves that raw field and reports a separate normalized
+byte count. Stream workers already normalize it. These are lifetime process RSS
+values, not isolated operation allocation measurements. No comparison is accepted
+solely because child exit codes are zero or the receipt checks pass.
 
 ## Tiny functional verification
 
