@@ -89,6 +89,89 @@ pinned to `1.43.2`, LMDB to `2.0.0`, and existing PostgreSQL/reference checks ar
 unchanged. This does not silently include previously excluded capability cases;
 explicitly run and accept the required added cases in the release matrix.
 
+## v0.8.17 final comparison coverage
+
+The release acceptance owner is Codex, tracked in
+[engine #690](https://github.com/alopex-db/alopex/issues/690) and
+[engine #712](https://github.com/alopex-db/alopex/issues/712). This inventory maps
+their original and added cases to existing entrypoints. It is preparation, not
+a completed measurement or authorization to bypass candidate acceptance.
+
+Run each applicable row for the published 0.8.16 baseline, the fixed pre-change
+source, and the final composed candidate, with the pinned reference on the same
+host. Record exact source/tree, runner source and artifact digests separately:
+a runner checkout is not the product being measured. Do not use one product's
+source SHA as the baseline for unrelated improvements without checking the
+owning issue's existing baseline evidence. Preserve distinct run directories.
+
+| Coverage | Existing entrypoint and explicit selection | Fixed boundary |
+| --- | --- | --- |
+| Original server SQL, 4 cases | `server-sql-isolated-v0816.py --harness-root <pinned-harness> --output <new-run>`: `aggregate`, `ordered`, `select-all`, `insert-rollback` | 34,250 rows for reads; initial 1 row for INSERT; public client/server round trip, complete results and rollback |
+| Added server SQL, 6 cases | `write-kv-v0816.py --family sql --data <owned-data> --output <new-run>`: `insert-commit`, `batch-insert-commit`, `random-get-hit`, `random-get-miss`, `random-update-commit`, `random-delete-commit` | Initial 10,000 rows; committed writes include begin through durable commit; reconnect and verify full state |
+| Native KV, 8 cases | Same entrypoint with `--family kv`: `put-commit`, `sequential-batch-put`, `random-batch-put`, `random-get-hit`, `random-get-miss`, `random-overwrite-commit`, `random-delete-commit`, `range-scan` | 10,000 keys; 10-byte key / 32-byte value; public embedded API, retained sync policy, close/reopen and verify all values |
+| DataFrame, 4 phases | Same entrypoint with `--family dataframe`: `construct`, `compute`, `convert`, `complete` | 34,250 rows, existing 12-expression oracle; construction, compute and Python conversion remain separate |
+| Lazy file computations, 6 cases | `polars_entrypoints_v0816.py --case <case> --data <new-data> --output <new-run>` for **each** of `csv-collect`, `csv-batches`, `parquet-collect`, `parquet-batches`, `parquet-numeric-collect`, `parquet-numeric-batches` | 34,250 rows; scan, compute and full collect/batch consumption; verify values/types/NULL/order. Parquet string cases are excluded by default and must be selected explicitly |
+| Original eager/CSV/Parquet/SQLite/SQL-streaming boundaries | `reproduce-v0816.py --phase tabular --harness-root <pinned-harness> --data <prepared-input> --output <new-run>` covers `polars-eager-api`, `polars-csv-streaming`, `polars-parquet-streaming`, `sql-sqlite-curated`, `sql-streaming` | Original 34,250-row cases; CSV/Parquet 8,192-row batches fully consumed; keep historical harness corrections and hashes |
+| HNSW search | Same entrypoint with `--phase hnsw` | 9,171 × 128 float32, seed 42, 200 query vectors, cosine/top-10, M16 / efConstruction200, efSearch16/32/64/128/256; 3 trials, at least 10,000 queries **and** 2 seconds per point, independent recall oracle |
+| SQL streaming, equal Python result representation | Engine `scripts/performance/sql_stream_profile.py`: `alopex-original`, `datafusion-original`, `alopex-rows`, `datafusion-rows` | 34,250 input rows / 17,125 result rows. Retain original full-consumption and equal typed-row lanes separately; first row versus first batch is not a comparable latency |
+| SQLite composite, explicit constraint semantics | Engine `scripts/performance/sqlite_composite_profile.py`: `alopex-original`, `sqlite-original`, `alopex-checked`, `sqlite-checked` | 34,250 rows; keep original workload and checked/FK-enabled lane separate; full results, rollback state and actual negative constraint checks |
+
+The engine driver paths in the last two rows are relative to a separately
+pinned engine checkout. Their existing `run_*_profile.py` supervisors are
+macOS diagnostics, not the Linux final-comparison supervisor. Before those rows
+run, bind the worker to the selected subject checker, record its complete source
+and environment, apply the same Linux CPU/thread topology, and provide bounded
+serial supervision, three trials, raw/status retention and storage cleanup.
+Do not reinterpret an old macOS diagnostic as a Linux final-candidate result.
+This README does not implement that supervision or claim those rows have run.
+
+Keep the six Polars entrypoint probes (`module-select`, `series-constructor`,
+`series-arithmetic`, `lazy-constructor`, `module-scan-csv`,
+`module-scan-parquet`) as capability results. Missing entrypoints and failed
+string computation are not successful performance measurements. The Polars
+parent records these probes alongside its selected measurement case.
+
+The separate `server-compare-v0816.py --preflight` checks the existing 20-row
+PostgreSQL composite contract for #720/#742 before any composite timing. Record
+its six functional checks and final rollback checksum. A historical
+`drop-sequence` failure does not block independent SQL cases and does not become
+a #712 speed result. The old embedded-versus-server ratio stays invalid.
+
+Before any dispatch, retain a run plan with these fields filled from evidence:
+
+- Accepted candidate SHA/tree and issue inclusion; published baseline and
+  each applicable pre-change SHA/tree; exact wheel/server build receipts.
+- Pinned docs and engine harness commits, any historical correction patch
+  digests, dataset digests, reference versions and selected case IDs. Never
+  apply an old correction patch blindly to a newer harness.
+- One physical host identity, CPU/thread affinity, filesystem/cache state,
+  sync settings, reused connections, TLS/auth and prepared-statement policy.
+  Server cases retain server CPU 0 / client CPU 1; native cases use CPU 0.
+- Primary metric and numerical noise/improvement criterion **before** seeing
+  candidate measurements. Preserve any stricter issue-specific criterion.
+  An unresolved criterion is an unready run plan, not permission to choose a
+  favorable threshold afterward.
+- Measured inclusive host storage, command/output paths, bounded additional
+  storage and elapsed time, stop/cleanup owner and timing. Serialize workloads
+  and builds; stop at 40 GB, never exceed 50 GB. The checker does not enforce
+  these resource limits itself.
+
+Except for the HNSW-specific sampling contract, retain 3 warmups, 21 samples and
+3 trials. Publish the ratio of trial-median summaries with trial ranges and raw
+samples; report time, throughput, memory and I/O separately. Capture server and
+client resources separately, and exclude raw-report writes from product I/O.
+Keep failed, timed-out, skipped and unmeasured cells visible. Preserve partial
+outputs and continue independent cells in new directories under the same budget.
+
+Retain #681/#682/#684's separate source-bound acceptance comparisons, including
+the 100,000 × 384 HNSW diagnostic and transaction preparation/index/commit
+boundaries. They do not replace the original search matrix above. Track the
+observed +10.8% SQL overflow commit, +9.87% HNSW construction and +11.40% ordered
+memory scan costs through final acceptance rather than omitting them from a
+summary of improvements. #712's full reference-parity goal remains open when
+only its v0.8.17 stage is accepted. A performance run never establishes RC
+package qualification, publication verification or the release-to-main merge.
+
 ## Tiny functional verification
 
 ```sh
