@@ -1,4 +1,6 @@
 """Run committed SQL, native KV, or independently validated DataFrame cases."""
+from subject_identity import verify_subject
+
 import argparse
 import importlib.metadata
 import importlib.util
@@ -26,6 +28,7 @@ def main():
     parser.add_argument("--engine")
     parser.add_argument("--case")
     args = parser.parse_args()
+    subject = verify_subject(require_server=args.family == "sql")
     os.environ.update({key: "1" for key in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "RAYON_NUM_THREADS", "TOKIO_WORKER_THREADS", "POLARS_MAX_THREADS")})
     os.sched_setaffinity(0, {1 if args.family == "sql" else 0})
     output, data = args.output.resolve(), args.data.resolve()
@@ -56,7 +59,7 @@ def main():
     source_files = [Path(__file__), Path(module.__file__), Path(shared.__file__)]
     shared.save(output / "environment.json", {
         "schema": "alopex.performance-environment/v1", "family": args.family,
-        "python": platform.python_version(), "platform": platform.platform(),
+        "subject_identity": subject, "python": platform.python_version(), "platform": platform.platform(),
         "cpu_model": next(line.split(":", 1)[1].strip() for line in Path("/proc/cpuinfo").read_text().splitlines() if line.startswith("model name")),
         "versions": {name: importlib.metadata.version(name) for name in ("alopex", "psycopg", "psycopg-binary", "lmdb", "polars", "polars-runtime-32")},
         "cpu_affinity": sorted(os.sched_getaffinity(0)), "server_cpu_affinity": [0] if args.family == "sql" else [],

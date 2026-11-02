@@ -1,4 +1,6 @@
 """Separate Python-list construction, frame computation and Python conversion."""
+from subject_identity import verify_subject
+
 import copy
 import hashlib
 import importlib
@@ -62,7 +64,7 @@ class Operations:
     def __init__(self, engine, rows):
         if engine not in ("alopex", "polars"):
             raise ValueError(f"Unknown engine: {engine}")
-        wanted = "0.8.16" if engine == "alopex" else "1.43.2"
+        wanted = verify_subject()["version"] if engine == "alopex" else "1.43.2"
         if importlib.metadata.version(engine) != wanted:
             raise RuntimeError(f"Expected {engine} {wanted}")
         self.api = importlib.import_module(engine)
@@ -113,9 +115,9 @@ class Operations:
 def run(engine, case, raw_path, rows=34250, warmups=3, runs=21):
     if case not in CASES or rows <= 0 or warmups < 0 or runs <= 0:
         raise ValueError("Valid phase, positive rows/runs and nonnegative warmups required")
+    operations = Operations(engine, rows)
     columns = inputs(rows)
     expected = oracle(columns)
-    operations = Operations(engine, rows)
     frame = operations.frame(columns) if case in ("compute", "convert") else None
     result = operations.compute(frame) if case == "convert" else None
 

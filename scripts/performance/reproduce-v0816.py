@@ -1,4 +1,6 @@
 """Run the existing Alopex comparison cases in sequential, isolated processes."""
+from subject_identity import verify_subject, worker_command
+
 import argparse
 import hashlib
 import importlib.metadata
@@ -83,6 +85,7 @@ def main():
     parser.add_argument("--phase", choices=["prepare", "tabular", "hnsw", "hnsw-worker"], required=True)
     parser.add_argument("--engine")
     args = parser.parse_args()
+    subject = verify_subject(require_server=False)
     root, data, output = args.harness_root.resolve(), args.data.resolve(), args.output.resolve()
     os.environ.update({key: "1" for key in (
         "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "POLARS_MAX_THREADS", "RAYON_NUM_THREADS",
@@ -99,7 +102,7 @@ def main():
     env = os.environ.copy()
     env["PYTHONDONTWRITEBYTECODE"] = "1"
     write(output / "environment.json", {
-        "python": platform.python_version(), "platform": platform.platform(),
+        "subject_identity": subject, "python": platform.python_version(), "platform": platform.platform(),
         "cpu_model": next(line.split(":", 1)[1].strip() for line in Path("/proc/cpuinfo").read_text().splitlines() if line.startswith("model name")),
         "cpu_affinity": sorted(os.sched_getaffinity(0)),
         "versions": {d.metadata["Name"]: d.version for d in importlib.metadata.distributions()},
@@ -132,7 +135,7 @@ def main():
                 env["ALOPEX_PERF_RAW_PATH"] = str(output / f"{name}.raw.ndjson")
                 started = time.monotonic()
                 with result.with_suffix(".stdout.txt").open("w") as stdout, result.with_suffix(".stderr.txt").open("w") as stderr:
-                    completed = subprocess.run(command, env=env, cwd=root, stdout=stdout, stderr=stderr)
+                    completed = subprocess.run(worker_command(command, engine == "alopex-server"), env=env, cwd=root, stdout=stdout, stderr=stderr)
                 status = {"case": case, "engine": engine, "trial": trial, "exit_code": completed.returncode, "elapsed_seconds": time.monotonic() - started}
                 if not completed.returncode and case != "hnsw":
                     write(result, json.loads(result.with_suffix(".stdout.txt").read_text()))
