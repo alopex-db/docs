@@ -1,6 +1,7 @@
 """The existing LSM KV workloads through two durable public Python APIs."""
+from subject_identity import verify_subject
+
 import hashlib
-import importlib.metadata
 import json
 from pathlib import Path
 import random
@@ -23,10 +24,11 @@ def value_for(index):
 class Store:
     def __init__(self, engine, root):
         self.engine = engine
+        if engine == "alopex-kv":
+            verify_subject()
         root.mkdir(parents=True, exist_ok=True)
         if engine == "alopex-kv":
             import alopex
-            assert importlib.metadata.version("alopex") == "0.8.16"
             self.db = alopex.Database.open(str(root / "store.alopex"))
             self.read_mode, self.write_mode = alopex.TxnMode.READ_ONLY, alopex.TxnMode.READ_WRITE
         elif engine == "lmdb":
@@ -105,6 +107,8 @@ def _plans(case, n, count):
 def run(engine, case, work_dir, raw_path, n=10000, warmups=3, runs=21):
     if case not in CASES or n <= 0 or warmups < 0 or runs <= 0:
         raise ValueError("Invalid KV measurement case or dimensions")
+    if engine == "alopex-kv":
+        verify_subject()
     root, raw_path = Path(work_dir), Path(raw_path)
     if root.exists() or raw_path.exists():
         raise RuntimeError("Do not overwrite a previous KV database or raw run")

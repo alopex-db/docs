@@ -1,4 +1,6 @@
 """Repeat the existing PostgreSQL case with two real server/client APIs."""
+from subject_identity import verify_subject, worker_command
+
 import argparse
 import hashlib
 import importlib.metadata
@@ -101,6 +103,7 @@ def main():
     parser.add_argument("--engine", choices=["alopex-server", "postgresql"])
     parser.add_argument("--preflight", action="store_true")
     args = parser.parse_args()
+    subject = verify_subject(require_server=True)
     os.environ.update({key: "1" for key in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "RAYON_NUM_THREADS", "TOKIO_WORKER_THREADS")})
     os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
     os.sched_setaffinity(0, {1})
@@ -113,7 +116,7 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     require_new_run(output)
     save(output / "environment.json", {
-        "python": platform.python_version(), "platform": platform.platform(),
+        "subject_identity": subject, "python": platform.python_version(), "platform": platform.platform(),
         "client_cpu_affinity": sorted(os.sched_getaffinity(0)), "server_cpu_affinity": [0],
         "cpu_model": next(line.split(":", 1)[1].strip() for line in Path("/proc/cpuinfo").read_text().splitlines() if line.startswith("model name")),
         "versions": {name: importlib.metadata.version(name) for name in ("alopex", "psycopg", "psycopg-binary")},
@@ -136,7 +139,7 @@ def main():
                 env = dict(os.environ, ALOPEX_PERF_RAW_PATH=str(output / f"{name}.raw.ndjson"))
                 started = time.monotonic()
                 with (output / f"{name}.stdout.txt").open("w") as stdout, (output / f"{name}.stderr.txt").open("w") as stderr:
-                    completed = subprocess.run(command, env=env, cwd=root, stdout=stdout, stderr=stderr)
+                    completed = subprocess.run(worker_command(command, engine == "alopex-server"), env=env, cwd=root, stdout=stdout, stderr=stderr)
                 status = {"phase": phase, "engine": engine, "trial": trial, "exit_code": completed.returncode, "elapsed_seconds": time.monotonic() - started}
                 save(status_path, status)
                 print(json.dumps(status), flush=True)

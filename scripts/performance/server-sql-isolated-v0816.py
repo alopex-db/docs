@@ -1,4 +1,6 @@
 """Measure independent existing SQL operations through both public server APIs."""
+from subject_identity import verify_subject, worker_command
+
 import argparse
 import hashlib
 import importlib.metadata
@@ -47,7 +49,7 @@ def run_process(command, output, name, metadata):
     started = time.monotonic()
     with (output / f"{name}.stdout.txt").open("w") as stdout, (output / f"{name}.stderr.txt").open("w") as stderr:
         try:
-            process = subprocess.run(command, stdout=stdout, stderr=stderr, timeout=300)
+            process = subprocess.run(worker_command(command, metadata.get("engine") == "alopex-server"), stdout=stdout, stderr=stderr, timeout=300)
             exit_code = process.returncode
         except subprocess.TimeoutExpired:
             exit_code = 124
@@ -153,6 +155,7 @@ def main():
     parser.add_argument("--engine", choices=("alopex-server", "postgresql"))
     parser.add_argument("--case", choices=CASES)
     args = parser.parse_args()
+    subject = verify_subject(require_server=True)
     os.environ.update({key: "1" for key in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "RAYON_NUM_THREADS", "TOKIO_WORKER_THREADS")})
     os.sched_setaffinity(0, {1})
     root, output = args.harness_root.resolve(), args.output.resolve()
@@ -166,7 +169,7 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     if (output / "environment.json").exists() or any(output.glob("case-*")):
         raise RuntimeError("Use a new run directory; partial runs must remain immutable")
-    save(output / "environment.json", {"python": platform.python_version(), "platform": platform.platform(),
+    save(output / "environment.json", {"subject_identity": subject, "python": platform.python_version(), "platform": platform.platform(),
          "versions": {key: importlib.metadata.version(key) for key in ("alopex", "psycopg", "psycopg-binary")},
          "client_cpu_affinity": sorted(os.sched_getaffinity(0)), "server_cpu_affinity": [0],
          "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -192,7 +195,7 @@ def main():
                     save(output / f"{name}.json", row)
                 results.append(row)
     save(output / "relative.json", {"schema": "alopex.isolated-server-sql/v1", "reference": "PostgreSQL 16.14 = 1",
-         "subject": "AlopexDB server 0.8.16 via RemoteDatabase", "cases": relative(results, cases),
+         "subject": f"AlopexDB server {subject['version']} via RemoteDatabase", "cases": relative(results, cases),
          "default_skips": {"drop-sequence": "Known server defect, alopex-db/alopex#720; explicit --case required"}})
 
 

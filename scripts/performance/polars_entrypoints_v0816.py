@@ -1,4 +1,6 @@
 """Probe Polars entrypoints and compare lazy scans without DataFrame construction."""
+from subject_identity import verify_subject
+
 import argparse
 import csv
 import hashlib
@@ -126,6 +128,7 @@ def main():
     parser.add_argument("--engine", choices=ENGINES)
     parser.add_argument("--case", choices=CASES + PROBES)
     args = parser.parse_args()
+    subject = verify_subject(require_server=False)
     os.environ.update({key: "1" for key in ("POLARS_MAX_THREADS", "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "RAYON_NUM_THREADS", "TOKIO_WORKER_THREADS")})
     os.sched_setaffinity(0, {0})
     output, data = args.output.resolve(), args.data.resolve()
@@ -154,7 +157,7 @@ def main():
     import polars as pl
     source_files = [Path(__file__), Path(__file__).with_name("dataframe_phases_v0816.py"), Path(shared.__file__)]
     shared.save(output / "environment.json", {
-        "schema": "alopex.polars-entrypoints/v1", "python": platform.python_version(),
+        "schema": "alopex.polars-entrypoints/v1", "subject_identity": subject, "python": platform.python_version(),
         "platform": platform.platform(), "cpu_affinity": sorted(os.sched_getaffinity(0)),
         "cpu_model": next(line.split(":", 1)[1].strip() for line in Path("/proc/cpuinfo").read_text().splitlines() if line.startswith("model name")),
         "versions": {name: importlib.metadata.version(name) for name in ("alopex", "polars", "polars-runtime-32")},
