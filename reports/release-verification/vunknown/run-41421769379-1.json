@@ -1,0 +1,40 @@
+{
+  "schema": "alopex-release-verification/v2",
+  "version": "unknown",
+  "started_at": "2026-11-02T09:35:06.558226Z",
+  "completed_at": "2026-11-02T09:35:06.783473Z",
+  "outcome": "failure",
+  "failure_stage": "workflow orchestration",
+  "environment": {
+    "package_source": "crates.io / PyPI",
+    "rust": "1.96",
+    "nim": "nimlang/nim:2.2",
+    "python": "3.11"
+  },
+  "identity": {
+    "commit": "unresolved",
+    "tag": "unresolved",
+    "run_id": "41421769379",
+    "run_attempt": 1,
+    "run_url": "https://github.com/alopex-db/alopex/actions/runs/41421769379",
+    "responsibility": "Stable Delivery / downstream availability"
+  },
+  "steps": [
+    {
+      "name": "workflow orchestration",
+      "status": "failure",
+      "description": "A verification workflow step failed or was skipped; see the recorded step outcomes.",
+      "duration_ms": null,
+      "log_excerpt": [
+        "release=failure",
+        "availability=skipped",
+        "latest_identity=skipped"
+      ],
+      "diagnostics": [
+        "release=failure",
+        "availability=skipped",
+        "latest_identity=skipped"
+      ]
+    }
+  ]
+}
