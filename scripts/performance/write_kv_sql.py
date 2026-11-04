@@ -11,6 +11,8 @@ import random
 import statistics
 import time
 
+from sql_resources import ENV as RESOURCE_ENV, OperationResources
+
 CASES = ("insert-commit", "batch-insert-commit", "random-get-hit",
          "random-get-miss", "random-update-commit", "random-delete-commit")
 
@@ -131,6 +133,8 @@ def run(engine, case, work_dir, raw_path, n=10000, warmups=3, runs=21):
             client.execute("CREATE TABLE bench_write (id INTEGER PRIMARY KEY, value TEXT)")
             fixture = list(expected.items())
             _write(client, [_insert(fixture[start:start + 1000]) for start in range(0, n, 1000)])
+            observer = OperationResources.from_environment(
+                engine, client.connection.info.backend_pid if engine == "postgresql" and os.environ.get(RESOURCE_ENV) else None)
             pending_restore = None
             for index, (sqls, payload) in enumerate(plans):
                 if pending_restore is not None:
@@ -138,11 +142,21 @@ def run(engine, case, work_dir, raw_path, n=10000, warmups=3, runs=21):
                     _write(client, [_insert([(key, value)])])
                     expected[key] = value
                     pending_restore = None
+                resource_before = observer.begin() if observer and index >= warmups else None
                 started = time.perf_counter()
                 result = [client.execute(sql) for sql in sqls] if read else _write(client, sqls)
                 elapsed = time.perf_counter() - started
                 if index >= warmups:
-                    raw.write(json.dumps({"phase": "measure", "index": index - warmups, "seconds": elapsed}, allow_nan=False) + "\n")
+                    row = {"phase": "measure", "index": index - warmups, "seconds": elapsed}
+                    try:
+                        if observer:
+                            row["resources"] = observer.end(resource_before)
+                    except Exception as error:
+                        row["resources"] = {"status": "failed", "error": str(error)}
+                        raw.write(json.dumps(row, allow_nan=False) + "\n")
+                        raw.flush()
+                        raise
+                    raw.write(json.dumps(row, allow_nan=False) + "\n")
                     raw.flush()
                     samples.append(elapsed)
                 if read:

@@ -25,3 +25,8 @@ jobs:
         env:
           PYTHONDONTWRITEBYTECODE: '1'
         run: python3 -B -m unittest discover -s scripts/performance -p 'test_supplemental_v0817.py' -v
+      - name: Check SQL resource boundaries (tiny functional cases only)
+        env:
+          PYTHONDONTWRITEBYTECODE: 1
+        working-directory: scripts/performance
+        run: python3 -B -m unittest -v test_sql_resources test_write_kv_sql test_isolated_sql

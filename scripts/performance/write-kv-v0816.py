@@ -56,7 +56,8 @@ def main():
     if (output / "environment.json").exists() or any(output.glob("case-*")):
         raise RuntimeError("Use a new run directory; do not overwrite partial evidence")
     cases = (args.case,) if args.case else module.CASES
-    source_files = [Path(__file__), Path(module.__file__), Path(shared.__file__)]
+    source_files = [Path(__file__), Path(module.__file__), Path(shared.__file__),
+                    Path(__file__).with_name("sql_resources.py")]
     shared.save(output / "environment.json", {
         "schema": "alopex.performance-environment/v1", "family": args.family,
         "subject_identity": subject, "python": platform.python_version(), "platform": platform.platform(),
