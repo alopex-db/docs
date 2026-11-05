@@ -82,6 +82,8 @@ def server_delta(before, after, ticks_per_second):
             row[target] = value / ticks_per_second
         for key in ("read_bytes", "write_bytes", "cancelled_write_bytes"):
             row[key] = end[key] - start[key]
+            if row[key] < 0:
+                raise RuntimeError("I/O counter decreased; resource cell is incomplete")
         rows.append(row)
     return rows
 
@@ -136,6 +138,9 @@ class OperationResources:
                   "output_blocks": client_after.ru_oublock - client_before.ru_oublock,
                   "lifetime_hwm_before_bytes": client_before.ru_maxrss * 1024,
                   "lifetime_hwm_after_bytes": client_after.ru_maxrss * 1024}
+        if any(client[key] < 0 for key in ("user_cpu_seconds", "system_cpu_seconds",
+                                           "input_blocks", "output_blocks")):
+            raise RuntimeError("Client resource counter decreased; resource cell is incomplete")
         return {"schema": "alopex.sql-operation-resources/v1", "status": "observed",
                 "manifest_sha256": self.manifest_sha256, "client": client,
                 "server_processes": server_delta(server_before, server_after, self.ticks),

@@ -72,6 +72,21 @@ class ResourceTests(unittest.TestCase):
         with self.assertRaises(PermissionError):
             meter.begin()
 
+    def test_decreased_server_io_counters_are_not_negative_cost(self):
+        for key in ('read_bytes', 'write_bytes', 'cancelled_write_bytes'):
+            with self.subTest(key=key), self.assertRaisesRegex(RuntimeError, 'I/O counter decreased'):
+                server_delta({1: counters(**{key: 10})}, {1: counters(**{key: 9})}, 100)
+
+    def test_decreased_client_counters_fail_the_resource_cell(self):
+        baseline = dict(ru_utime=2, ru_stime=2, ru_inblock=2, ru_oublock=2, ru_maxrss=10)
+        for key in ('ru_utime', 'ru_stime', 'ru_inblock', 'ru_oublock'):
+            values = iter([SimpleNamespace(**baseline), SimpleNamespace(**dict(baseline, **{key: 1}))])
+            meter = OperationResources(1, 123, server_reader=lambda *_: {1: counters()},
+                                       usage_reader=lambda: next(values))
+            before = meter.begin()
+            with self.subTest(key=key), self.assertRaisesRegex(RuntimeError, 'Client resource counter decreased'):
+                meter.end(before)
+
     def test_disabled_observer_needs_no_server_or_manifest(self):
         with patch.dict(os.environ, {}, clear=True):
             self.assertIsNone(OperationResources.from_environment('postgresql'))
