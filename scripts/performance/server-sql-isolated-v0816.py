@@ -170,7 +170,10 @@ def main():
     args = parser.parse_args()
     subject = verify_subject(require_server=True)
     os.environ.update({key: "1" for key in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "RAYON_NUM_THREADS", "TOKIO_WORKER_THREADS")})
-    os.sched_setaffinity(0, {1})
+    from subject_identity import cpu_assignment
+    allocation = cpu_assignment(subject)
+    os.sched_setaffinity(0, set(allocation["client"]))
+    assert os.sched_getaffinity(0) == set(allocation["client"]), "Client CPU affinity differs from manifest"
     root, output = args.harness_root.resolve(), args.output.resolve()
     sys.path.insert(0, str(root / "scripts/performance"))
     import parity_v0811_measure as module
@@ -184,7 +187,7 @@ def main():
         raise RuntimeError("Use a new run directory; partial runs must remain immutable")
     save(output / "environment.json", {"subject_identity": subject, "python": platform.python_version(), "platform": platform.platform(),
          "versions": {key: importlib.metadata.version(key) for key in ("alopex", "psycopg", "psycopg-binary")},
-         "client_cpu_affinity": sorted(os.sched_getaffinity(0)), "server_cpu_affinity": [0],
+         "client_cpu_affinity": sorted(os.sched_getaffinity(0)), "server_cpu_affinity": allocation["server"],
          "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
          "harness_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip(),
          "runner_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=Path(__file__).resolve().parents[2], text=True).strip(),

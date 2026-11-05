@@ -197,6 +197,22 @@ class SubjectTest(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "CPU affinity"):
                 subject._server(record, binary, proc_root)
 
+    def test_configured_server_affinity_replaces_historical_topology(self):
+        proc_root, _, binary, record = self.server_fixture()
+        allocation = {"server": [4, 6], "client": [9]}
+        with patch.object(subject.sys, "platform", "linux"), patch.object(subject.os, "sched_getaffinity", return_value={4, 6}, create=True), patch.dict(os.environ, {"ALOPEX_PERF_SERVER_URL": record["url"]}):
+            self.assertEqual(subject._server(record, binary, proc_root, cpu=allocation)["cpu_affinity"], [4, 6])
+            with self.assertRaisesRegex(RuntimeError, "CPU affinity"):
+                subject._server(record, binary, proc_root, cpu={"server": [7], "client": [9]})
+
+    def test_invalid_cpu_assignments_fail_closed(self):
+        for allocation in ({"server": [], "client": [1]}, {"server": [2], "client": [2]},
+                           {"server": [True], "client": [1]}, {"server": [-1], "client": [1]},
+                           {"server": [2, 2], "client": [1]}, {"server": [2]}):
+            with self.subTest(allocation=allocation), self.assertRaises(RuntimeError):
+                subject.cpu_assignment({"cpu": allocation})
+        self.assertEqual(subject.cpu_assignment({}), {"server": [0], "client": [1]})
+
     def test_missing_server_identity_is_rejected_for_server_cases(self):
         with self.assertRaises(KeyError):
             subject.verify_subject(require_server=True)
