@@ -13,7 +13,8 @@ def counters(**updates):
     value = dict(start_ticks=123, user_ticks=10, system_ticks=20,
                  reaped_user_ticks=0, reaped_system_ticks=0,
                  rss_bytes=4096, lifetime_hwm_bytes=8192,
-                 read_bytes=1024, write_bytes=2048, cancelled_write_bytes=0)
+                 read_bytes=1024, write_bytes=2048, cancelled_write_bytes=0,
+                 exe_identity=[1, 2, 3, 4], threads=[1], children=[])
     return dict(value, **updates)
 
 
@@ -54,7 +55,8 @@ class ResourceTests(unittest.TestCase):
             return SimpleNamespace(ru_utime=calls, ru_stime=calls / 2,
                                    ru_inblock=calls * 2, ru_oublock=calls * 3,
                                    ru_maxrss=10)
-        meter = OperationResources(1, 123, server_reader=server, usage_reader=usage)
+        meter = OperationResources(1, 123, server_reader=server, usage_reader=usage,
+                                   client_reader=lambda: counters(pid=999), allocation_reader=lambda: 10)
         before = meter.begin()
         events.append('operation')
         result = meter.end(before)
@@ -64,11 +66,14 @@ class ResourceTests(unittest.TestCase):
         self.assertEqual(result['client']['input_blocks'], 2)
         self.assertEqual(result['client']['output_blocks'], 3)
         self.assertEqual(result['client']['lifetime_hwm_after_bytes'], 10240)
+        self.assertEqual(result['client']['rss_after_bytes'], 4096)
+        self.assertEqual(result['client']['write_bytes'], 0)
+        self.assertEqual(result['coverage'], 'stable_pid_namespace_allocation')
 
     def test_missing_server_counters_are_not_zero_cost(self):
         def missing(*_):
             raise PermissionError('counter unavailable')
-        meter = OperationResources(1, 123, server_reader=missing)
+        meter = OperationResources(1, 123, server_reader=missing, allocation_reader=lambda: 10)
         with self.assertRaises(PermissionError):
             meter.begin()
 
@@ -82,7 +87,8 @@ class ResourceTests(unittest.TestCase):
         for key in ('ru_utime', 'ru_stime', 'ru_inblock', 'ru_oublock'):
             values = iter([SimpleNamespace(**baseline), SimpleNamespace(**dict(baseline, **{key: 1}))])
             meter = OperationResources(1, 123, server_reader=lambda *_: {1: counters()},
-                                       usage_reader=lambda: next(values))
+                                       usage_reader=lambda: next(values),
+                                       client_reader=lambda: counters(pid=999), allocation_reader=lambda: 10)
             before = meter.begin()
             with self.subTest(key=key), self.assertRaisesRegex(RuntimeError, 'Client resource counter decreased'):
                 meter.end(before)
@@ -128,10 +134,50 @@ class ResourceTests(unittest.TestCase):
             (proc / 'stat').write_text('17 (name with ) spaces) ' + ' '.join(fields))
             (proc / 'status').write_text('VmRSS:\t4 kB\nVmHWM:\t8 kB\n')
             (proc / 'task' / '17' / 'children').write_text('')
+            executable = root / 'executable'
+            executable.write_bytes(b'fixture')
+            (proc / 'exe').symlink_to(executable)
             with self.assertRaisesRegex(RuntimeError, 'I/O counters unavailable'):
                 _server(17, 123, root)
             (proc / 'io').write_text('read_bytes: 1024\nwrite_bytes: 2048\ncancelled_write_bytes: 0\n')
-            self.assertEqual(_server(17, 123, root), {17: counters()})
+            info = executable.stat()
+            self.assertEqual(_server(17, 123, root), {17: counters(threads=[17],
+                exe_identity=[info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns])})
+
+    def test_transient_pid_allocation_invalidates_unchanged_endpoint_trees(self):
+        allocations = iter([10, 10, 11])
+        meter = OperationResources(1, 123, server_reader=lambda *_: {1: counters()},
+                                   client_reader=lambda: counters(pid=999), allocation_reader=lambda: next(allocations))
+        before = meter.begin()
+        with self.assertRaisesRegex(RuntimeError, 'PID allocation changed'):
+            meter.end(before)
+
+    def test_pid_allocation_during_snapshot_is_rejected(self):
+        allocations = iter([10, 11])
+        meter = OperationResources(1, 123, server_reader=lambda *_: {1: counters()},
+                                   client_reader=lambda: counters(pid=999), allocation_reader=lambda: next(allocations))
+        with self.assertRaisesRegex(RuntimeError, 'PID allocation changed'):
+            meter.begin()
+
+    def test_missing_allocation_counter_is_not_complete_coverage(self):
+        def missing():
+            raise FileNotFoundError('counter unavailable')
+        meter = OperationResources(1, 123, allocation_reader=missing)
+        with self.assertRaises(FileNotFoundError):
+            meter.begin()
+
+    def test_thread_executable_and_child_changes_invalidate_deltas(self):
+        for field, value in [('threads', [1, 2]), ('children', [2]), ('exe_identity', [1, 9, 3, 4])]:
+            with self.subTest(field=field), self.assertRaisesRegex(RuntimeError, 'membership changed'):
+                server_delta({1: counters()}, {1: counters(**{field: value})}, 100)
+
+    def test_client_pid_reuse_is_rejected(self):
+        clients = iter([counters(pid=999), counters(pid=999, start_ticks=124)])
+        meter = OperationResources(1, 123, server_reader=lambda *_: {1: counters()},
+                                   client_reader=lambda: next(clients), allocation_reader=lambda: 10)
+        before = meter.begin()
+        with self.assertRaisesRegex(RuntimeError, 'PID was reused'):
+            meter.end(before)
 
 
 class HarnessBoundaryTests(unittest.TestCase):

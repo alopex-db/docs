@@ -251,8 +251,9 @@ apply. The optional observer never starts or configures a server.
 
 Each measured sample records `resources` before any raw-file write or result
 validation. The client uses `getrusage` CPU seconds and input/output block
-counters; the server keeps per-process CPU seconds and Linux `read_bytes`,
-`write_bytes`, and `cancelled_write_bytes`. These are distinct kernel accounting
+counters, plus process RSS and Linux I/O byte counters. The server keeps
+per-process CPU seconds and Linux `read_bytes`, `write_bytes`, and
+`cancelled_write_bytes`. These are distinct kernel accounting
 units, not network bytes or interchangeable metrics. Client usage excludes
 server-counter enumeration. Resource collection is outside the existing latency
 timer, but adds inter-sample work: enable it consistently for every compared
@@ -262,11 +263,15 @@ and disabled observations as if they had identical execution conditions.
 Memory records are RSS boundary values and lifetime high-water marks. They are
 not operation peaks; server RSS is not summed because processes can share pages.
 Server snapshot windows bracket the client timer and may include background
-activity. CPU measurements have the host tick resolution. Stable observed
-process membership does not prove coverage of transient unobserved children;
-record that limitation rather than claiming complete whole-server accounting.
+activity. Server CPU measurements have the host tick resolution. The observer
+checks the PID-namespace allocation counter across both snapshots and the
+operation, rejecting any allocation, including short-lived processes absent
+from both endpoints. Use an isolated PID namespace for these resource runs;
+unrelated allocations in a shared namespace also invalidate the sample. This
+guard does not reconstruct process events or qualify a changing process tree.
 
-An unavailable counter, changed PID/membership, or detected reaped child fails
+An unavailable counter, decreased counter, changed PID/executable/thread/child
+membership, PID allocation, or detected reaped child fails
 the resource cell. A failure after the SQL operation preserves its elapsed
 sample and error in raw output before propagating; missing I/O is never zero.
 Some WSL kernels do not expose `/proc/PID/io`: such a host cannot qualify these
