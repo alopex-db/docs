@@ -1,5 +1,6 @@
 """Measure independent existing SQL operations through both public server APIs."""
 from subject_identity import verify_subject, worker_command
+from sql_resources import ENV as RESOURCE_ENV, OperationResources
 
 import argparse
 import hashlib
@@ -127,13 +128,25 @@ def measure(module, engine, case, raw_path):
         checksum = validate(case, operation(), ROWS)
         for _ in range(3):
             validate(case, operation(), ROWS)
+        observer = OperationResources.from_environment(
+            engine, connection.info.backend_pid if driver == "postgresql" and os.environ.get(RESOURCE_ENV) else None)
         samples = []
         with raw_path.open("x") as raw:
             for index in range(21):
+                resource_before = observer.begin() if observer else None
                 started = time.perf_counter()
                 result = operation()
                 elapsed = time.perf_counter() - started
-                raw.write(json.dumps({"sample": index, "seconds": elapsed}) + "\n")
+                row = {"sample": index, "seconds": elapsed}
+                try:
+                    if observer:
+                        row["resources"] = observer.end(resource_before)
+                except Exception as error:
+                    row["resources"] = {"status": "failed", "error": str(error)}
+                    raw.write(json.dumps(row) + "\n")
+                    raw.flush()
+                    raise
+                raw.write(json.dumps(row) + "\n")
                 raw.flush()
                 assert validate(case, result, ROWS) == checksum
                 samples.append(elapsed)
@@ -157,7 +170,10 @@ def main():
     args = parser.parse_args()
     subject = verify_subject(require_server=True)
     os.environ.update({key: "1" for key in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "RAYON_NUM_THREADS", "TOKIO_WORKER_THREADS")})
-    os.sched_setaffinity(0, {1})
+    from subject_identity import cpu_assignment
+    allocation = cpu_assignment(subject)
+    os.sched_setaffinity(0, set(allocation["client"]))
+    assert os.sched_getaffinity(0) == set(allocation["client"]), "Client CPU affinity differs from manifest"
     root, output = args.harness_root.resolve(), args.output.resolve()
     sys.path.insert(0, str(root / "scripts/performance"))
     import parity_v0811_measure as module
@@ -171,11 +187,12 @@ def main():
         raise RuntimeError("Use a new run directory; partial runs must remain immutable")
     save(output / "environment.json", {"subject_identity": subject, "python": platform.python_version(), "platform": platform.platform(),
          "versions": {key: importlib.metadata.version(key) for key in ("alopex", "psycopg", "psycopg-binary")},
-         "client_cpu_affinity": sorted(os.sched_getaffinity(0)), "server_cpu_affinity": [0],
+         "client_cpu_affinity": sorted(os.sched_getaffinity(0)), "server_cpu_affinity": allocation["server"],
          "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
          "harness_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip(),
          "runner_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=Path(__file__).resolve().parents[2], text=True).strip(),
          "harness_sha256": hashlib.sha256((root / "scripts/performance/parity_v0811_measure.py").read_bytes()).hexdigest(),
+         "resource_observer_sha256": hashlib.sha256(Path(__file__).with_name("sql_resources.py").read_bytes()).hexdigest(),
          "runner_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()})
     results = []
     cases = selected_cases(args.case)

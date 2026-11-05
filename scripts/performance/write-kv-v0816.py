@@ -30,7 +30,11 @@ def main():
     args = parser.parse_args()
     subject = verify_subject(require_server=args.family == "sql")
     os.environ.update({key: "1" for key in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "RAYON_NUM_THREADS", "TOKIO_WORKER_THREADS", "POLARS_MAX_THREADS")})
-    os.sched_setaffinity(0, {1 if args.family == "sql" else 0})
+    from subject_identity import cpu_assignment
+    allocation = cpu_assignment(subject)
+    selected = allocation["client"] if args.family == "sql" else allocation["server"]
+    os.sched_setaffinity(0, set(selected))
+    assert os.sched_getaffinity(0) == set(selected), "Worker CPU affinity differs from manifest"
     output, data = args.output.resolve(), args.data.resolve()
     if args.family == "sql":
         import write_kv_sql as module
@@ -56,13 +60,14 @@ def main():
     if (output / "environment.json").exists() or any(output.glob("case-*")):
         raise RuntimeError("Use a new run directory; do not overwrite partial evidence")
     cases = (args.case,) if args.case else module.CASES
-    source_files = [Path(__file__), Path(module.__file__), Path(shared.__file__)]
+    source_files = [Path(__file__), Path(module.__file__), Path(shared.__file__),
+                    Path(__file__).with_name("sql_resources.py")]
     shared.save(output / "environment.json", {
         "schema": "alopex.performance-environment/v1", "family": args.family,
         "subject_identity": subject, "python": platform.python_version(), "platform": platform.platform(),
         "cpu_model": next(line.split(":", 1)[1].strip() for line in Path("/proc/cpuinfo").read_text().splitlines() if line.startswith("model name")),
         "versions": {name: importlib.metadata.version(name) for name in ("alopex", "psycopg", "psycopg-binary", "lmdb", "polars", "polars-runtime-32")},
-        "cpu_affinity": sorted(os.sched_getaffinity(0)), "server_cpu_affinity": [0] if args.family == "sql" else [],
+        "cpu_affinity": sorted(os.sched_getaffinity(0)), "server_cpu_affinity": allocation["server"] if args.family == "sql" else [],
         "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "runner_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=Path(__file__).resolve().parents[2], text=True).strip(),
         "source_sha256": {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in source_files},

@@ -235,3 +235,52 @@ rejection, worker failure recording, setup-before-timing behavior and supported
 Python syntax without building Alopex, starting a server, or making a performance
 claim. Ordinary CI runs only these identity contracts. Native adapter tests and
 the qualified product server require the separate execution environment.
+
+## Optional SQL operation resource observations
+
+For the four isolated SQL cases and six committed/random SQL cases, set
+`ALOPEX_PERF_SQL_RESOURCE_MANIFEST` to an absolute JSON file before invoking the
+existing manual runner. The schema is `alopex.sql-resource-servers/v1`; its
+`servers` object maps `alopex-server` and `postgresql` to integer `pid` and
+`start_ticks` values for the owned server root processes. Obtain start ticks
+from field 22 of `/proc/PID/stat`, not from wall-clock time. Keep this manifest
+with the run plan and raw evidence. The observer checks Alopex against the
+qualified live subject and checks that the PostgreSQL connection backend is
+inside the declared server tree. Existing topology and artifact checks still
+apply. The optional observer never starts or configures a server.
+
+Each measured sample records `resources` before any raw-file write or result
+validation. The client uses `getrusage` CPU seconds and input/output block
+counters, plus process RSS and Linux I/O byte counters. The server keeps
+per-process CPU seconds and Linux `read_bytes`, `write_bytes`, and
+`cancelled_write_bytes`. These are distinct kernel accounting
+units, not network bytes or interchangeable metrics. Client usage excludes
+server-counter enumeration. Resource collection is outside the existing latency
+timer, but adds inter-sample work: enable it consistently for every compared
+subject/reference and record its source and manifest digests. Do not mix enabled
+and disabled observations as if they had identical execution conditions.
+
+Memory records are RSS boundary values and lifetime high-water marks. They are
+not operation peaks; server RSS is not summed because processes can share pages.
+Server snapshot windows bracket the client timer and may include background
+activity. Server CPU measurements have the host tick resolution. The observer
+checks the PID-namespace allocation counter across both snapshots and the
+operation, rejecting any allocation, including short-lived processes absent
+from both endpoints. Use an isolated PID namespace for these resource runs;
+unrelated allocations in a shared namespace also invalidate the sample. This
+guard does not reconstruct process events or qualify a changing process tree.
+
+An unavailable counter, decreased counter, changed PID/executable/thread/child
+membership, PID allocation, or detected reaped child fails
+the resource cell. A failure after the SQL operation preserves its elapsed
+sample and error in raw output before propagating; missing I/O is never zero.
+Some WSL kernels do not expose `/proc/PID/io`: such a host cannot qualify these
+I/O observations. The real-counter functional test reports a skip there; tiny
+fixtures still test parsing, boundaries, identity changes and missing-counter
+rejection. This skip is not resource acceptance. With no manifest the historical
+runner remains available, but its output does not establish server resources.
+
+Run the functional tests with `python3 -B -m unittest -v test_sql_resources
+test_write_kv_sql test_isolated_sql` from this directory. They use tiny fixtures
+and no benchmark or load. Full live Alopex/PostgreSQL resource validation remains
+a separately bounded manual check before accepting resource results.

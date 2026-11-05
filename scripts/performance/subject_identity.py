@@ -83,7 +83,22 @@ def _start_ticks(proc):
     return int((proc / "stat").read_text().rsplit(")", 1)[1].split()[19])
 
 
-def _server(record, binary, proc_root=Path("/proc")):
+def cpu_assignment(subject):
+    """Optional manifest allocation; preserve the historical v0.8.16 topology."""
+    allocation = subject.get("cpu", {"server": [0], "client": [1]})
+    _require(isinstance(allocation, dict) and set(allocation) == {"server", "client"},
+             "CPU assignment requires server and client sets")
+    for role in ("server", "client"):
+        values = allocation[role]
+        _require(isinstance(values, list) and values
+                 and all(type(value) is int and value >= 0 for value in values)
+                 and len(set(values)) == len(values), "Invalid CPU affinity assignment")
+    _require(not set(allocation["server"]) & set(allocation["client"]),
+             "Server and client CPU affinity must not overlap")
+    return {role: sorted(values) for role, values in allocation.items()}
+
+
+def _server(record, binary, proc_root=Path("/proc"), cpu=None):
     _require(sys.platform == "linux", "Server identity requires the original local Linux topology")
     url = urlsplit(os.environ.get("ALOPEX_PERF_SERVER_URL", ""))
     _require(url.scheme == "http" and url.hostname == "127.0.0.1" and url.port is not None
@@ -96,7 +111,8 @@ def _server(record, binary, proc_root=Path("/proc")):
     before = _start_ticks(proc)
     _require(before == record["start_ticks"], "Server process was replaced")
     _require(digest(proc / "exe") == digest(binary), "Running server executable mismatch")
-    _require(os.sched_getaffinity(record["pid"]) == {0}, "Server CPU affinity must remain [0]")
+    expected = cpu_assignment({"cpu": cpu})["server"] if cpu is not None else cpu_assignment({})["server"]
+    _require(os.sched_getaffinity(record["pid"]) == set(expected), "Server CPU affinity differs from manifest")
     sockets = {p.readlink().as_posix() for p in (proc / "fd").iterdir() if p.is_symlink()}
     listening = False
     for line in (proc / "net/tcp").read_text().splitlines()[1:]:
@@ -107,7 +123,7 @@ def _server(record, binary, proc_root=Path("/proc")):
             listening = True
     _require(listening and _start_ticks(proc) == before, "Endpoint is not owned by the qualified server")
     return {"pid": record["pid"], "start_ticks": before, "url": record["url"],
-            "sha256": digest(binary), "cpu_affinity": [0]}
+            "sha256": digest(binary), "cpu_affinity": expected}
 
 
 @functools.lru_cache(maxsize=4)
@@ -118,6 +134,7 @@ def _verify(path_string, expected_digest, require_server):
     manifest = json.loads(raw)
     _require(manifest["schema"] == "alopex.performance-subject/v1", "Unknown subject schema")
     version, source = manifest["version"], manifest["source"]
+    allocation = cpu_assignment(manifest)
     _require(re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", version), "Invalid subject version")
     _require(all(re.fullmatch(r"[0-9a-f]{40}", source[k]) for k in ("commit", "tree")),
              "Exact source commit/tree required")
@@ -134,12 +151,13 @@ def _verify(path_string, expected_digest, require_server):
     result = {"schema": manifest["schema"], "manifest_sha256": expected_digest,
               "version": version, "source": source,
               "build_receipt_sha256": manifest["build_receipt"]["sha256"],
-              "python_wheel_sha256": manifest["python_wheel"]["sha256"], "installed": installed}
+              "python_wheel_sha256": manifest["python_wheel"]["sha256"], "installed": installed,
+              "cpu": allocation}
     if require_server:
         binary = _artifact(path.parent, manifest["server"]["binary"])
         _require(receipt["server_sha256"] == manifest["server"]["binary"]["sha256"],
                  "Server is not identified by the build receipt")
-        result["server"] = _server(manifest["server"], binary)
+        result["server"] = _server(manifest["server"], binary, cpu=allocation)
     result["identity_checker_sha256"] = digest(__file__)
     return result
 

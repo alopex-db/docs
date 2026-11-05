@@ -106,7 +106,10 @@ def main():
     subject = verify_subject(require_server=True)
     os.environ.update({key: "1" for key in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "RAYON_NUM_THREADS", "TOKIO_WORKER_THREADS")})
     os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
-    os.sched_setaffinity(0, {1})
+    from subject_identity import cpu_assignment
+    allocation = cpu_assignment(subject)
+    os.sched_setaffinity(0, set(allocation["client"]))
+    assert os.sched_getaffinity(0) == set(allocation["client"]), "Client CPU affinity differs from manifest"
     root, output = args.harness_root.resolve(), args.output.resolve()
     sys.path.insert(0, str(root / "scripts/performance"))
     import parity_v0811_measure as module
@@ -117,7 +120,7 @@ def main():
     require_new_run(output)
     save(output / "environment.json", {
         "subject_identity": subject, "python": platform.python_version(), "platform": platform.platform(),
-        "client_cpu_affinity": sorted(os.sched_getaffinity(0)), "server_cpu_affinity": [0],
+        "client_cpu_affinity": sorted(os.sched_getaffinity(0)), "server_cpu_affinity": allocation["server"],
         "cpu_model": next(line.split(":", 1)[1].strip() for line in Path("/proc/cpuinfo").read_text().splitlines() if line.startswith("model name")),
         "versions": {name: importlib.metadata.version(name) for name in ("alopex", "psycopg", "psycopg-binary")},
         "harness_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip(),
