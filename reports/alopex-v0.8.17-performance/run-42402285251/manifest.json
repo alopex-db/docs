@@ -1,0 +1,81 @@
+{
+  "schema": "alopex.public-native-sql-report/v1",
+  "run": 42402285251,
+  "controller_commit": "566cfbe92edcb1cb33aa2681f0a91cc057fbc2d2",
+  "auditor_commit": "3c53307669311fd381fca7413a768a00d6d633f8",
+  "candidate_source": "4b88e0844b0a6cc1dab93a69a9e7bffbd8a1f39c",
+  "before_source": "34ce28d5c15377837cb78b15a261cfa2c05757a8",
+  "published_source": "d9ff8783b8d18a63d167204e55902ea6cd90dcd1",
+  "docs_harness_digest": "9012c7ead25e606fbe945298b435cdae2a02a6d293a946c44fd07dbc69c60b37",
+  "comparison_sha256": "e52ceba6b1e8907917a617f952b3c9ba7add6d8a82e585ad3c9424ce7bfcd108",
+  "samples": 2520,
+  "cells": 120,
+  "warmups_per_cell": 3,
+  "samples_per_cell": 21,
+  "trials": 3,
+  "performance_acceptance": false,
+  "raw_files": [
+    {
+      "path": "raw/aggregate.ndjson",
+      "size": 247026,
+      "sha256": "4c4530473d536b1ce78a6b050086b79602d5ac0257996b7ae5191776d57f71fe",
+      "samples": 252
+    },
+    {
+      "path": "raw/ordered.ndjson",
+      "size": 246626,
+      "sha256": "47c7ba861ac5ef395dddb3dc5bc5f1160a5b032a57ceafcbc3fc4240042e4763",
+      "samples": 252
+    },
+    {
+      "path": "raw/select-all.ndjson",
+      "size": 248933,
+      "sha256": "98ede035d62c331975aa63881b63a3563252c19542080b8632d7ed092779f2c1",
+      "samples": 252
+    },
+    {
+      "path": "raw/insert-rollback.ndjson",
+      "size": 248345,
+      "sha256": "9788c422f03e7e2f7995c61a8baf064f80b8f042562f96b2253031ec1db0214d",
+      "samples": 252
+    },
+    {
+      "path": "raw/insert-commit.ndjson",
+      "size": 248405,
+      "sha256": "8ac92625d8b46886a82e8fddaafa50fde9ba963f7ba6d6321036597707d05bfe",
+      "samples": 252
+    },
+    {
+      "path": "raw/batch-insert-commit.ndjson",
+      "size": 250662,
+      "sha256": "3c1c910de37c767261b11b0630a93ff466cfb35784721e0c2ba419dedb11babb",
+      "samples": 252
+    },
+    {
+      "path": "raw/random-get-hit.ndjson",
+      "size": 250179,
+      "sha256": "c4fd65c078a21d3164b9f1972c991a56a2a7b2edfaad7a47f23bc5e544a8d550",
+      "samples": 252
+    },
+    {
+      "path": "raw/random-get-miss.ndjson",
+      "size": 250474,
+      "sha256": "b9b3e77c1b3318c74204959d625214404df729df5bb3fac2a7f55a2f58303597",
+      "samples": 252
+    },
+    {
+      "path": "raw/random-update-commit.ndjson",
+      "size": 250358,
+      "sha256": "8b5703814e5bdb46ffdeb3352c2fa9d909619f690d1de58c63e99c1198b90315",
+      "samples": 252
+    },
+    {
+      "path": "raw/random-delete-commit.ndjson",
+      "size": 250674,
+      "sha256": "206f99aa1720636639ddf132b07ca375fadfa6896053d02b5a97a1dd11370f83",
+      "samples": 252
+    }
+  ],
+  "resource_scope": "Per-process CPU and I/O deltas and RSS boundary observations; no summed RSS or operation peak.",
+  "process_labels": "Server labels are local to one case/subject/trial and are not OS identifiers."
+}
