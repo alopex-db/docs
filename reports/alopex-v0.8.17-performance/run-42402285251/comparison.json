@@ -1,0 +1,676 @@
+{
+  "cases": [
+    {
+      "case": "aggregate",
+      "comparisons": {
+        "before": {
+          "baseline_median": 0.03072271100000279,
+          "baseline_trial_mad": 0.00026055299999683257,
+          "candidate_median": 0.018632501999974238,
+          "candidate_trial_mad": 0.00014140899996561984,
+          "exceeds_regression_threshold": false,
+          "improvement_fraction": 0.39352676266191006,
+          "improvement_proven": true,
+          "increase": false,
+          "latency_ratio": 0.6064732373380899,
+          "noise": 0.0007816589999904977,
+          "paired_ratios": [
+            0.6018704859739409,
+            0.6297242362928686,
+            0.6116606052654114
+          ],
+          "status": "within_tolerance"
+        },
+        "published": {
+          "baseline_median": 0.030981174999993755,
+          "baseline_trial_mad": 0.00018374099999363125,
+          "candidate_median": 0.018632501999974238,
+          "candidate_trial_mad": 0.00014140899996561984,
+          "exceeds_regression_threshold": false,
+          "improvement_fraction": 0.39858633508967967,
+          "improvement_proven": true,
+          "increase": false,
+          "latency_ratio": 0.6014136649103203,
+          "noise": 0.0005512229999808937,
+          "paired_ratios": [
+            0.6004101835240087,
+            0.6387848900568195,
+            0.6014136649103203
+          ],
+          "status": "within_tolerance"
+        }
+      },
+      "reference_goal_met": false,
+      "reference_latency_ratio": 8.673004603990353,
+      "reference_throughput_ratio": 0.11530029622489893,
+      "status": "measured",
+      "trials": {
+        "before": [
+          0.03072271100000279,
+          0.031758784000004425,
+          0.030462158000005957
+        ],
+        "candidate": [
+          0.018491093000008618,
+          0.01999927599999296,
+          0.018632501999974238
+        ],
+        "postgresql": [
+          0.0021427809999892133,
+          0.0021523700000045665,
+          0.0021483330000080514
+        ],
+        "published": [
+          0.030797434000000123,
+          0.03130831099998943,
+          0.030981174999993755
+        ]
+      }
+    },
+    {
+      "case": "ordered",
+      "comparisons": {
+        "before": {
+          "baseline_median": 0.013787048000011737,
+          "baseline_trial_mad": 7.446100002539424e-05,
+          "candidate_median": 0.00796245400002249,
+          "candidate_trial_mad": 8.568999987801362e-06,
+          "exceeds_regression_threshold": false,
+          "improvement_fraction": 0.4224685371360344,
+          "improvement_proven": true,
+          "increase": false,
+          "latency_ratio": 0.5775314628639656,
+          "noise": 0.00022338300007618273,
+          "paired_ratios": [
+            0.5542578460918969,
+            0.5781529882251447,
+            0.5806675283103342
+          ],
+          "status": "within_tolerance"
+        },
+        "published": {
+          "baseline_median": 0.014350839000002225,
+          "baseline_trial_mad": 0.0001674659999935102,
+          "candidate_median": 0.00796245400002249,
+          "candidate_trial_mad": 8.568999987801362e-06,
+          "exceeds_regression_threshold": false,
+          "improvement_fraction": 0.44515759670767296,
+          "improvement_proven": true,
+          "increase": false,
+          "latency_ratio": 0.554842403292327,
+          "noise": 0.0005023979999805306,
+          "paired_ratios": [
+            0.5502103396184339,
+            0.5390430434533371,
+            0.5613935415798201
+          ],
+          "status": "within_tolerance"
+        }
+      },
+      "reference_goal_met": false,
+      "reference_latency_ratio": 22.832260414338858,
+      "reference_throughput_ratio": 0.043797678453771985,
+      "status": "measured",
+      "trials": {
+        "before": [
+          0.014246041000006926,
+          0.013787048000011737,
+          0.013712586999986343
+        ],
+        "candidate": [
+          0.00789598000000069,
+          0.007971023000010291,
+          0.00796245400002249
+        ],
+        "postgresql": [
+          0.00034489899999812224,
+          0.00034873699999593555,
+          0.000349247000002606
+        ],
+        "published": [
+          0.014350839000002225,
+          0.01478735900002448,
+          0.014183373000008714
+        ]
+      }
+    },
+    {
+      "case": "select-all",
+      "comparisons": {
+        "before": {
+          "baseline_median": 0.08846670200000517,
+          "baseline_trial_mad": 0.0003301050000459327,
+          "candidate_median": 0.0735110239999699,
+          "candidate_trial_mad": 0.0002191259999904105,
+          "exceeds_regression_threshold": false,
+          "improvement_fraction": 0.1690543183132836,
+          "improvement_proven": true,
+          "increase": false,
+          "latency_ratio": 0.8309456816867163,
+          "noise": 0.000990315000137798,
+          "paired_ratios": [
+            0.8254860269032881,
+            0.8283572260004283,
+            0.8334226136287526
+          ],
+          "status": "within_tolerance"
+        },
+        "published": {
+          "baseline_median": 0.08952751300000727,
+          "baseline_trial_mad": 0.0004981249999786996,
+          "candidate_median": 0.0735110239999699,
+          "candidate_trial_mad": 0.0002191259999904105,
+          "exceeds_regression_threshold": false,
+          "improvement_fraction": 0.17890018904061458,
+          "improvement_proven": true,
+          "increase": false,
+          "latency_ratio": 0.8210998109593854,
+          "noise": 0.001494374999936099,
+          "paired_ratios": [
+            0.8210998109593854,
+            0.8200504197555584,
+            0.8149345082686145
+          ],
+          "status": "within_tolerance"
+        }
+      },
+      "reference_goal_met": true,
+      "reference_latency_ratio": 0.7128908093515297,
+      "reference_throughput_ratio": 1.4027393632829055,
+      "status": "measured",
+      "trials": {
+        "before": [
+          0.08905180900001142,
+          0.08813659699995924,
+          0.08846670200000517
+        ],
+        "candidate": [
+          0.0735110239999699,
+          0.0730085870000039,
+          0.0737301499999603
+        ],
+        "postgresql": [
+          0.10346581599998217,
+          0.10311680699999215,
+          0.10300612000003184
+        ],
+        "published": [
+          0.08952751300000727,
+          0.08902938800002858,
+          0.09047371200000498
+        ]
+      }
+    },
+    {
+      "case": "insert-rollback",
+      "comparisons": {
+        "before": {
+          "baseline_median": 0.000997767000001204,
+          "baseline_trial_mad": 6.724000002122921e-06,
+          "candidate_median": 0.0009764380000092387,
+          "candidate_trial_mad": 8.707000006324961e-06,
+          "exceeds_regression_threshold": false,
+          "improvement_fraction": 0.021376734239496306,
+          "improvement_proven": false,
+          "increase": false,
+          "latency_ratio": 0.9786232657605037,
+          "noise": 2.6121000018974883e-05,
+          "paired_ratios": [
+            0.9698967795103928,
+            1.0022417151807346,
+            1.0165456932880803
+          ],
+          "status": "within_tolerance"
+        },
+        "published": {
+          "baseline_median": 0.0009786619999658797,
+          "baseline_trial_mad": 7.374000063009589e-06,
+          "candidate_median": 0.0009764380000092387,
+          "candidate_trial_mad": 8.707000006324961e-06,
+          "exceeds_regression_threshold": false,
+          "improvement_fraction": 0.002272490355933354,
+          "improvement_proven": false,
+          "increase": false,
+          "latency_ratio": 0.9977275096440666,
+          "noise": 2.6121000018974883e-05,
+          "paired_ratios": [
+            1.0005283182689475,
+            0.9977275096440666,
+            1.0355717235172976
+          ],
+          "status": "within_tolerance"
+        }
+      },
+      "reference_goal_met": false,
+      "reference_latency_ratio": 2.45293655105412,
+      "reference_throughput_ratio": 0.40767462964757983,
+      "status": "measured",
+      "trials": {
+        "before": [
+          0.000997767000001204,
+          0.0009742540000274857,
+          0.001004491000003327
+        ],
+        "candidate": [
+          0.0009677310000029138,
+          0.0009764380000092387,
+          0.001021111000000019
+        ],
+        "postgresql": [
+          0.000396555999998327,
+          0.00039806900002758994,
+          0.0005686800000148651
+        ],
+        "published": [
+          0.0009672200000068187,
+          0.0009786619999658797,
+          0.0009860360000288892
+        ]
+      }
+    },
+    {
+      "case": "insert-commit",
+      "comparisons": {
+        "before": {
+          "baseline_median": 0.0020682420000639468,
+          "baseline_trial_mad": 1.356499996063576e-05,
+          "candidate_median": 0.0019636869999999362,
+          "candidate_trial_mad": 5.5753000026470545e-05,
+          "exceeds_regression_threshold": false,
+          "improvement_fraction": 0.05055259493849262,
+          "improvement_proven": false,
+          "increase": false,
+          "latency_ratio": 0.9494474050615074,
+          "noise": 0.00016725900007941163,
+          "paired_ratios": [
+            0.9432608306037729,
+            0.976404115168326,
+            0.9102533907168671
+          ],
+          "status": "pending_noise"
+        },
+        "published": {
+          "baseline_median": 0.002003049999984796,
+          "baseline_trial_mad": 9.968999961529335e-06,
+          "candidate_median": 0.0019636869999999362,
+          "candidate_trial_mad": 5.5753000026470545e-05,
+          "exceeds_regression_threshold": false,
+          "improvement_fraction": 0.019651531407183398,
+          "improvement_proven": false,
+          "increase": false,
+          "latency_ratio": 0.9803484685928167,
+          "noise": 0.00016725900007941163,
+          "paired_ratios": [
+            0.9852519792105853,
+            1.0081825216753126,
+            0.7664247564624485
+          ],
+          "status": "pending_noise"
+        }
+      },
+      "reference_goal_met": false,
+      "reference_latency_ratio": 2.3980419382922618,
+      "reference_throughput_ratio": 0.4170068855059885,
+      "status": "measured",
+      "trials": {
+        "before": [
+          0.0020818070000245825,
+          0.0020682420000639468,
+          0.0017662840000411961
+        ],
+        "candidate": [
+          0.0019636869999999362,
+          0.0020194400000264068,
+          0.0016077660000064498
+        ],
+        "postgresql": [
+          0.000862503000007564,
+          0.0008188709999785715,
+          0.0007241719999910856
+        ],
+        "published": [
+          0.001993081000023267,
+          0.002003049999984796,
+          0.0020977479999828574
+        ]
+      }
+    },
+    {
+      "case": "batch-insert-commit",
+      "comparisons": {
+        "before": {
+          "baseline_median": 0.00672185900009481,
+          "baseline_trial_mad": 6.657500000528671e-05,
+          "candidate_median": 0.006948907000037252,
+          "candidate_trial_mad": 5.9300999964762013e-05,
+          "exceeds_regression_threshold": false,
+          "improvement_fraction": -0.03377756063303916,
+          "improvement_proven": false,
+          "increase": true,
+          "latency_ratio": 1.033777560633039,
+          "noise": 0.00019972500001586013,
+          "paired_ratios": [
+            1.0441187783937964,
+            1.000822881439469,
+            1.0425996736770535
+          ],
+          "status": "within_tolerance"
+        },
+        "published": {
+          "baseline_median": 0.0066944980000016585,
+          "baseline_trial_mad": 4.352199994173134e-05,
+          "candidate_median": 0.006948907000037252,
+          "candidate_trial_mad": 5.9300999964762013e-05,
+          "exceeds_regression_threshold": false,
+          "improvement_fraction": -0.038002700133084,
+          "improvement_proven": false,
+          "increase": true,
+          "latency_ratio": 1.038002700133084,
+          "noise": 0.00017790299989428604,
+          "paired_ratios": [
+            1.0447950796957681,
+            1.0128808975124537,
+            1.0468608699263602
+          ],
+          "status": "within_tolerance"
+        }
+      },
+      "reference_goal_met": false,
+      "reference_latency_ratio": 6.671313639397321,
+      "reference_throughput_ratio": 0.14989551594374428,
+      "status": "measured",
+      "trials": {
+        "before": [
+          0.006655284000089523,
+          0.00684302700005901,
+          0.00672185900009481
+        ],
+        "candidate": [
+          0.006948907000037252,
+          0.006848657999967145,
+          0.007008208000002014
+        ],
+        "postgresql": [
+          0.0010662369999181465,
+          0.000997296999912578,
+          0.0010416100000156803
+        ],
+        "published": [
+          0.006650976000059927,
+          0.006761562999940907,
+          0.0066944980000016585
+        ]
+      }
+    },
+    {
+      "case": "random-get-hit",
+      "comparisons": {
+        "before": {
+          "baseline_median": 0.054780055000037464,
+          "baseline_trial_mad": 0.00021209999999882712,
+          "candidate_median": 0.05445099399992159,
+          "candidate_trial_mad": 0.00034110700005385297,
+          "exceeds_regression_threshold": false,
+          "improvement_fraction": 0.006006949064137414,
+          "improvement_proven": false,
+          "increase": false,
+          "latency_ratio": 0.9939930509358625,
+          "noise": 0.001023321000161559,
+          "paired_ratios": [
+            0.9889793973062009,
+            1.0002198975509968,
+            0.9901593054479436
+          ],
+          "status": "within_tolerance"
+        },
+        "published": {
+          "baseline_median": 0.054760662000035154,
+          "baseline_trial_mad": 9.688400007235032e-05,
+          "candidate_median": 0.05445099399992159,
+          "candidate_trial_mad": 0.00034110700005385297,
+          "exceeds_regression_threshold": false,
+          "improvement_fraction": 0.0056549352912015965,
+          "improvement_proven": false,
+          "increase": false,
+          "latency_ratio": 0.9943450647087984,
+          "noise": 0.001023321000161559,
+          "paired_ratios": [
+            0.9863810181574765,
+            1.0005741165061202,
+            0.990340635674065
+          ],
+          "status": "within_tolerance"
+        }
+      },
+      "reference_goal_met": false,
+      "reference_latency_ratio": 2.749049992107661,
+      "reference_throughput_ratio": 0.36376202792635026,
+      "status": "measured",
+      "trials": {
+        "before": [
+          0.05452015800005938,
+          0.054780055000037464,
+          0.05499215500003629
+        ],
+        "candidate": [
+          0.053919312999937574,
+          0.054792100999975446,
+          0.05445099399992159
+        ],
+        "postgresql": [
+          0.01980720400001701,
+          0.01973563900003228,
+          0.019832210000004125
+        ],
+        "published": [
+          0.054663777999962804,
+          0.054760662000035154,
+          0.054982085999995434
+        ]
+      }
+    },
+    {
+      "case": "random-get-miss",
+      "comparisons": {
+        "before": {
+          "baseline_median": 0.053691585000024133,
+          "baseline_trial_mad": 0.0006607459999941057,
+          "candidate_median": 0.05314584799998556,
+          "candidate_trial_mad": 5.9351000118113006e-05,
+          "exceeds_regression_threshold": false,
+          "improvement_fraction": 0.010164292971390685,
+          "improvement_proven": false,
+          "increase": false,
+          "latency_ratio": 0.9898357070286093,
+          "noise": 0.001982237999982317,
+          "paired_ratios": [
+            0.9744334286385969,
+            0.9909411130269252,
+            1.0021687192230821
+          ],
+          "status": "within_tolerance"
+        },
+        "published": {
+          "baseline_median": 0.05282951200001662,
+          "baseline_trial_mad": 0.0001918640000440064,
+          "candidate_median": 0.05314584799998556,
+          "candidate_trial_mad": 5.9351000118113006e-05,
+          "exceeds_regression_threshold": false,
+          "improvement_fraction": -0.005987865266838777,
+          "improvement_proven": false,
+          "increase": true,
+          "latency_ratio": 1.0059878652668388,
+          "noise": 0.0005755920001320192,
+          "paired_ratios": [
+            1.0004079298109665,
+            1.0107856245615967,
+            1.0059878652668388
+          ],
+          "status": "within_tolerance"
+        }
+      },
+      "reference_goal_met": false,
+      "reference_latency_ratio": 2.922999805181648,
+      "reference_throughput_ratio": 0.3421142889668635,
+      "status": "measured",
+      "trials": {
+        "before": [
+          0.054434713999967244,
+          0.053691585000024133,
+          0.05303083900003003
+        ],
+        "candidate": [
+          0.05304300499994952,
+          0.053205199000103676,
+          0.05314584799998556
+        ],
+        "postgresql": [
+          0.018190620000041235,
+          0.018181954000056066,
+          0.01812784199989892
+        ],
+        "published": [
+          0.05302137600006063,
+          0.05263747100002547,
+          0.05282951200001662
+        ]
+      }
+    },
+    {
+      "case": "random-update-commit",
+      "comparisons": {
+        "before": {
+          "baseline_median": 0.0018675849998999183,
+          "baseline_trial_mad": 0.00016764500003318972,
+          "candidate_median": 0.0019072890000870757,
+          "candidate_trial_mad": 1.5187999906629557e-05,
+          "exceeds_regression_threshold": false,
+          "improvement_fraction": -0.021259541166418157,
+          "improvement_proven": false,
+          "increase": true,
+          "latency_ratio": 1.0212595411664183,
+          "noise": 0.0005029350000995692,
+          "paired_ratios": [
+            0.9371368347310931,
+            1.217272239140826,
+            0.9667929438850814
+          ],
+          "status": "pending_noise"
+        },
+        "published": {
+          "baseline_median": 0.0018240729999661198,
+          "baseline_trial_mad": 7.901899994067207e-05,
+          "candidate_median": 0.0019072890000870757,
+          "candidate_trial_mad": 1.5187999906629557e-05,
+          "exceeds_regression_threshold": false,
+          "improvement_fraction": -0.04562098124499486,
+          "improvement_proven": false,
+          "increase": true,
+          "latency_ratio": 1.0456209812449948,
+          "noise": 0.00023705699982201622,
+          "paired_ratios": [
+            1.0929684697775897,
+            0.9889396896507348,
+            0.9898551209531624
+          ],
+          "status": "pending_noise"
+        }
+      },
+      "reference_goal_met": false,
+      "reference_latency_ratio": 2.4249442804963466,
+      "reference_throughput_ratio": 0.4123806093372654,
+      "status": "measured",
+      "trials": {
+        "before": [
+          0.002035229999933108,
+          0.0015793320000057065,
+          0.0018675849998999183
+        ],
+        "candidate": [
+          0.0019072890000870757,
+          0.0019224769999937052,
+          0.0018055680000088614
+        ],
+        "postgresql": [
+          0.0008088619999853108,
+          0.000766082000041024,
+          0.0007865290000381719
+        ],
+        "published": [
+          0.0017450540000254477,
+          0.001943977999985691,
+          0.0018240729999661198
+        ]
+      }
+    },
+    {
+      "case": "random-delete-commit",
+      "comparisons": {
+        "before": {
+          "baseline_median": 0.060449861999927634,
+          "baseline_trial_mad": 5.134800005635043e-05,
+          "candidate_median": 0.0013525449999178818,
+          "candidate_trial_mad": 2.2140999931252736e-05,
+          "exceeds_regression_threshold": false,
+          "improvement_fraction": 0.9776253418093908,
+          "improvement_proven": true,
+          "increase": false,
+          "latency_ratio": 0.022374658190609284,
+          "noise": 0.0001540440001690513,
+          "paired_ratios": [
+            0.02334361666554856,
+            0.022008387711260975,
+            0.022765511631356566
+          ],
+          "status": "within_tolerance"
+        },
+        "published": {
+          "baseline_median": 0.06043657600002916,
+          "baseline_trial_mad": 0.0008512400000881826,
+          "candidate_median": 0.0013525449999178818,
+          "candidate_trial_mad": 2.2140999931252736e-05,
+          "exceeds_regression_threshold": false,
+          "improvement_fraction": 0.9776204231040946,
+          "improvement_proven": true,
+          "increase": false,
+          "latency_ratio": 0.022379576895905372,
+          "noise": 0.0025537200002645477,
+          "paired_ratios": [
+            0.02269929299247757,
+            0.021242061633416142,
+            0.02278985824685232
+          ],
+          "status": "within_tolerance"
+        }
+      },
+      "reference_goal_met": false,
+      "reference_latency_ratio": 1.8384363818577556,
+      "reference_throughput_ratio": 0.5439404974076348,
+      "status": "measured",
+      "trials": {
+        "before": [
+          0.057940679000012096,
+          0.060449861999927634,
+          0.060501209999983985
+        ],
+        "candidate": [
+          0.0013525449999178818,
+          0.001330403999986629,
+          0.0013773409999657815
+        ],
+        "postgresql": [
+          0.0007490890000099171,
+          0.000735704000021542,
+          0.0007298129999071534
+        ],
+        "published": [
+          0.05958533599994098,
+          0.06263064399990981,
+          0.06043657600002916
+        ]
+      }
+    }
+  ],
+  "performance_acceptance": false,
+  "schema": "alopex.native-sql-comparison/v1"
+}
