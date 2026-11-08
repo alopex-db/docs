@@ -112,7 +112,13 @@ class Operations:
                 "first_series_name": next(iter(series.values())).name}
 
 
-def run(engine, case, raw_path, rows=34250, warmups=3, runs=21):
+def run(engine, case, raw_path, rows=34250, warmups=3, runs=21, *, observer=None):
+    """Optionally bracket every phase with begin(index) / finish(index).
+
+    Both callbacks are outside timing. Finish returns a nonempty JSON object
+    before raw output and untimed validation. Index includes warmups. Exceptions
+    propagate without reporting a successful sample for the failed operation.
+    """
     if case not in CASES or rows <= 0 or warmups < 0 or runs <= 0:
         raise ValueError("Valid phase, positive rows/runs and nonnegative warmups required")
     operations = Operations(engine, rows)
@@ -136,11 +142,23 @@ def run(engine, case, raw_path, rows=34250, warmups=3, runs=21):
     samples = []
     with Path(raw_path).open("x") as raw:
         for index in range(warmups + runs):
+            if observer is not None:
+                observer.begin(index)
             started = time.perf_counter()
             actual = operation()
             elapsed = time.perf_counter() - started
+            resources = None
+            if observer is not None:
+                resources = observer.finish(index)
+                if not isinstance(resources, dict) or not resources:
+                    raise RuntimeError("DataFrame resource observation missing")
+                # Invalid warmup counters are errors too.
+                json.dumps(resources, allow_nan=False)
             if index >= warmups:
-                raw.write(json.dumps({"phase": "measure", "index": index - warmups, "seconds": elapsed}, allow_nan=False) + "\n")
+                record = {"phase": "measure", "index": index - warmups, "seconds": elapsed}
+                if observer is not None:
+                    record["resources"] = resources
+                raw.write(json.dumps(record, allow_nan=False) + "\n")
                 raw.flush()
                 samples.append(elapsed)
             if case == "construct":

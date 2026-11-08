@@ -5,6 +5,16 @@ performance matrix. Keep the existing rows, keys, seeds, complete-result oracles
 durability, timer boundaries, three warmups, 21 samples and three trials. The
 original Linux affinity/topology requirements remain in place.
 
+`dataframe_phases_v0816.run` accepts an optional `observer` with `begin(index)`
+and `finish(index)` methods. Both callbacks are outside the existing timer.
+Finish returns a nonempty JSON object before raw output and untimed validation;
+measured rows retain it under `resources`. Every warmup is observed too.
+Missing, invalid or failed observations abort the run. An operation failure
+does not emit a successful finish; the supervisor must retain the pending
+observation and handle child exit. The manual runner owns process identity,
+counter validity and observation-window semantics. Existing calls without an
+observer keep their original raw format and timing boundaries.
+
 ## Select the actual subject
 
 For a new comparison, set `ALOPEX_PERF_SUBJECT_MANIFEST` to an absolute JSON

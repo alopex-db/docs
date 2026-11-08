@@ -30,3 +30,8 @@ jobs:
           PYTHONDONTWRITEBYTECODE: 1
         working-directory: scripts/performance
         run: python3 -B -m unittest -v test_sql_resources test_write_kv_sql test_isolated_sql
+      - name: Check DataFrame observation boundaries (tiny fake frames only)
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        working-directory: scripts/performance
+        run: python3 -B -m unittest -v test_dataframe_observation
