@@ -1,0 +1,91 @@
+{
+  "schema": "alopex.public-lazy-report/v1",
+  "run": 42443110123,
+  "controller": "ae4917a09ed6f7b64ffcba33b6b9c523495ce3d1",
+  "subjects": {
+    "published": {
+      "source_commit": "d9ff8783b8d18a63d167204e55902ea6cd90dcd1",
+      "source_tree": "cef47de8408e760bd6da108b92dcb917753c5a4f",
+      "wheel_sha256": "ac9f4b1fd2fa0e78d634334242de4290ae4b34bf700515b59937ea2c718a98c3",
+      "assets_sha256": "59394688e04eb02de8e6ef2354b268c8c89199c70887ef71bce95347da6192b9",
+      "producer_run": 42400479270
+    },
+    "before": {
+      "source_commit": "8d404614f3989ed8dc3732b657d5ac746e70977b",
+      "source_tree": "f6ab6b685f04bc924f6603f64ba726431eaf864e",
+      "wheel_sha256": "8a40178329d82f38a62bd4056badcb7b499ed49e809e88af25d591f83416e65f",
+      "assets_sha256": "05afe85285e2e5992cd4dbc323f7c0edca35974c4f26c9c8d95b2d2ec031b73f",
+      "producer_run": 42428522438
+    },
+    "candidate": {
+      "source_commit": "2ea6befef45fe6019c6976cfd8260371b0a57bde",
+      "source_tree": "6850f0a6aca136ac2ff8b59ba5e11aeaaad79108",
+      "wheel_sha256": "a12adca9c5eb81ffa21d4fc3c2b55740af5b04b7083424831149f8183f810ed6",
+      "assets_sha256": "a4d2742a26b0e114dc712f94d0d9dc97207f95b752b16c4a292fec6a8163ff62",
+      "producer_run": 42437307884
+    }
+  },
+  "polars": {
+    "version": "1.43.2",
+    "wheel_hashes": {
+      "polars": "22aa0cb92a1ee2d60d6a15a638b2e8e0dd99aea21ac0cd8fb29da8e382e075a9",
+      "polars-runtime-32": "6d5a7ae004a2723ebf4427f6d6a639f30f86af4cf077075f6b35d04711154fc3"
+    }
+  },
+  "raw_files": [
+    {
+      "path": "raw/csv-collect.ndjson",
+      "samples": 252,
+      "sha256": "6628736a957ec5ddd533dbedffeffff8d43bb34d30db4fbe434951e345832420",
+      "size": 207660
+    },
+    {
+      "path": "raw/csv-batches.ndjson",
+      "samples": 252,
+      "sha256": "5b28ef286196023d3187d2a0c3c3d9dd9455c44565c2c00330d058a1c8069cf3",
+      "size": 207943
+    },
+    {
+      "path": "raw/parquet-numeric-collect.ndjson",
+      "samples": 252,
+      "sha256": "11698d75aa77154abe5d7d2250fd5f5e3651ebb68f6995aa11a1925286c78287",
+      "size": 211833
+    },
+    {
+      "path": "raw/parquet-numeric-batches.ndjson",
+      "samples": 252,
+      "sha256": "9a425af1d115609b4db1d267d634861848aa9e759345126e35dfbc6f35341144",
+      "size": 211097
+    }
+  ],
+  "comparison_sha256": "da389e7def47783bba52272f36113d69d4f284ed91fe1de45f507f904bf2dd15",
+  "exporter_sha256": "cd5efc655f3e0102d896332addc04ae5f5a3401555c25f8291994b14435a9c53",
+  "recalculator_sha256": "ec2d310e592f5156694f7af4346eed24fdeb9980624b019db99d099e105ca86f",
+  "auditor_source_sha256": {
+    "verify_lazy_comparison.py": "c832cafb4798674dffd5bacd6a1d8b6a6c365d90571dc8e22618ce6dc98d2422",
+    "audit_native_sql_matrix.py": "f15ef9bea497f8ec99aec039ce4c84ed5d8fa424a7a2b0be85f247a52337a2c1",
+    "lazy_phase_contract.py": "2fae79a61b0d9dd4c86a1c410b0d3c585c85b823e45198556b66deff44adf0c7",
+    "dataframe_phase_contract.py": "90013f37bbdddc1c3db571de9013b98a376f73105fccd0f202dcf9e298fd261e"
+  },
+  "rows": [
+    34250
+  ],
+  "cases": [
+    "csv-collect",
+    "csv-batches",
+    "parquet-numeric-collect",
+    "parquet-numeric-batches"
+  ],
+  "cells": 48,
+  "samples": 1008,
+  "observations_including_warmup": 1152,
+  "trials": 3,
+  "warmups_per_phase": 3,
+  "samples_per_phase": 21,
+  "all_value_oracles_match": true,
+  "performance_acceptance": false,
+  "latency_scope": "Original scan + expression plan + file load + collect/all batches; Python conversion, validation and disposal outside timers.",
+  "resource_scope": "Whole worker process from pre-timer observation through collect or batch-stream close; includes resident inputs and counter-read overhead. Excludes untimed validation and raw output. Kernel RSS is not an exact allocation peak.",
+  "io_scope": "Physical read/write/cancelled bytes reported separately; no derived net-I/O claim.",
+  "criteria": "Three times maximum MAD of three trial medians <= 5% baseline; regression ratio > 1.05; preserve all increases and trial ratios."
+}
