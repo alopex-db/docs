@@ -141,9 +141,12 @@ def _verify(path_string, expected_digest, require_server):
     _require(source["profile"] == "release", "Final comparison requires a release build")
     receipt_path = _artifact(path.parent, manifest["build_receipt"])
     receipt = json.loads(receipt_path.read_bytes())
-    _require(receipt["schema"] == "alopex.performance-build/v1"
+    receipt_schema = receipt["schema"]
+    _require(receipt_schema in ("alopex.performance-build/v1", "alopex.performance-wheel-build/v1")
              and receipt["source"] == source and receipt["version"] == version,
              "Build receipt source/version mismatch")
+    _require(not require_server or receipt_schema == "alopex.performance-build/v1",
+             "Server comparison requires a server build receipt")
     wheel = _artifact(path.parent, manifest["python_wheel"])
     _require(receipt["python_wheel_sha256"] == manifest["python_wheel"]["sha256"],
              "Wheel is not identified by the build receipt")
