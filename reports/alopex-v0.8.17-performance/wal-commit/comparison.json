@@ -1,0 +1,1242 @@
+{
+  "cost_runs": {
+    "42438307642": {
+      "medians": {
+        "before-kv-16": {
+          "prepare_ns": 3406,
+          "open_ns": 3189767,
+          "schema_ns": 0,
+          "index_ns": 0,
+          "prior_ns": 673084,
+          "begin_ns": 6315,
+          "stage_ns": 3655,
+          "commit_ns": 651093,
+          "peak_rss_bytes": 32325632,
+          "wal_bytes": 4144,
+          "spool_bytes": 290,
+          "fixture_bytes": 4717,
+          "allocated_bytes": 40960,
+          "commit_mad_ns": 47082
+        },
+        "candidate-kv-16": {
+          "prepare_ns": 3136,
+          "open_ns": 3418462,
+          "schema_ns": 0,
+          "index_ns": 0,
+          "prior_ns": 133379,
+          "begin_ns": 2547,
+          "stage_ns": 4976,
+          "commit_ns": 98367,
+          "peak_rss_bytes": 33038336,
+          "wal_bytes": 4144,
+          "spool_bytes": 0,
+          "fixture_bytes": 4427,
+          "allocated_bytes": 32768,
+          "commit_mad_ns": 5266
+        },
+        "before-kv-2048": {
+          "prepare_ns": 6545,
+          "open_ns": 3236833,
+          "schema_ns": 0,
+          "index_ns": 0,
+          "prior_ns": 804880,
+          "begin_ns": 6222,
+          "stage_ns": 4527,
+          "commit_ns": 632868,
+          "peak_rss_bytes": 32321536,
+          "wal_bytes": 4144,
+          "spool_bytes": 4546,
+          "fixture_bytes": 8973,
+          "allocated_bytes": 45056,
+          "commit_mad_ns": 36063
+        },
+        "candidate-kv-2048": {
+          "prepare_ns": 6853,
+          "open_ns": 2973179,
+          "schema_ns": 0,
+          "index_ns": 0,
+          "prior_ns": 149846,
+          "begin_ns": 2488,
+          "stage_ns": 5721,
+          "commit_ns": 706431,
+          "peak_rss_bytes": 33083392,
+          "wal_bytes": 4144,
+          "spool_bytes": 4424,
+          "fixture_bytes": 8851,
+          "allocated_bytes": 40960,
+          "commit_mad_ns": 102571
+        },
+        "before-sql-16": {
+          "prepare_ns": 3584,
+          "open_ns": 3347391,
+          "schema_ns": 916237,
+          "index_ns": 715759,
+          "prior_ns": 813250,
+          "begin_ns": 12298,
+          "stage_ns": 104477,
+          "commit_ns": 660782,
+          "peak_rss_bytes": 38002688,
+          "wal_bytes": 4144,
+          "spool_bytes": 2754,
+          "fixture_bytes": 7181,
+          "allocated_bytes": 49152,
+          "commit_mad_ns": 93824
+        },
+        "candidate-sql-16": {
+          "prepare_ns": 3318,
+          "open_ns": 3299024,
+          "schema_ns": 394469,
+          "index_ns": 156459,
+          "prior_ns": 247671,
+          "begin_ns": 5695,
+          "stage_ns": 92608,
+          "commit_ns": 124166,
+          "peak_rss_bytes": 38264832,
+          "wal_bytes": 4144,
+          "spool_bytes": 0,
+          "fixture_bytes": 4427,
+          "allocated_bytes": 32768,
+          "commit_mad_ns": 5496
+        },
+        "before-sql-2048": {
+          "prepare_ns": 6789,
+          "open_ns": 3111731,
+          "schema_ns": 843874,
+          "index_ns": 614670,
+          "prior_ns": 839410,
+          "begin_ns": 12232,
+          "stage_ns": 245513,
+          "commit_ns": 659499,
+          "peak_rss_bytes": 37933056,
+          "wal_bytes": 4144,
+          "spool_bytes": 11266,
+          "fixture_bytes": 15693,
+          "allocated_bytes": 57344,
+          "commit_mad_ns": 16187
+        },
+        "candidate-sql-2048": {
+          "prepare_ns": 6804,
+          "open_ns": 4012740,
+          "schema_ns": 359724,
+          "index_ns": 169350,
+          "prior_ns": 236819,
+          "begin_ns": 5931,
+          "stage_ns": 231948,
+          "commit_ns": 746866,
+          "peak_rss_bytes": 38330368,
+          "wal_bytes": 4144,
+          "spool_bytes": 9620,
+          "fixture_bytes": 14047,
+          "allocated_bytes": 45056,
+          "commit_mad_ns": 47804
+        }
+      },
+      "comparison": {
+        "kv-16": {
+          "commit_ratio": 0.1510797996599564,
+          "commit_noise_ratio": 0.21693675097105944,
+          "decision": "pending_noise",
+          "resource_increases": {
+            "peak_rss_bytes": 712704
+          }
+        },
+        "kv-2048": {
+          "commit_ratio": 1.1162375092436339,
+          "commit_noise_ratio": 0.4862198752346461,
+          "decision": "pending_noise",
+          "resource_increases": {
+            "peak_rss_bytes": 761856
+          }
+        },
+        "sql-16": {
+          "commit_ratio": 0.18790766092296704,
+          "commit_noise_ratio": 0.42596801970998,
+          "decision": "pending_noise",
+          "resource_increases": {
+            "peak_rss_bytes": 262144
+          }
+        },
+        "sql-2048": {
+          "commit_ratio": 1.132474802842764,
+          "commit_noise_ratio": 0.21745597794689606,
+          "decision": "pending_noise",
+          "resource_increases": {
+            "peak_rss_bytes": 397312
+          }
+        }
+      },
+      "context": {
+        "before-kv-16": {
+          "commit_ns": [
+            604011,
+            713722,
+            651093,
+            668028,
+            560704
+          ],
+          "cpu_seconds": [
+            0.0001649999999999846,
+            0.00015700000000000436,
+            0.0001350000000000101,
+            0.0001609999999999806,
+            0.00014499999999999236
+          ],
+          "physical_write_bytes": [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ],
+          "voluntary_switches": [
+            4,
+            4,
+            4,
+            4,
+            4
+          ],
+          "rss_before_identity": 29573120,
+          "rss_after_identity": 29978624
+        },
+        "candidate-kv-16": {
+          "commit_ns": [
+            103633,
+            91067,
+            122771,
+            98367,
+            95088
+          ],
+          "cpu_seconds": [
+            4.400000000001278e-05,
+            3.699999999997802e-05,
+            4.0000000000033065e-05,
+            3.399999999999931e-05,
+            3.699999999997455e-05
+          ],
+          "physical_write_bytes": [
+            4096,
+            4096,
+            4096,
+            4096,
+            4096
+          ],
+          "voluntary_switches": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "rss_before_identity": 29769728,
+          "rss_after_identity": 30158848
+        },
+        "before-kv-2048": {
+          "commit_ns": [
+            638110,
+            632868,
+            743442,
+            521124,
+            596805
+          ],
+          "cpu_seconds": [
+            0.00018400000000003136,
+            0.00017300000000002036,
+            0.0001930000000000126,
+            0.0001589999999999786,
+            0.00017399999999998667
+          ],
+          "physical_write_bytes": [
+            12288,
+            12288,
+            12288,
+            12288,
+            12288
+          ],
+          "voluntary_switches": [
+            4,
+            4,
+            4,
+            4,
+            4
+          ],
+          "rss_before_identity": 29569024,
+          "rss_after_identity": 29974528
+        },
+        "candidate-kv-2048": {
+          "commit_ns": [
+            603860,
+            847903,
+            807599,
+            579200,
+            706431
+          ],
+          "cpu_seconds": [
+            0.00017400000000000054,
+            0.00017600000000001642,
+            0.00018400000000003136,
+            0.00015800000000000536,
+            0.00019000000000000267
+          ],
+          "physical_write_bytes": [
+            12288,
+            12288,
+            12288,
+            12288,
+            12288
+          ],
+          "voluntary_switches": [
+            4,
+            4,
+            4,
+            4,
+            4
+          ],
+          "rss_before_identity": 29814784,
+          "rss_after_identity": 30203904
+        },
+        "before-sql-16": {
+          "commit_ns": [
+            660782,
+            847376,
+            754606,
+            601434,
+            565814
+          ],
+          "cpu_seconds": [
+            0.0001659999999999856,
+            0.0001889999999999739,
+            0.00019600000000000867,
+            0.00017300000000001342,
+            0.00018700000000000314
+          ],
+          "physical_write_bytes": [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ],
+          "voluntary_switches": [
+            4,
+            4,
+            4,
+            4,
+            4
+          ],
+          "rss_before_identity": 29609984,
+          "rss_after_identity": 30015488
+        },
+        "candidate-sql-16": {
+          "commit_ns": [
+            152066,
+            118128,
+            125176,
+            118670,
+            124166
+          ],
+          "cpu_seconds": [
+            6.900000000000656e-05,
+            5.800000000003025e-05,
+            5.7999999999995555e-05,
+            5.6999999999994555e-05,
+            6.29999999999728e-05
+          ],
+          "physical_write_bytes": [
+            4096,
+            4096,
+            4096,
+            4096,
+            4096
+          ],
+          "voluntary_switches": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "rss_before_identity": 29749248,
+          "rss_after_identity": 30138368
+        },
+        "before-sql-2048": {
+          "commit_ns": [
+            1842068,
+            810945,
+            659499,
+            652133,
+            643312
+          ],
+          "cpu_seconds": [
+            0.00024500000000000216,
+            0.00022299999999998016,
+            0.00023899999999999616,
+            0.00023899999999998922,
+            0.0002439999999999734
+          ],
+          "physical_write_bytes": [
+            16384,
+            16384,
+            16384,
+            16384,
+            16384
+          ],
+          "voluntary_switches": [
+            4,
+            4,
+            4,
+            4,
+            4
+          ],
+          "rss_before_identity": 29540352,
+          "rss_after_identity": 29945856
+        },
+        "candidate-sql-2048": {
+          "commit_ns": [
+            699062,
+            814001,
+            769196,
+            693080,
+            746866
+          ],
+          "cpu_seconds": [
+            0.00022499999999997522,
+            0.0002449999999999952,
+            0.0002500000000000002,
+            0.00023600000000002092,
+            0.00024700000000000416
+          ],
+          "physical_write_bytes": [
+            16384,
+            16384,
+            16384,
+            16384,
+            16384
+          ],
+          "voluntary_switches": [
+            4,
+            4,
+            4,
+            4,
+            4
+          ],
+          "rss_before_identity": 29814784,
+          "rss_after_identity": 30203904
+        }
+      }
+    },
+    "42490656351": {
+      "medians": {
+        "before-kv-16": {
+          "prepare_ns": 3133,
+          "open_ns": 4667455,
+          "schema_ns": 0,
+          "index_ns": 0,
+          "prior_ns": 914802,
+          "begin_ns": 5712,
+          "stage_ns": 3295,
+          "commit_ns": 882953,
+          "peak_rss_bytes": 32260096,
+          "wal_bytes": 4144,
+          "spool_bytes": 290,
+          "fixture_bytes": 4717,
+          "allocated_bytes": 40960,
+          "commit_mad_ns": 33740
+        },
+        "candidate-kv-16": {
+          "prepare_ns": 3192,
+          "open_ns": 4265967,
+          "schema_ns": 0,
+          "index_ns": 0,
+          "prior_ns": 189350,
+          "begin_ns": 2768,
+          "stage_ns": 5343,
+          "commit_ns": 155910,
+          "peak_rss_bytes": 33030144,
+          "wal_bytes": 4144,
+          "spool_bytes": 0,
+          "fixture_bytes": 4427,
+          "allocated_bytes": 32768,
+          "commit_mad_ns": 12945
+        },
+        "before-kv-2048": {
+          "prepare_ns": 5115,
+          "open_ns": 4124323,
+          "schema_ns": 0,
+          "index_ns": 0,
+          "prior_ns": 923579,
+          "begin_ns": 5819,
+          "stage_ns": 4176,
+          "commit_ns": 1006597,
+          "peak_rss_bytes": 32292864,
+          "wal_bytes": 4144,
+          "spool_bytes": 4546,
+          "fixture_bytes": 8973,
+          "allocated_bytes": 45056,
+          "commit_mad_ns": 28791
+        },
+        "candidate-kv-2048": {
+          "prepare_ns": 5363,
+          "open_ns": 4384091,
+          "schema_ns": 0,
+          "index_ns": 0,
+          "prior_ns": 190144,
+          "begin_ns": 2746,
+          "stage_ns": 5758,
+          "commit_ns": 895127,
+          "peak_rss_bytes": 33034240,
+          "wal_bytes": 4144,
+          "spool_bytes": 4424,
+          "fixture_bytes": 8851,
+          "allocated_bytes": 40960,
+          "commit_mad_ns": 15432
+        },
+        "before-sql-16": {
+          "prepare_ns": 3410,
+          "open_ns": 3911158,
+          "schema_ns": 1102812,
+          "index_ns": 836936,
+          "prior_ns": 1017123,
+          "begin_ns": 13499,
+          "stage_ns": 110290,
+          "commit_ns": 830276,
+          "peak_rss_bytes": 37937152,
+          "wal_bytes": 4144,
+          "spool_bytes": 2754,
+          "fixture_bytes": 7181,
+          "allocated_bytes": 49152,
+          "commit_mad_ns": 29646
+        },
+        "candidate-sql-16": {
+          "prepare_ns": 3148,
+          "open_ns": 4184926,
+          "schema_ns": 458361,
+          "index_ns": 208866,
+          "prior_ns": 315628,
+          "begin_ns": 5534,
+          "stage_ns": 90147,
+          "commit_ns": 180893,
+          "peak_rss_bytes": 38236160,
+          "wal_bytes": 4144,
+          "spool_bytes": 0,
+          "fixture_bytes": 4427,
+          "allocated_bytes": 32768,
+          "commit_mad_ns": 4750
+        },
+        "before-sql-2048": {
+          "prepare_ns": 5595,
+          "open_ns": 4623746,
+          "schema_ns": 1149218,
+          "index_ns": 852472,
+          "prior_ns": 1001625,
+          "begin_ns": 12572,
+          "stage_ns": 264567,
+          "commit_ns": 1030494,
+          "peak_rss_bytes": 37928960,
+          "wal_bytes": 4144,
+          "spool_bytes": 11266,
+          "fixture_bytes": 15693,
+          "allocated_bytes": 57344,
+          "commit_mad_ns": 8508
+        },
+        "candidate-sql-2048": {
+          "prepare_ns": 5699,
+          "open_ns": 3886874,
+          "schema_ns": 446271,
+          "index_ns": 199766,
+          "prior_ns": 286209,
+          "begin_ns": 5263,
+          "stage_ns": 238302,
+          "commit_ns": 1048484,
+          "peak_rss_bytes": 38277120,
+          "wal_bytes": 4144,
+          "spool_bytes": 9620,
+          "fixture_bytes": 14047,
+          "allocated_bytes": 45056,
+          "commit_mad_ns": 97210
+        }
+      },
+      "comparison": {
+        "kv-16": {
+          "commit_ratio": 0.17657791524577185,
+          "commit_noise_ratio": 0.11463803849129002,
+          "decision": "pending_noise",
+          "resource_increases": {
+            "peak_rss_bytes": 770048
+          }
+        },
+        "kv-2048": {
+          "commit_ratio": 0.8892605481637637,
+          "commit_noise_ratio": 0.08580693167176139,
+          "decision": "pending_noise",
+          "resource_increases": {
+            "peak_rss_bytes": 741376
+          }
+        },
+        "sql-16": {
+          "commit_ratio": 0.21787092484908632,
+          "commit_noise_ratio": 0.10711859670760085,
+          "decision": "pending_noise",
+          "resource_increases": {
+            "peak_rss_bytes": 299008
+          }
+        },
+        "sql-2048": {
+          "commit_ratio": 1.0174576465268115,
+          "commit_noise_ratio": 0.2830001921408567,
+          "decision": "pending_noise",
+          "resource_increases": {
+            "peak_rss_bytes": 348160
+          }
+        }
+      },
+      "context": {
+        "before-kv-16": {
+          "commit_ns": [
+            916693,
+            882953,
+            890682,
+            848761,
+            816866
+          ],
+          "cpu_seconds": [
+            0.00017799999999999067,
+            0.0001430000000000181,
+            0.00015900000000000636,
+            0.00017500000000004665,
+            0.00017599999999996785
+          ],
+          "physical_write_bytes": [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ],
+          "voluntary_switches": [
+            4,
+            4,
+            4,
+            4,
+            4
+          ],
+          "rss_before_identity": 29507584,
+          "rss_after_identity": 29913088
+        },
+        "candidate-kv-16": {
+          "commit_ns": [
+            155910,
+            189990,
+            168855,
+            145727,
+            139657
+          ],
+          "cpu_seconds": [
+            4.000000000000878e-05,
+            4.39999999999538e-05,
+            5.6999999999998024e-05,
+            4.299999999995627e-05,
+            3.800000000000678e-05
+          ],
+          "physical_write_bytes": [
+            4096,
+            4096,
+            4096,
+            4096,
+            4096
+          ],
+          "voluntary_switches": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "rss_before_identity": 29712384,
+          "rss_after_identity": 30093312
+        },
+        "before-kv-2048": {
+          "commit_ns": [
+            1006597,
+            1035388,
+            1008393,
+            855250,
+            797415
+          ],
+          "cpu_seconds": [
+            0.00019000000000003736,
+            0.00018699999999997885,
+            0.0002319999999999961,
+            0.00019400000000000667,
+            0.0002130000000000326
+          ],
+          "physical_write_bytes": [
+            12288,
+            12288,
+            12288,
+            12288,
+            12288
+          ],
+          "voluntary_switches": [
+            4,
+            4,
+            4,
+            4,
+            4
+          ],
+          "rss_before_identity": 29515776,
+          "rss_after_identity": 29921280
+        },
+        "candidate-kv-2048": {
+          "commit_ns": [
+            910559,
+            1057730,
+            894352,
+            823042,
+            895127
+          ],
+          "cpu_seconds": [
+            0.0001780000000000219,
+            0.0001940000000000379,
+            0.00019100000000003836,
+            0.00020500000000001073,
+            0.0001840000000000036
+          ],
+          "physical_write_bytes": [
+            12288,
+            12288,
+            12288,
+            12288,
+            12288
+          ],
+          "voluntary_switches": [
+            4,
+            4,
+            4,
+            4,
+            4
+          ],
+          "rss_before_identity": 29765632,
+          "rss_after_identity": 30154752
+        },
+        "before-sql-16": {
+          "commit_ns": [
+            1147813,
+            882698,
+            800630,
+            830276,
+            810444
+          ],
+          "cpu_seconds": [
+            0.00023500000000004073,
+            0.00022899999999998963,
+            0.00021399999999998157,
+            0.00023500000000004767,
+            0.0001949999999999799
+          ],
+          "physical_write_bytes": [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ],
+          "voluntary_switches": [
+            4,
+            4,
+            4,
+            4,
+            4
+          ],
+          "rss_before_identity": 29544448,
+          "rss_after_identity": 29949952
+        },
+        "candidate-sql-16": {
+          "commit_ns": [
+            185643,
+            9603254,
+            172253,
+            180893,
+            179673
+          ],
+          "cpu_seconds": [
+            7.700000000001456e-05,
+            0.00012099999999999611,
+            6.99999999999798e-05,
+            6.800000000000556e-05,
+            6.99999999999798e-05
+          ],
+          "physical_write_bytes": [
+            4096,
+            4096,
+            4096,
+            4096,
+            4096
+          ],
+          "voluntary_switches": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "rss_before_identity": 29720576,
+          "rss_after_identity": 30109696
+        },
+        "before-sql-2048": {
+          "commit_ns": [
+            1012650,
+            1030494,
+            1034190,
+            1039002,
+            875735
+          ],
+          "cpu_seconds": [
+            0.00025499999999998094,
+            0.00031100000000002653,
+            0.0002820000000000114,
+            0.0002939999999999887,
+            0.00027900000000000147
+          ],
+          "physical_write_bytes": [
+            16384,
+            16384,
+            16384,
+            16384,
+            16384
+          ],
+          "voluntary_switches": [
+            4,
+            4,
+            4,
+            4,
+            4
+          ],
+          "rss_before_identity": 29544448,
+          "rss_after_identity": 29949952
+        },
+        "candidate-sql-2048": {
+          "commit_ns": [
+            1145694,
+            1066162,
+            1048484,
+            843581,
+            931925
+          ],
+          "cpu_seconds": [
+            0.0002830000000000332,
+            0.00027199999999999447,
+            0.0002740000000000173,
+            0.00023500000000004767,
+            0.0002869999999999852
+          ],
+          "physical_write_bytes": [
+            16384,
+            16384,
+            16384,
+            16384,
+            16384
+          ],
+          "voluntary_switches": [
+            4,
+            4,
+            4,
+            4,
+            4
+          ],
+          "rss_before_identity": 29761536,
+          "rss_after_identity": 30150656
+        }
+      }
+    }
+  },
+  "diagnostic_runs": {
+    "42487505305": [
+      {
+        "cell": {
+          "round": 0,
+          "surface": "kv",
+          "value_bytes": 16,
+          "subject": "before"
+        },
+        "spool_writes": 4,
+        "memory_delta": {
+          "status_bytes": {
+            "VmRSS": 0,
+            "RssAnon": 0,
+            "RssFile": 0,
+            "RssShmem": 0
+          },
+          "smaps_rollup_bytes": {
+            "Rss": 0,
+            "Pss_Anon": 0,
+            "Pss_File": 0,
+            "Pss_Shmem": 0,
+            "Anonymous": 0
+          }
+        }
+      },
+      {
+        "cell": {
+          "round": 0,
+          "surface": "kv",
+          "value_bytes": 16,
+          "subject": "candidate"
+        },
+        "spool_writes": 0,
+        "memory_delta": {
+          "status_bytes": {
+            "VmRSS": 0,
+            "RssAnon": 0,
+            "RssFile": 0,
+            "RssShmem": 0
+          },
+          "smaps_rollup_bytes": {
+            "Rss": 0,
+            "Pss_Anon": 0,
+            "Pss_File": 0,
+            "Pss_Shmem": 0,
+            "Anonymous": 0
+          }
+        }
+      },
+      {
+        "cell": {
+          "round": 0,
+          "surface": "kv",
+          "value_bytes": 2048,
+          "subject": "before"
+        },
+        "spool_writes": 36,
+        "memory_delta": {
+          "status_bytes": {
+            "VmRSS": 0,
+            "RssAnon": 0,
+            "RssFile": 0,
+            "RssShmem": 0
+          },
+          "smaps_rollup_bytes": {
+            "Rss": 0,
+            "Pss_Anon": 0,
+            "Pss_File": 0,
+            "Pss_Shmem": 0,
+            "Anonymous": 0
+          }
+        }
+      },
+      {
+        "cell": {
+          "round": 0,
+          "surface": "kv",
+          "value_bytes": 2048,
+          "subject": "candidate"
+        },
+        "spool_writes": 36,
+        "memory_delta": {
+          "status_bytes": {
+            "VmRSS": 0,
+            "RssAnon": 0,
+            "RssFile": 0,
+            "RssShmem": 0
+          },
+          "smaps_rollup_bytes": {
+            "Rss": 0,
+            "Pss_Anon": 0,
+            "Pss_File": 0,
+            "Pss_Shmem": 0,
+            "Anonymous": 0
+          }
+        }
+      },
+      {
+        "cell": {
+          "round": 0,
+          "surface": "sql",
+          "value_bytes": 16,
+          "subject": "before"
+        },
+        "spool_writes": 10,
+        "memory_delta": {
+          "status_bytes": {
+            "VmRSS": 0,
+            "RssAnon": 0,
+            "RssFile": 0,
+            "RssShmem": 0
+          },
+          "smaps_rollup_bytes": {
+            "Rss": 0,
+            "Pss_Anon": 0,
+            "Pss_File": 0,
+            "Pss_Shmem": 0,
+            "Anonymous": 0
+          }
+        }
+      },
+      {
+        "cell": {
+          "round": 0,
+          "surface": "sql",
+          "value_bytes": 16,
+          "subject": "candidate"
+        },
+        "spool_writes": 0,
+        "memory_delta": {
+          "status_bytes": {
+            "VmRSS": 0,
+            "RssAnon": 0,
+            "RssFile": 0,
+            "RssShmem": 0
+          },
+          "smaps_rollup_bytes": {
+            "Rss": 0,
+            "Pss_Anon": 0,
+            "Pss_File": 0,
+            "Pss_Shmem": 0,
+            "Anonymous": 0
+          }
+        }
+      },
+      {
+        "cell": {
+          "round": 0,
+          "surface": "sql",
+          "value_bytes": 2048,
+          "subject": "before"
+        },
+        "spool_writes": 74,
+        "memory_delta": {
+          "status_bytes": {
+            "VmRSS": 0,
+            "RssAnon": 0,
+            "RssFile": 0,
+            "RssShmem": 0
+          },
+          "smaps_rollup_bytes": {
+            "Rss": 0,
+            "Pss_Anon": 0,
+            "Pss_File": 0,
+            "Pss_Shmem": 0,
+            "Anonymous": 0
+          }
+        }
+      },
+      {
+        "cell": {
+          "round": 0,
+          "surface": "sql",
+          "value_bytes": 2048,
+          "subject": "candidate"
+        },
+        "spool_writes": 74,
+        "memory_delta": {
+          "status_bytes": {
+            "VmRSS": 0,
+            "RssAnon": 0,
+            "RssFile": 0,
+            "RssShmem": 0
+          },
+          "smaps_rollup_bytes": {
+            "Rss": 0,
+            "Pss_Anon": 0,
+            "Pss_File": 0,
+            "Pss_Shmem": 0,
+            "Anonymous": 0
+          }
+        }
+      }
+    ],
+    "42490399767": [
+      {
+        "cell": {
+          "round": 0,
+          "surface": "kv",
+          "value_bytes": 16,
+          "subject": "before"
+        },
+        "spool_writes": 4,
+        "memory_delta": {
+          "status_bytes": {
+            "VmRSS": 0,
+            "RssAnon": 0,
+            "RssFile": 0,
+            "RssShmem": 0
+          },
+          "smaps_rollup_bytes": {
+            "Rss": 0,
+            "Pss_Anon": 0,
+            "Pss_File": 0,
+            "Pss_Shmem": 0,
+            "Anonymous": 0
+          }
+        }
+      },
+      {
+        "cell": {
+          "round": 0,
+          "surface": "kv",
+          "value_bytes": 16,
+          "subject": "candidate"
+        },
+        "spool_writes": 0,
+        "memory_delta": {
+          "status_bytes": {
+            "VmRSS": 0,
+            "RssAnon": 0,
+            "RssFile": 0,
+            "RssShmem": 0
+          },
+          "smaps_rollup_bytes": {
+            "Rss": 0,
+            "Pss_Anon": 0,
+            "Pss_File": 0,
+            "Pss_Shmem": 0,
+            "Anonymous": 0
+          }
+        }
+      },
+      {
+        "cell": {
+          "round": 0,
+          "surface": "kv",
+          "value_bytes": 2048,
+          "subject": "before"
+        },
+        "spool_writes": 36,
+        "memory_delta": {
+          "status_bytes": {
+            "VmRSS": 0,
+            "RssAnon": 0,
+            "RssFile": 0,
+            "RssShmem": 0
+          },
+          "smaps_rollup_bytes": {
+            "Rss": 0,
+            "Pss_Anon": 0,
+            "Pss_File": 0,
+            "Pss_Shmem": 0,
+            "Anonymous": 0
+          }
+        }
+      },
+      {
+        "cell": {
+          "round": 0,
+          "surface": "kv",
+          "value_bytes": 2048,
+          "subject": "candidate"
+        },
+        "spool_writes": 19,
+        "memory_delta": {
+          "status_bytes": {
+            "VmRSS": 0,
+            "RssAnon": 0,
+            "RssFile": 0,
+            "RssShmem": 0
+          },
+          "smaps_rollup_bytes": {
+            "Rss": 0,
+            "Pss_Anon": 0,
+            "Pss_File": 0,
+            "Pss_Shmem": 0,
+            "Anonymous": 0
+          }
+        }
+      },
+      {
+        "cell": {
+          "round": 0,
+          "surface": "sql",
+          "value_bytes": 16,
+          "subject": "before"
+        },
+        "spool_writes": 10,
+        "memory_delta": {
+          "status_bytes": {
+            "VmRSS": 0,
+            "RssAnon": 0,
+            "RssFile": 0,
+            "RssShmem": 0
+          },
+          "smaps_rollup_bytes": {
+            "Rss": 0,
+            "Pss_Anon": 0,
+            "Pss_File": 0,
+            "Pss_Shmem": 0,
+            "Anonymous": 0
+          }
+        }
+      },
+      {
+        "cell": {
+          "round": 0,
+          "surface": "sql",
+          "value_bytes": 16,
+          "subject": "candidate"
+        },
+        "spool_writes": 0,
+        "memory_delta": {
+          "status_bytes": {
+            "VmRSS": 0,
+            "RssAnon": 0,
+            "RssFile": 0,
+            "RssShmem": 0
+          },
+          "smaps_rollup_bytes": {
+            "Rss": 0,
+            "Pss_Anon": 0,
+            "Pss_File": 0,
+            "Pss_Shmem": 0,
+            "Anonymous": 0
+          }
+        }
+      },
+      {
+        "cell": {
+          "round": 0,
+          "surface": "sql",
+          "value_bytes": 2048,
+          "subject": "before"
+        },
+        "spool_writes": 74,
+        "memory_delta": {
+          "status_bytes": {
+            "VmRSS": 0,
+            "RssAnon": 0,
+            "RssFile": 0,
+            "RssShmem": 0
+          },
+          "smaps_rollup_bytes": {
+            "Rss": 0,
+            "Pss_Anon": 0,
+            "Pss_File": 0,
+            "Pss_Shmem": 0,
+            "Anonymous": 0
+          }
+        }
+      },
+      {
+        "cell": {
+          "round": 0,
+          "surface": "sql",
+          "value_bytes": 2048,
+          "subject": "candidate"
+        },
+        "spool_writes": 38,
+        "memory_delta": {
+          "status_bytes": {
+            "VmRSS": 0,
+            "RssAnon": 0,
+            "RssFile": 0,
+            "RssShmem": 0
+          },
+          "smaps_rollup_bytes": {
+            "Rss": 0,
+            "Pss_Anon": 0,
+            "Pss_File": 0,
+            "Pss_Shmem": 0,
+            "Anonymous": 0
+          }
+        }
+      }
+    ]
+  }
+}
