@@ -25,6 +25,12 @@ from the exact clean source and release-profile build, with artifact hashes:
 }
 ```
 
+For a wheel-only build, use `alopex.performance-wheel-build/v1` with the same
+version, source and wheel-hash fields. Preserve the original receipt from the
+builder. Native Python and DataFrame cases accept this receipt; server cases
+reject it, even if a server hash is added. They require the combined build
+receipt and the running-server checks below.
+
 The selection manifest points to that receipt and the artifacts. Paths may be
 absolute or relative to the manifest directory:
 

@@ -68,6 +68,44 @@ class SubjectTest(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "manifest changed"):
             subject.verify_subject()
 
+    def wheel_only_receipt(self, **changes):
+        receipt = json.loads(self.receipt.read_text())
+        receipt.update(schema="alopex.performance-wheel-build/v1", **changes)
+        self.receipt.write_text(json.dumps(receipt))
+        self.value["build_receipt"]["sha256"] = subject.digest(self.receipt)
+        self.save()
+
+    def test_wheel_only_receipt_verifies_installed_package(self):
+        self.wheel_only_receipt()
+        result = subject.verify_subject()
+        self.assertEqual(result["source"], self.value["source"])
+        self.assertEqual(result["installed"]["verified_files"], 2)
+        self.assertEqual(result["build_receipt_sha256"], subject.digest(self.receipt))
+
+    def test_wheel_only_receipt_cannot_qualify_server_even_after_python_check(self):
+        self.wheel_only_receipt(server_sha256="c" * 64)
+        subject.verify_subject()
+        with patch.object(subject, "_server") as server:
+            with self.assertRaisesRegex(RuntimeError, "requires a server build receipt"):
+                subject.verify_subject(require_server=True)
+            server.assert_not_called()
+
+    def test_wheel_only_receipt_still_rejects_wrong_source(self):
+        self.wheel_only_receipt(source=dict(self.value["source"], commit="c" * 40))
+        with self.assertRaisesRegex(RuntimeError, "receipt source/version mismatch"):
+            subject.verify_subject()
+
+    def test_wheel_only_receipt_still_rejects_wrong_wheel(self):
+        self.wheel_only_receipt(python_wheel_sha256="c" * 64)
+        with self.assertRaisesRegex(RuntimeError, "not identified by the build receipt"):
+            subject.verify_subject()
+
+    def test_wheel_only_receipt_still_rejects_changed_installed_bytes(self):
+        self.wheel_only_receipt()
+        (self.package / "_alopex.so").write_bytes(b"wrong installed extension")
+        with self.assertRaisesRegex(RuntimeError, "Installed wheel file mismatch"):
+            subject.verify_subject()
+
     def test_receipt_for_another_source_is_rejected(self):
         self.value["source"]["commit"] = "c" * 40
         self.save()
