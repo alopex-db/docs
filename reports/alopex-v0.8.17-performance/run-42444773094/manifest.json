@@ -1,0 +1,94 @@
+{
+  "schema": "alopex.public-sqlite-report/v1",
+  "run": 42444773094,
+  "controller": "164ef30c80518c3c14dc459fa63f6fa124bb335d",
+  "subjects": {
+    "published": {
+      "source_commit": "d9ff8783b8d18a63d167204e55902ea6cd90dcd1",
+      "source_tree": "cef47de8408e760bd6da108b92dcb917753c5a4f",
+      "wheel_sha256": "ac9f4b1fd2fa0e78d634334242de4290ae4b34bf700515b59937ea2c718a98c3",
+      "assets_sha256": "59394688e04eb02de8e6ef2354b268c8c89199c70887ef71bce95347da6192b9",
+      "producer_run": 42400479270
+    },
+    "before": {
+      "source_commit": "34ce28d5c15377837cb78b15a261cfa2c05757a8",
+      "source_tree": "8ed9c3277def8201e16d41e826bd1ed35b70590a",
+      "wheel_sha256": "7508104cf08ada246cfd0cee832cbc97e50ce9364a26d846e7f0af1f987413c7",
+      "assets_sha256": "f46c5dd1656b51b2f9bfb741ee7844f7db3b51289a54ce46b865643394233396",
+      "producer_run": 42399964667
+    },
+    "candidate": {
+      "source_commit": "2ea6befef45fe6019c6976cfd8260371b0a57bde",
+      "source_tree": "6850f0a6aca136ac2ff8b59ba5e11aeaaad79108",
+      "wheel_sha256": "a12adca9c5eb81ffa21d4fc3c2b55740af5b04b7083424831149f8183f810ed6",
+      "assets_sha256": "a4d2742a26b0e114dc712f94d0d9dc97207f95b752b16c4a292fec6a8163ff62",
+      "producer_run": 42437307884
+    }
+  },
+  "sqlite": {
+    "version": "3.46.1",
+    "distribution": "pysqlite3-binary",
+    "distribution_version": "0.5.4",
+    "wheel_hashes": {
+      "pysqlite3-binary": "cb551d736ac3a049b3a91332dbcb0df506eaed58add8a95acfd264dc45ce3fa8"
+    }
+  },
+  "raw_files": [
+    {
+      "path": "raw/original-execute.ndjson",
+      "samples": 252,
+      "sha256": "56c8f231afb7504927a1f4df0f9da543db7ff8e745b294d88138c340706f569d",
+      "size": 207743
+    },
+    {
+      "path": "raw/original-plan.ndjson",
+      "samples": 252,
+      "sha256": "3252c6550f0b62bdab89ededead91671bb77922cdecc516f95078adee9fdd22d",
+      "size": 203788
+    },
+    {
+      "path": "raw/checked-execute.ndjson",
+      "samples": 252,
+      "sha256": "53581d8e714004e71497413158b244f7e31f054279bdae9346ac22a3205e3cac",
+      "size": 207368
+    },
+    {
+      "path": "raw/checked-plan.ndjson",
+      "samples": 252,
+      "sha256": "308d4ea763c4b4a3b859d070f6c2f3e5cd0fa2e241f696257c044c31e4ad0932",
+      "size": 203204
+    }
+  ],
+  "comparison_sha256": "d926416cfc6016b5a054d0654e26744a24c3f1f8033cf573b15d009b90b2b1de",
+  "exporter_sha256": "10fe95278fdc39eb199ba06a7589c7445f9ad3476153528b966712bd6c78b432",
+  "recalculator_sha256": "a8d4dc429ba7f4f9b89eea8ca2961813f26b6241d008fed882e0027a587c4fdf",
+  "auditor_source_sha256": {
+    "verify_sqlite_comparison.py": "0ef677f1bae7373cee52a2ad9c83859033824d4933ae1e684447854bb8f218ae",
+    "audit_native_sql_matrix.py": "f15ef9bea497f8ec99aec039ce4c84ed5d8fa424a7a2b0be85f247a52337a2c1",
+    "sqlite_phase_contract.py": "401fb6b7c3ac6bebefc513d3f7e99e7683065717b1d9d42edc3691b2e684d4fc",
+    "dataframe_phase_contract.py": "90013f37bbdddc1c3db571de9013b98a376f73105fccd0f202dcf9e298fd261e"
+  },
+  "rows": [
+    34250
+  ],
+  "cases": [
+    "original-execute",
+    "original-plan",
+    "checked-execute",
+    "checked-plan"
+  ],
+  "cells": 24,
+  "samples": 1008,
+  "execution_samples": 504,
+  "plan_samples": 504,
+  "observations_including_warmup": 1152,
+  "trials": 3,
+  "warmups_per_phase": 3,
+  "samples_per_phase": 21,
+  "all_value_oracles_match": true,
+  "performance_acceptance": false,
+  "latency_scope": "Original SQL composite and checked composite measured separately; same plan warmup preserved. Composite result validation, state checks and result disposal outside timer; plan result disposal inside timer.",
+  "resource_scope": "Whole worker process from pre-timer observation through composite completion or plan completion; includes resident inputs and counter-read overhead. Excludes untimed validation and raw output. Kernel RSS is not an exact allocation peak.",
+  "io_scope": "Physical read/write/cancelled bytes reported separately; no derived net-I/O claim.",
+  "criteria": "Three times maximum MAD of three trial medians <= 5% baseline; regression ratio > 1.05; preserve all increases and trial ratios."
+}
