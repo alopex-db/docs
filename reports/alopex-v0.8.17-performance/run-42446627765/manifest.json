@@ -1,0 +1,99 @@
+{
+  "schema": "alopex.public-sqlstream-report/v1",
+  "run": 42446627765,
+  "controller": "dfcd2c4d66117f3ccba060fe6c9d21febd7d0abd",
+  "subjects": {
+    "published": {
+      "source_commit": "d9ff8783b8d18a63d167204e55902ea6cd90dcd1",
+      "source_tree": "cef47de8408e760bd6da108b92dcb917753c5a4f",
+      "wheel_sha256": "ac9f4b1fd2fa0e78d634334242de4290ae4b34bf700515b59937ea2c718a98c3",
+      "assets_sha256": "59394688e04eb02de8e6ef2354b268c8c89199c70887ef71bce95347da6192b9",
+      "producer_run": 42400479270
+    },
+    "before": {
+      "source_commit": "34ce28d5c15377837cb78b15a261cfa2c05757a8",
+      "source_tree": "8ed9c3277def8201e16d41e826bd1ed35b70590a",
+      "wheel_sha256": "7508104cf08ada246cfd0cee832cbc97e50ce9364a26d846e7f0af1f987413c7",
+      "assets_sha256": "f46c5dd1656b51b2f9bfb741ee7844f7db3b51289a54ce46b865643394233396",
+      "producer_run": 42399964667
+    },
+    "candidate": {
+      "source_commit": "2ea6befef45fe6019c6976cfd8260371b0a57bde",
+      "source_tree": "6850f0a6aca136ac2ff8b59ba5e11aeaaad79108",
+      "wheel_sha256": "a12adca9c5eb81ffa21d4fc3c2b55740af5b04b7083424831149f8183f810ed6",
+      "assets_sha256": "a4d2742a26b0e114dc712f94d0d9dc97207f95b752b16c4a292fec6a8163ff62",
+      "producer_run": 42437307884
+    }
+  },
+  "reference": {
+    "versions": {
+      "datafusion": "50.0.0",
+      "pyarrow": "26.0.0",
+      "typing-extensions": "4.15.0"
+    },
+    "wheel_hashes": {
+      "datafusion": "20342283580526f6f9492d1615407fbe1329ef61a8fe98dbf507649fe8d4593b",
+      "pyarrow": "6a628922ba20705fa964ca73e4ef959c2fb2f14b9bbec5589a6a1e68e6257c85",
+      "typing-extensions": "f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548"
+    },
+    "target_partitions": 1
+  },
+  "raw_files": [
+    {
+      "path": "raw/original-stream.ndjson",
+      "samples": 252,
+      "sha256": "195e0956f6af18e553693b9d25edf7508beac8394e094db494b478f76b6bb7d6",
+      "size": 233149
+    },
+    {
+      "path": "raw/original-plan.ndjson",
+      "samples": 252,
+      "sha256": "7287f6eee78dbf3027fbcb24d495569e35b5484d4994c2d0641bbfe25f1cba9f",
+      "size": 204424
+    },
+    {
+      "path": "raw/rows-stream.ndjson",
+      "samples": 252,
+      "sha256": "8d6bfbc1de910c242e5cfe3dca8377f185793af21f49df3e018dfae14661d15d",
+      "size": 233138
+    },
+    {
+      "path": "raw/rows-plan.ndjson",
+      "samples": 252,
+      "sha256": "7541b288209813c7e29282e726a058e765cd54bfd716f591b0314fafa141a71f",
+      "size": 202920
+    }
+  ],
+  "comparison_sha256": "e6f39967ddb7f110b10b4fc63ad0caca3a7bc0bc0cefdd1f81f90dab9e6d253d",
+  "exporter_sha256": "ad92142868a6d3ee77a539a8693141b8e4c60f8527a92c698e0a9e2da7d7b831",
+  "recalculator_sha256": "25a2e77cef768f6443143ba39296c97cc9db2f9ce3e6922f672b3d106ef58b71",
+  "auditor_source_sha256": {
+    "verify_sqlstream_comparison.py": "80aca3db55058a72d03ab1d5bd7c11ad27f8c96305c39cd934584adad998af48",
+    "audit_native_sql_matrix.py": "f15ef9bea497f8ec99aec039ce4c84ed5d8fa424a7a2b0be85f247a52337a2c1",
+    "sqlstream_phase_contract.py": "ef3a6afd2948260e7078aa0112d3a6a09115ffd22f7a686d3854f4e22907e52b",
+    "dataframe_phase_contract.py": "90013f37bbdddc1c3db571de9013b98a376f73105fccd0f202dcf9e298fd261e"
+  },
+  "rows": [
+    34250
+  ],
+  "cases": [
+    "original-stream",
+    "original-plan",
+    "rows-stream",
+    "rows-plan"
+  ],
+  "cells": 24,
+  "samples": 1008,
+  "stream_samples": 504,
+  "plan_samples": 504,
+  "observations_including_warmup": 1152,
+  "trials": 3,
+  "warmups_per_phase": 3,
+  "samples_per_phase": 21,
+  "all_value_oracles_match": true,
+  "performance_acceptance": false,
+  "latency_scope": "Original consumers and fully materialized Python rows measured separately. First and total times stay paired; Alopex first row differs from DataFusion first batch. Original close/disposal boundaries retained; plan disposal inside timer. Validation and resource observation outside latency clocks.",
+  "resource_scope": "Whole worker process from pre-timer observation through stream completion including consumer close or plan completion; includes resident inputs and counter-read overhead. Excludes untimed validation and raw output. Kernel RSS is not an exact allocation peak.",
+  "io_scope": "Physical read/write/cancelled bytes reported separately; no derived net-I/O claim.",
+  "criteria": "Three times maximum MAD of three trial medians <= 5% baseline; regression ratio > 1.05; preserve all increases and trial ratios."
+}
