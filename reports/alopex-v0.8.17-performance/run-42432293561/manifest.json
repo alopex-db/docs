@@ -1,0 +1,74 @@
+{
+  "schema": "alopex.public-dataframe-report/v1",
+  "run": 42432293561,
+  "controller": "6836445b9bc807d1902b471b6a48b181cd2ef6fe",
+  "harness_commit": "f07a6afe7d89eff28bed47c2da9d491cbca86b9b",
+  "subjects": {
+    "published": {
+      "source_commit": "d9ff8783b8d18a63d167204e55902ea6cd90dcd1",
+      "source_tree": "cef47de8408e760bd6da108b92dcb917753c5a4f",
+      "wheel_sha256": "ac9f4b1fd2fa0e78d634334242de4290ae4b34bf700515b59937ea2c718a98c3",
+      "assets_sha256": "59394688e04eb02de8e6ef2354b268c8c89199c70887ef71bce95347da6192b9"
+    },
+    "before": {
+      "source_commit": "8d404614f3989ed8dc3732b657d5ac746e70977b",
+      "source_tree": "f6ab6b685f04bc924f6603f64ba726431eaf864e",
+      "wheel_sha256": "8a40178329d82f38a62bd4056badcb7b499ed49e809e88af25d591f83416e65f",
+      "assets_sha256": "05afe85285e2e5992cd4dbc323f7c0edca35974c4f26c9c8d95b2d2ec031b73f"
+    },
+    "candidate": {
+      "source_commit": "62bd98910891c48c406b9317b56486363892ffe6",
+      "source_tree": "0a7f86ed4c220ba35caca5088e2c90a106e44908",
+      "wheel_sha256": "dfc2cb150f7615dfb08f2091fa89decb3c0b01d392476a6148c3147ba4675e06",
+      "assets_sha256": "ffe1122f64213be6763a4cf4c6476d3c8b0ee8a4682a16cc24cf9fb74840adfb"
+    }
+  },
+  "polars": {
+    "version": "1.43.2",
+    "wheel_hashes": {
+      "polars": "22aa0cb92a1ee2d60d6a15a638b2e8e0dd99aea21ac0cd8fb29da8e382e075a9",
+      "polars-runtime-32": "6d5a7ae004a2723ebf4427f6d6a639f30f86af4cf077075f6b35d04711154fc3"
+    }
+  },
+  "auditor_sha256": "6c5a88964ec9a776239fc6ae13f57823e3fbd90822110369e54b9a0969584baa",
+  "exporter_sha256": "b09c0f471d2b527bb8ec3c85ba6f223ce7ffa8470e832a6dfbddbe21ac2478d9",
+  "raw_files": [
+    {
+      "path": "raw/construct.ndjson",
+      "samples": 252,
+      "sha256": "89a7bd72295b0eaff80cc57891968971d646f04bbc99d80beab0ec4a984a7209",
+      "size": 130171
+    },
+    {
+      "path": "raw/compute.ndjson",
+      "samples": 252,
+      "sha256": "ba5a82bba2df768be2d6fc7f3fee2cb8d1a6ea9a27e1395ce7807f5fa89825be",
+      "size": 129138
+    },
+    {
+      "path": "raw/convert.ndjson",
+      "samples": 252,
+      "sha256": "7992767d0ed156e99fc5279fe8d45e60fa80f18ea849333cf018a98cbce47b11",
+      "size": 128960
+    },
+    {
+      "path": "raw/complete.ndjson",
+      "samples": 252,
+      "sha256": "c4ac4a4a0e694049f8aa887c00fb0d44e63ca874542b6ecbdd64b3269dd93fe5",
+      "size": 131680
+    }
+  ],
+  "comparison_sha256": "9152e047289034f969360d1f456c97cc0d4e558d344c7230a7e8667ab3640c53",
+  "rows": 34250,
+  "cells": 48,
+  "samples": 1008,
+  "warmups_per_cell": 3,
+  "samples_per_cell": 21,
+  "trials": 3,
+  "all_value_oracles_match": true,
+  "performance_acceptance": false,
+  "latency_scope": "Original four DataFrame phases; preparation, observation callbacks, raw output and untimed oracle excluded.",
+  "resource_scope": "Whole worker process: phase CPU and physical I/O deltas; RSS kernel high-water after reset. Includes resident input and observation overhead; not exact allocation peaks.",
+  "io_scope": "Read, write and cancelled physical bytes reported separately; no derived net I/O or throughput claim.",
+  "criteria": "Trial-median noise: three times maximum MAD <= 5% baseline; no-regression latency ratio <= 1.05. Reference goal <= 1 with noise gate."
+}
