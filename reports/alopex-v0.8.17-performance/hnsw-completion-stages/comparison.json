@@ -1,0 +1,861 @@
+{
+  "schema": "alopex.hnsw-completion-public-summary/v1",
+  "complete": true,
+  "assets": {
+    "before": "062a414fc77e25b24f7e47f531e4c8306b47363a44264704f75b4c9fbcdac15c",
+    "candidate": "c85eafa0fb7cc3ca4b662dd1a0ce768a57f698fbd345c306b5143cd8de764f8e"
+  },
+  "source_commits": {
+    "before": "880da6711efd3da4c0d081d3ce0e51d7db777a83",
+    "candidate": "6a793e152c9eea8621bd93fbc3102ac81ee43568"
+  },
+  "stages": [
+    {
+      "finish": "commit",
+      "rows": 1000,
+      "run": 42538030303,
+      "controller": "02b61db1b52c315ff6850f3d5f72107945f36085",
+      "result_sha256": "cc645d195738d01ca3ac204340a09e606d3f7ae18c749b196904ba80eb69478d",
+      "assets": {
+        "before": "062a414fc77e25b24f7e47f531e4c8306b47363a44264704f75b4c9fbcdac15c",
+        "candidate": "c85eafa0fb7cc3ca4b662dd1a0ce768a57f698fbd345c306b5143cd8de764f8e"
+      },
+      "source_commits": {
+        "before": "880da6711efd3da4c0d081d3ce0e51d7db777a83",
+        "candidate": "6a793e152c9eea8621bd93fbc3102ac81ee43568"
+      },
+      "outcomes": {
+        "elapsed_ns": {
+          "seed": {
+            "before_median": 13063286,
+            "candidate_median": 13395965,
+            "noise": 1093518,
+            "ratio": 1.0254667164142315,
+            "outcome": "uncertain"
+          },
+          "index_build": {
+            "before_median": 658288831,
+            "candidate_median": 666758295,
+            "noise": 10637418,
+            "ratio": 1.0128658783214264,
+            "outcome": "uncertain"
+          },
+          "cold_transaction_1": {
+            "before_median": 2072726,
+            "candidate_median": 2159075,
+            "noise": 256944,
+            "ratio": 1.041659630843633,
+            "outcome": "uncertain"
+          },
+          "cold_transaction_2": {
+            "before_median": 1918756,
+            "candidate_median": 551406,
+            "noise": 137697,
+            "ratio": 0.28737682123208996,
+            "outcome": "improved"
+          },
+          "writer_begin": {
+            "before_median": 23516,
+            "candidate_median": 17917,
+            "noise": 6999,
+            "ratio": 0.7619067868685151,
+            "outcome": "uncertain"
+          },
+          "first_insert": {
+            "before_median": 9056872,
+            "candidate_median": 3029831,
+            "noise": 876024,
+            "ratio": 0.3345339318033864,
+            "outcome": "improved"
+          },
+          "second_insert": {
+            "before_median": 4384510,
+            "candidate_median": 1832108,
+            "noise": 192948,
+            "ratio": 0.4178592362658541,
+            "outcome": "improved"
+          },
+          "commit": {
+            "before_median": 3048508,
+            "candidate_median": 254071,
+            "noise": 465069,
+            "ratio": 0.08334273684044785,
+            "outcome": "improved"
+          }
+        },
+        "kernel_peak_rss_bytes": {
+          "seed": {
+            "before_median": 19554304,
+            "candidate_median": 20029440,
+            "noise": 1056768,
+            "ratio": 1.0242982823627984,
+            "outcome": "uncertain"
+          },
+          "index_build": {
+            "before_median": 22474752,
+            "candidate_median": 23285760,
+            "noise": 1241088,
+            "ratio": 1.036085292509568,
+            "outcome": "uncertain"
+          },
+          "cold_transaction_1": {
+            "before_median": 23588864,
+            "candidate_median": 24256512,
+            "noise": 897024,
+            "ratio": 1.0283035249175203,
+            "outcome": "uncertain"
+          },
+          "cold_transaction_2": {
+            "before_median": 23588864,
+            "candidate_median": 24256512,
+            "noise": 897024,
+            "ratio": 1.0283035249175203,
+            "outcome": "uncertain"
+          },
+          "warm": {
+            "before_median": 23588864,
+            "candidate_median": 24256512,
+            "noise": 897024,
+            "ratio": 1.0283035249175203,
+            "outcome": "uncertain"
+          },
+          "writer_begin": {
+            "before_median": 23588864,
+            "candidate_median": 24256512,
+            "noise": 897024,
+            "ratio": 1.0283035249175203,
+            "outcome": "uncertain"
+          },
+          "first_insert": {
+            "before_median": 29822976,
+            "candidate_median": 24387584,
+            "noise": 995328,
+            "ratio": 0.8177448152726274,
+            "outcome": "improved"
+          },
+          "second_insert": {
+            "before_median": 29851648,
+            "candidate_median": 24391680,
+            "noise": 995328,
+            "ratio": 0.8170965971459934,
+            "outcome": "improved"
+          },
+          "commit": {
+            "before_median": 31453184,
+            "candidate_median": 24391680,
+            "noise": 995328,
+            "ratio": 0.775491600468811,
+            "outcome": "improved"
+          }
+        }
+      },
+      "performance_qualification": false
+    },
+    {
+      "finish": "commit",
+      "rows": 10000,
+      "run": 42541930459,
+      "controller": "02b61db1b52c315ff6850f3d5f72107945f36085",
+      "result_sha256": "90ca4d4c481211286c4632b7459b7477dc4129a60e427334fd3c45de6b2bffe8",
+      "assets": {
+        "before": "062a414fc77e25b24f7e47f531e4c8306b47363a44264704f75b4c9fbcdac15c",
+        "candidate": "c85eafa0fb7cc3ca4b662dd1a0ce768a57f698fbd345c306b5143cd8de764f8e"
+      },
+      "source_commits": {
+        "before": "880da6711efd3da4c0d081d3ce0e51d7db777a83",
+        "candidate": "6a793e152c9eea8621bd93fbc3102ac81ee43568"
+      },
+      "outcomes": {
+        "elapsed_ns": {
+          "seed": {
+            "before_median": 133566896,
+            "candidate_median": 142081313,
+            "noise": 11295243,
+            "ratio": 1.0637464615483765,
+            "outcome": "uncertain"
+          },
+          "index_build": {
+            "before_median": 38369123126,
+            "candidate_median": 38179885893,
+            "noise": 1366915194,
+            "ratio": 0.9950679812937459,
+            "outcome": "uncertain"
+          },
+          "cold_transaction_1": {
+            "before_median": 23788022,
+            "candidate_median": 19113811,
+            "noise": 4966191,
+            "ratio": 0.8035056887033315,
+            "outcome": "uncertain"
+          },
+          "cold_transaction_2": {
+            "before_median": 25206654,
+            "candidate_median": 900174,
+            "noise": 2637267,
+            "ratio": 0.035711760870760556,
+            "outcome": "improved"
+          },
+          "writer_begin": {
+            "before_median": 31027,
+            "candidate_median": 18749,
+            "noise": 18960,
+            "ratio": 0.60428014310117,
+            "outcome": "uncertain"
+          },
+          "first_insert": {
+            "before_median": 91452276,
+            "candidate_median": 10762259,
+            "noise": 978879,
+            "ratio": 0.11768169662611787,
+            "outcome": "improved"
+          },
+          "second_insert": {
+            "before_median": 55196982,
+            "candidate_median": 9520230,
+            "noise": 2038695,
+            "ratio": 0.17247736479505346,
+            "outcome": "improved"
+          },
+          "commit": {
+            "before_median": 50862084,
+            "candidate_median": 512787,
+            "noise": 12994554,
+            "ratio": 0.01008191091816057,
+            "outcome": "improved"
+          }
+        },
+        "kernel_peak_rss_bytes": {
+          "seed": {
+            "before_median": 94445568,
+            "candidate_median": 96354304,
+            "noise": 221184,
+            "ratio": 1.0202099054558071,
+            "outcome": "increased"
+          },
+          "index_build": {
+            "before_median": 117383168,
+            "candidate_median": 121327616,
+            "noise": 491520,
+            "ratio": 1.033603182357457,
+            "outcome": "increased"
+          },
+          "cold_transaction_1": {
+            "before_median": 118542336,
+            "candidate_median": 122249216,
+            "noise": 356352,
+            "ratio": 1.0312705158771294,
+            "outcome": "increased"
+          },
+          "cold_transaction_2": {
+            "before_median": 118542336,
+            "candidate_median": 122249216,
+            "noise": 356352,
+            "ratio": 1.0312705158771294,
+            "outcome": "increased"
+          },
+          "warm": {
+            "before_median": 118542336,
+            "candidate_median": 122249216,
+            "noise": 356352,
+            "ratio": 1.0312705158771294,
+            "outcome": "increased"
+          },
+          "writer_begin": {
+            "before_median": 118542336,
+            "candidate_median": 122249216,
+            "noise": 356352,
+            "ratio": 1.0312705158771294,
+            "outcome": "increased"
+          },
+          "first_insert": {
+            "before_median": 180219904,
+            "candidate_median": 122314752,
+            "noise": 638976,
+            "ratio": 0.6786972431191618,
+            "outcome": "improved"
+          },
+          "second_insert": {
+            "before_median": 180502528,
+            "candidate_median": 122318848,
+            "noise": 638976,
+            "ratio": 0.6776572569665064,
+            "outcome": "improved"
+          },
+          "commit": {
+            "before_median": 196235264,
+            "candidate_median": 122318848,
+            "noise": 638976,
+            "ratio": 0.6233275584963159,
+            "outcome": "improved"
+          }
+        }
+      },
+      "performance_qualification": false
+    },
+    {
+      "finish": "commit",
+      "rows": 100000,
+      "run": 42544892529,
+      "controller": "f371792589266dd136a49d33ea22da92cea2aa20",
+      "result_sha256": "16b1ae328935a6cd4ad3288826584d0504a85a953c77f794ae3b3098da21dd2b",
+      "assets": {
+        "before": "062a414fc77e25b24f7e47f531e4c8306b47363a44264704f75b4c9fbcdac15c",
+        "candidate": "c85eafa0fb7cc3ca4b662dd1a0ce768a57f698fbd345c306b5143cd8de764f8e"
+      },
+      "source_commits": {
+        "before": "880da6711efd3da4c0d081d3ce0e51d7db777a83",
+        "candidate": "6a793e152c9eea8621bd93fbc3102ac81ee43568"
+      },
+      "outcomes": {
+        "elapsed_ns": {
+          "seed": {
+            "before_median": 1439262474,
+            "candidate_median": 1572567134,
+            "noise": 123520800,
+            "ratio": 1.0926201178785129,
+            "outcome": "increased"
+          },
+          "index_build": {
+            "before_median": 893202183956,
+            "candidate_median": 875450937988,
+            "noise": 84251107377,
+            "ratio": 0.9801262846342588,
+            "outcome": "uncertain"
+          },
+          "cold_transaction_1": {
+            "before_median": 289662656,
+            "candidate_median": 241338145,
+            "noise": 33900450,
+            "ratio": 0.8331696889501696,
+            "outcome": "improved"
+          },
+          "cold_transaction_2": {
+            "before_median": 301987063,
+            "candidate_median": 1193456,
+            "noise": 42839868,
+            "ratio": 0.0039520103548276835,
+            "outcome": "improved"
+          },
+          "writer_begin": {
+            "before_median": 21062,
+            "candidate_median": 14452,
+            "noise": 16194,
+            "ratio": 0.6861646567277562,
+            "outcome": "uncertain"
+          },
+          "first_insert": {
+            "before_median": 970316594,
+            "candidate_median": 15162017,
+            "noise": 148563678,
+            "ratio": 0.015625845310443077,
+            "outcome": "improved"
+          },
+          "second_insert": {
+            "before_median": 546836463,
+            "candidate_median": 15767760,
+            "noise": 49634562,
+            "ratio": 0.028834507328747754,
+            "outcome": "improved"
+          },
+          "commit": {
+            "before_median": 671461670,
+            "candidate_median": 616751,
+            "noise": 64590717,
+            "ratio": 0.0009185200400195591,
+            "outcome": "improved"
+          }
+        },
+        "kernel_peak_rss_bytes": {
+          "seed": {
+            "before_median": 839098368,
+            "candidate_median": 854540288,
+            "noise": 1032192,
+            "ratio": 1.0184029913403432,
+            "outcome": "increased"
+          },
+          "index_build": {
+            "before_median": 1056550912,
+            "candidate_median": 1090818048,
+            "noise": 1056768,
+            "ratio": 1.032433019186112,
+            "outcome": "increased"
+          },
+          "cold_transaction_1": {
+            "before_median": 1057693696,
+            "candidate_median": 1074728960,
+            "noise": 638976,
+            "ratio": 1.016106046641314,
+            "outcome": "increased"
+          },
+          "cold_transaction_2": {
+            "before_median": 1057693696,
+            "candidate_median": 1074728960,
+            "noise": 638976,
+            "ratio": 1.016106046641314,
+            "outcome": "increased"
+          },
+          "warm": {
+            "before_median": 1057693696,
+            "candidate_median": 1074728960,
+            "noise": 638976,
+            "ratio": 1.016106046641314,
+            "outcome": "increased"
+          },
+          "writer_begin": {
+            "before_median": 1057693696,
+            "candidate_median": 1074728960,
+            "noise": 638976,
+            "ratio": 1.016106046641314,
+            "outcome": "increased"
+          },
+          "first_insert": {
+            "before_median": 1674665984,
+            "candidate_median": 1074827264,
+            "noise": 737280,
+            "ratio": 0.6418159049440632,
+            "outcome": "improved"
+          },
+          "second_insert": {
+            "before_median": 1676132352,
+            "candidate_median": 1074831360,
+            "noise": 737280,
+            "ratio": 0.6412568546376939,
+            "outcome": "improved"
+          },
+          "commit": {
+            "before_median": 1832591360,
+            "candidate_median": 1074831360,
+            "noise": 737280,
+            "ratio": 0.5865090185735679,
+            "outcome": "improved"
+          }
+        }
+      },
+      "performance_qualification": false
+    },
+    {
+      "finish": "rollback",
+      "rows": 1000,
+      "run": 42594853731,
+      "controller": "f371792589266dd136a49d33ea22da92cea2aa20",
+      "result_sha256": "35ba4aeeaa957ab55bfa9affd51d62f7cd7cdedeb079e1168910ef0251769641",
+      "assets": {
+        "before": "062a414fc77e25b24f7e47f531e4c8306b47363a44264704f75b4c9fbcdac15c",
+        "candidate": "c85eafa0fb7cc3ca4b662dd1a0ce768a57f698fbd345c306b5143cd8de764f8e"
+      },
+      "source_commits": {
+        "before": "880da6711efd3da4c0d081d3ce0e51d7db777a83",
+        "candidate": "6a793e152c9eea8621bd93fbc3102ac81ee43568"
+      },
+      "outcomes": {
+        "elapsed_ns": {
+          "seed": {
+            "before_median": 22206893,
+            "candidate_median": 23156719,
+            "noise": 167772,
+            "ratio": 1.0427716745426747,
+            "outcome": "increased"
+          },
+          "index_build": {
+            "before_median": 1008714606,
+            "candidate_median": 1012257787,
+            "noise": 1215723,
+            "ratio": 1.0035125703334964,
+            "outcome": "increased"
+          },
+          "cold_transaction_1": {
+            "before_median": 2791582,
+            "candidate_median": 2749694,
+            "noise": 136155,
+            "ratio": 0.9849948882031766,
+            "outcome": "uncertain"
+          },
+          "cold_transaction_2": {
+            "before_median": 2545191,
+            "candidate_median": 663962,
+            "noise": 404676,
+            "ratio": 0.26086922356711145,
+            "outcome": "improved"
+          },
+          "writer_begin": {
+            "before_median": 10680,
+            "candidate_median": 8836,
+            "noise": 1983,
+            "ratio": 0.8273408239700375,
+            "outcome": "uncertain"
+          },
+          "first_insert": {
+            "before_median": 12057747,
+            "candidate_median": 3770187,
+            "noise": 31758,
+            "ratio": 0.31267756737639296,
+            "outcome": "improved"
+          },
+          "second_insert": {
+            "before_median": 5392759,
+            "candidate_median": 2018526,
+            "noise": 201885,
+            "ratio": 0.3743030237397963,
+            "outcome": "improved"
+          },
+          "rollback": {
+            "before_median": 502821,
+            "candidate_median": 56225,
+            "noise": 24915,
+            "ratio": 0.11181911654445618,
+            "outcome": "improved"
+          }
+        },
+        "kernel_peak_rss_bytes": {
+          "seed": {
+            "before_median": 19443712,
+            "candidate_median": 19849216,
+            "noise": 172032,
+            "ratio": 1.0208552770170634,
+            "outcome": "increased"
+          },
+          "index_build": {
+            "before_median": 22364160,
+            "candidate_median": 23121920,
+            "noise": 270336,
+            "ratio": 1.033882783882784,
+            "outcome": "increased"
+          },
+          "cold_transaction_1": {
+            "before_median": 23478272,
+            "candidate_median": 24154112,
+            "noise": 208896,
+            "ratio": 1.0287857641311933,
+            "outcome": "increased"
+          },
+          "cold_transaction_2": {
+            "before_median": 23478272,
+            "candidate_median": 24154112,
+            "noise": 208896,
+            "ratio": 1.0287857641311933,
+            "outcome": "increased"
+          },
+          "warm": {
+            "before_median": 23478272,
+            "candidate_median": 24154112,
+            "noise": 208896,
+            "ratio": 1.0287857641311933,
+            "outcome": "increased"
+          },
+          "writer_begin": {
+            "before_median": 23478272,
+            "candidate_median": 24154112,
+            "noise": 208896,
+            "ratio": 1.0287857641311933,
+            "outcome": "increased"
+          },
+          "first_insert": {
+            "before_median": 29712384,
+            "candidate_median": 24219648,
+            "noise": 405504,
+            "ratio": 0.815136476426799,
+            "outcome": "improved"
+          },
+          "second_insert": {
+            "before_median": 29741056,
+            "candidate_median": 24223744,
+            "noise": 405504,
+            "ratio": 0.8144883624845063,
+            "outcome": "improved"
+          },
+          "rollback": {
+            "before_median": 29741056,
+            "candidate_median": 24223744,
+            "noise": 405504,
+            "ratio": 0.8144883624845063,
+            "outcome": "improved"
+          }
+        }
+      },
+      "performance_qualification": false
+    },
+    {
+      "finish": "rollback",
+      "rows": 10000,
+      "run": 42595303435,
+      "controller": "f371792589266dd136a49d33ea22da92cea2aa20",
+      "result_sha256": "16bf320dad2db89462823ea3b4a7977a58cf70451a9b1cc3801645cb98a0901a",
+      "assets": {
+        "before": "062a414fc77e25b24f7e47f531e4c8306b47363a44264704f75b4c9fbcdac15c",
+        "candidate": "c85eafa0fb7cc3ca4b662dd1a0ce768a57f698fbd345c306b5143cd8de764f8e"
+      },
+      "source_commits": {
+        "before": "880da6711efd3da4c0d081d3ce0e51d7db777a83",
+        "candidate": "6a793e152c9eea8621bd93fbc3102ac81ee43568"
+      },
+      "outcomes": {
+        "elapsed_ns": {
+          "seed": {
+            "before_median": 127981539,
+            "candidate_median": 131520837,
+            "noise": 12536799,
+            "ratio": 1.0276547541751315,
+            "outcome": "uncertain"
+          },
+          "index_build": {
+            "before_median": 35495065951,
+            "candidate_median": 36151996501,
+            "noise": 3084894201,
+            "ratio": 1.0185076582448636,
+            "outcome": "uncertain"
+          },
+          "cold_transaction_1": {
+            "before_median": 15960450,
+            "candidate_median": 16007548,
+            "noise": 1897830,
+            "ratio": 1.0029509193036537,
+            "outcome": "uncertain"
+          },
+          "cold_transaction_2": {
+            "before_median": 15552394,
+            "candidate_median": 727802,
+            "noise": 3006783,
+            "ratio": 0.04679678254036002,
+            "outcome": "improved"
+          },
+          "writer_begin": {
+            "before_median": 16064,
+            "candidate_median": 9254,
+            "noise": 480,
+            "ratio": 0.5760707171314741,
+            "outcome": "improved"
+          },
+          "first_insert": {
+            "before_median": 76568376,
+            "candidate_median": 9669575,
+            "noise": 4143633,
+            "ratio": 0.12628679756770603,
+            "outcome": "improved"
+          },
+          "second_insert": {
+            "before_median": 45428047,
+            "candidate_median": 8652390,
+            "noise": 1628418,
+            "ratio": 0.190463613811089,
+            "outcome": "improved"
+          },
+          "rollback": {
+            "before_median": 6692828,
+            "candidate_median": 143044,
+            "noise": 135669,
+            "ratio": 0.02137272913632324,
+            "outcome": "improved"
+          }
+        },
+        "kernel_peak_rss_bytes": {
+          "seed": {
+            "before_median": 94552064,
+            "candidate_median": 96354304,
+            "noise": 307200,
+            "ratio": 1.0190608213481198,
+            "outcome": "increased"
+          },
+          "index_build": {
+            "before_median": 117727232,
+            "candidate_median": 121389056,
+            "noise": 270336,
+            "ratio": 1.0311043072855055,
+            "outcome": "increased"
+          },
+          "cold_transaction_1": {
+            "before_median": 118665216,
+            "candidate_median": 122314752,
+            "noise": 86016,
+            "ratio": 1.0307548928238583,
+            "outcome": "increased"
+          },
+          "cold_transaction_2": {
+            "before_median": 118665216,
+            "candidate_median": 122314752,
+            "noise": 86016,
+            "ratio": 1.0307548928238583,
+            "outcome": "increased"
+          },
+          "warm": {
+            "before_median": 118665216,
+            "candidate_median": 122314752,
+            "noise": 86016,
+            "ratio": 1.0307548928238583,
+            "outcome": "increased"
+          },
+          "writer_begin": {
+            "before_median": 118665216,
+            "candidate_median": 122314752,
+            "noise": 86016,
+            "ratio": 1.0307548928238583,
+            "outcome": "increased"
+          },
+          "first_insert": {
+            "before_median": 180420608,
+            "candidate_median": 122408960,
+            "noise": 147456,
+            "ratio": 0.6784644024700327,
+            "outcome": "improved"
+          },
+          "second_insert": {
+            "before_median": 180703232,
+            "candidate_median": 122413056,
+            "noise": 147456,
+            "ratio": 0.6774259355803885,
+            "outcome": "improved"
+          },
+          "rollback": {
+            "before_median": 180703232,
+            "candidate_median": 122413056,
+            "noise": 147456,
+            "ratio": 0.6774259355803885,
+            "outcome": "improved"
+          }
+        }
+      },
+      "performance_qualification": false
+    },
+    {
+      "finish": "rollback",
+      "rows": 100000,
+      "run": 42596463233,
+      "controller": "f371792589266dd136a49d33ea22da92cea2aa20",
+      "result_sha256": "dcde8a3955511f7823e92d785f9463bb856735e53999ee1a18878f96d43629ba",
+      "assets": {
+        "before": "062a414fc77e25b24f7e47f531e4c8306b47363a44264704f75b4c9fbcdac15c",
+        "candidate": "c85eafa0fb7cc3ca4b662dd1a0ce768a57f698fbd345c306b5143cd8de764f8e"
+      },
+      "source_commits": {
+        "before": "880da6711efd3da4c0d081d3ce0e51d7db777a83",
+        "candidate": "6a793e152c9eea8621bd93fbc3102ac81ee43568"
+      },
+      "outcomes": {
+        "elapsed_ns": {
+          "seed": {
+            "before_median": 1404355227,
+            "candidate_median": 1485537827,
+            "noise": 84803886,
+            "ratio": 1.0578077386968703,
+            "outcome": "uncertain"
+          },
+          "index_build": {
+            "before_median": 860452424225,
+            "candidate_median": 849757431560,
+            "noise": 39624517902,
+            "ratio": 0.9875705008622262,
+            "outcome": "uncertain"
+          },
+          "cold_transaction_1": {
+            "before_median": 282879932,
+            "candidate_median": 254666154,
+            "noise": 20782032,
+            "ratio": 0.9002623558322971,
+            "outcome": "uncertain"
+          },
+          "cold_transaction_2": {
+            "before_median": 297410360,
+            "candidate_median": 1211717,
+            "noise": 1541292,
+            "ratio": 0.00407422592810822,
+            "outcome": "improved"
+          },
+          "writer_begin": {
+            "before_median": 23966,
+            "candidate_median": 13490,
+            "noise": 6522,
+            "ratio": 0.5628807477259451,
+            "outcome": "improved"
+          },
+          "first_insert": {
+            "before_median": 927447256,
+            "candidate_median": 15596638,
+            "noise": 51790146,
+            "ratio": 0.01681673852512859,
+            "outcome": "improved"
+          },
+          "second_insert": {
+            "before_median": 535483934,
+            "candidate_median": 15794265,
+            "noise": 27519357,
+            "ratio": 0.02949531068470861,
+            "outcome": "improved"
+          },
+          "rollback": {
+            "before_median": 136225675,
+            "candidate_median": 270901,
+            "noise": 13984707,
+            "ratio": 0.0019886192525748175,
+            "outcome": "improved"
+          }
+        },
+        "kernel_peak_rss_bytes": {
+          "seed": {
+            "before_median": 839110656,
+            "candidate_median": 854573056,
+            "noise": 1069056,
+            "ratio": 1.0184271286384428,
+            "outcome": "increased"
+          },
+          "index_build": {
+            "before_median": 1056661504,
+            "candidate_median": 1090768896,
+            "noise": 946176,
+            "ratio": 1.0322784466651678,
+            "outcome": "increased"
+          },
+          "cold_transaction_1": {
+            "before_median": 1057759232,
+            "candidate_median": 1074679808,
+            "noise": 884736,
+            "ratio": 1.01599662332231,
+            "outcome": "increased"
+          },
+          "cold_transaction_2": {
+            "before_median": 1057759232,
+            "candidate_median": 1074679808,
+            "noise": 884736,
+            "ratio": 1.01599662332231,
+            "outcome": "increased"
+          },
+          "warm": {
+            "before_median": 1057759232,
+            "candidate_median": 1074679808,
+            "noise": 884736,
+            "ratio": 1.01599662332231,
+            "outcome": "increased"
+          },
+          "writer_begin": {
+            "before_median": 1057759232,
+            "candidate_median": 1074679808,
+            "noise": 884736,
+            "ratio": 1.01599662332231,
+            "outcome": "increased"
+          },
+          "first_insert": {
+            "before_median": 1674731520,
+            "candidate_median": 1074716672,
+            "noise": 552960,
+            "ratio": 0.6417247535891604,
+            "outcome": "improved"
+          },
+          "second_insert": {
+            "before_median": 1676197888,
+            "candidate_median": 1074720768,
+            "noise": 552960,
+            "ratio": 0.6411658048813864,
+            "outcome": "improved"
+          },
+          "rollback": {
+            "before_median": 1676197888,
+            "candidate_median": 1074720768,
+            "noise": 552960,
+            "ratio": 0.6411658048813864,
+            "outcome": "improved"
+          }
+        }
+      },
+      "performance_qualification": false
+    }
+  ],
+  "performance_qualification": false
+}
