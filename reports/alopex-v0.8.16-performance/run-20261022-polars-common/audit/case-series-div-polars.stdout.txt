@@ -1,0 +1,1 @@
+{"execution": "ok", "observation": {"kind": "Series", "schema": [["x", "Float64"]], "values": [0.5, null, 1.5]}}

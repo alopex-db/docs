@@ -1,0 +1,1264 @@
+{
+  "case_count": 149,
+  "status_counts": {
+    "failed": 149
+  },
+  "subject_execution_counts": {
+    "ok": 20,
+    "error": 129
+  },
+  "value_matches": 19,
+  "schema_unverified": 20,
+  "families": {
+    "aggregation": {
+      "failed": 10
+    },
+    "batch-boundaries": {
+      "failed": 10
+    },
+    "construction": {
+      "failed": 14
+    },
+    "errors": {
+      "failed": 3
+    },
+    "expression": {
+      "failed": 21
+    },
+    "io": {
+      "failed": 10
+    },
+    "join-concat": {
+      "failed": 9
+    },
+    "namespaces": {
+      "failed": 14
+    },
+    "selection": {
+      "failed": 20
+    },
+    "series": {
+      "failed": 8
+    },
+    "series-diagnostic": {
+      "failed": 8
+    },
+    "table-and-nulls": {
+      "failed": 12
+    },
+    "types-and-shapes": {
+      "failed": 10
+    }
+  },
+  "results": [
+    {
+      "case": "construct-dict",
+      "family": "construction",
+      "expected_error": false,
+      "status": "failed",
+      "kind": "match",
+      "values": "match",
+      "schema": "unverified"
+    },
+    {
+      "case": "construct-empty",
+      "family": "construction",
+      "expected_error": false,
+      "status": "failed",
+      "kind": "match",
+      "values": "match",
+      "schema": "unverified"
+    },
+    {
+      "case": "construct-empty-column",
+      "family": "construction",
+      "expected_error": false,
+      "status": "failed",
+      "kind": "match",
+      "values": "match",
+      "schema": "unverified"
+    },
+    {
+      "case": "construct-all-null",
+      "family": "construction",
+      "expected_error": false,
+      "status": "failed",
+      "kind": "match",
+      "values": "match",
+      "schema": "unverified"
+    },
+    {
+      "case": "construct-bool",
+      "family": "construction",
+      "expected_error": false,
+      "status": "failed",
+      "kind": "match",
+      "values": "mismatch",
+      "schema": "unverified"
+    },
+    {
+      "case": "construct-float",
+      "family": "construction",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "construct-dates",
+      "family": "construction",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "construct-datetimes",
+      "family": "construction",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "construct-schema",
+      "family": "construction",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "construct-series",
+      "family": "construction",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "construct-lazy",
+      "family": "construction",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "column-by-name",
+      "family": "construction",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "schema",
+      "family": "construction",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "module-select",
+      "family": "selection",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "module-select-series",
+      "family": "selection",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "select-all",
+      "family": "selection",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "literal-dtype",
+      "family": "types-and-shapes",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "constructor-nonstrict",
+      "family": "construction",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "NotImplementedError"
+    },
+    {
+      "case": "collect-streaming-option",
+      "family": "selection",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "NotImplementedError"
+    },
+    {
+      "case": "eager-select-name",
+      "family": "selection",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "eager-select-list",
+      "family": "selection",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "eager-select-named",
+      "family": "selection",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "eager-with-columns",
+      "family": "selection",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "eager-filter-partial",
+      "family": "selection",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "eager-filter-all",
+      "family": "selection",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "eager-filter-empty",
+      "family": "selection",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "eager-filter-null-predicate",
+      "family": "selection",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "eager-group-aggregate",
+      "family": "aggregation",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "lazy-select-name",
+      "family": "selection",
+      "expected_error": false,
+      "status": "failed",
+      "kind": "match",
+      "values": "match",
+      "schema": "unverified"
+    },
+    {
+      "case": "lazy-select-list",
+      "family": "selection",
+      "expected_error": false,
+      "status": "failed",
+      "kind": "match",
+      "values": "match",
+      "schema": "unverified"
+    },
+    {
+      "case": "lazy-select-named",
+      "family": "selection",
+      "expected_error": false,
+      "status": "failed",
+      "kind": "match",
+      "values": "match",
+      "schema": "unverified"
+    },
+    {
+      "case": "lazy-with-columns",
+      "family": "selection",
+      "expected_error": false,
+      "status": "failed",
+      "kind": "match",
+      "values": "match",
+      "schema": "unverified"
+    },
+    {
+      "case": "lazy-filter-partial",
+      "family": "selection",
+      "expected_error": false,
+      "status": "failed",
+      "kind": "match",
+      "values": "match",
+      "schema": "unverified"
+    },
+    {
+      "case": "lazy-filter-all",
+      "family": "selection",
+      "expected_error": false,
+      "status": "failed",
+      "kind": "match",
+      "values": "match",
+      "schema": "unverified"
+    },
+    {
+      "case": "lazy-filter-empty",
+      "family": "selection",
+      "expected_error": false,
+      "status": "failed",
+      "kind": "match",
+      "values": "match",
+      "schema": "unverified"
+    },
+    {
+      "case": "lazy-filter-null-predicate",
+      "family": "selection",
+      "expected_error": false,
+      "status": "failed",
+      "kind": "match",
+      "values": "match",
+      "schema": "unverified"
+    },
+    {
+      "case": "lazy-group-aggregate",
+      "family": "aggregation",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "expr-add-method",
+      "family": "expression",
+      "expected_error": false,
+      "status": "failed",
+      "kind": "match",
+      "values": "match",
+      "schema": "unverified"
+    },
+    {
+      "case": "expr-add-operator",
+      "family": "expression",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "expr-reverse-add",
+      "family": "expression",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "expr-column-add",
+      "family": "expression",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "expr-sub",
+      "family": "expression",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "expr-mul",
+      "family": "expression",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "expr-div",
+      "family": "expression",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "expr-division-by-zero",
+      "family": "expression",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "expr-eq",
+      "family": "expression",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "expr-ne",
+      "family": "expression",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "expr-and",
+      "family": "expression",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "expr-or",
+      "family": "expression",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "expr-not",
+      "family": "expression",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "expr-sum",
+      "family": "expression",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "expr-mean",
+      "family": "expression",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "expr-min",
+      "family": "expression",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "expr-max",
+      "family": "expression",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "expr-count",
+      "family": "expression",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "expr-null-count",
+      "family": "expression",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "expr-n-unique",
+      "family": "expression",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "series-add",
+      "family": "series",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "existing-series-add",
+      "family": "series-diagnostic",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "series-sub",
+      "family": "series",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "existing-series-sub",
+      "family": "series-diagnostic",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "series-mul",
+      "family": "series",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "existing-series-mul",
+      "family": "series-diagnostic",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "series-div",
+      "family": "series",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "existing-series-div",
+      "family": "series-diagnostic",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "series-compare",
+      "family": "series",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "existing-series-compare",
+      "family": "series-diagnostic",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "series-sum",
+      "family": "series",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "existing-series-sum",
+      "family": "series-diagnostic",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "series-mean",
+      "family": "series",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "existing-series-mean",
+      "family": "series-diagnostic",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "series-fill-null",
+      "family": "series",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "existing-series-fill-null",
+      "family": "series-diagnostic",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "frame-sort",
+      "family": "table-and-nulls",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "frame-head",
+      "family": "table-and-nulls",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "frame-tail",
+      "family": "table-and-nulls",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "frame-slice",
+      "family": "table-and-nulls",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "frame-unique",
+      "family": "table-and-nulls",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "frame-drop",
+      "family": "table-and-nulls",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "frame-rename",
+      "family": "table-and-nulls",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "frame-fill-null",
+      "family": "table-and-nulls",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "frame-drop-nulls",
+      "family": "table-and-nulls",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "frame-null-count",
+      "family": "table-and-nulls",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "frame-explode",
+      "family": "table-and-nulls",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "NotImplementedError"
+    },
+    {
+      "case": "frame-implode",
+      "family": "table-and-nulls",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "join-inner",
+      "family": "join-concat",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "join-left",
+      "family": "join-concat",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "join-right",
+      "family": "join-concat",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "join-full",
+      "family": "join-concat",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "join-semi",
+      "family": "join-concat",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "join-anti",
+      "family": "join-concat",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "concat-vertical",
+      "family": "join-concat",
+      "expected_error": false,
+      "status": "failed",
+      "kind": "match",
+      "values": "match",
+      "schema": "unverified"
+    },
+    {
+      "case": "concat-horizontal",
+      "family": "join-concat",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "NotImplementedError"
+    },
+    {
+      "case": "concat-diagonal",
+      "family": "join-concat",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "NotImplementedError"
+    },
+    {
+      "case": "group-null-key",
+      "family": "aggregation",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "group-empty",
+      "family": "aggregation",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "aggregate-empty-sum",
+      "family": "aggregation",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "aggregate-empty-mean",
+      "family": "aggregation",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "aggregate-empty-count",
+      "family": "aggregation",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "aggregate-all-null-sum",
+      "family": "aggregation",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "aggregate-all-null-mean",
+      "family": "aggregation",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "aggregate-all-null-count",
+      "family": "aggregation",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "boolean-null-logic",
+      "family": "expression",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "PyAlopexError"
+    },
+    {
+      "case": "list-null-element",
+      "family": "types-and-shapes",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "NotImplementedError"
+    },
+    {
+      "case": "string-lower",
+      "family": "namespaces",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "string-upper",
+      "family": "namespaces",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "string-contains",
+      "family": "namespaces",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "string-replace",
+      "family": "namespaces",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "string-split",
+      "family": "namespaces",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "string-length",
+      "family": "namespaces",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "string-concat",
+      "family": "namespaces",
+      "expected_error": false,
+      "status": "failed",
+      "kind": "match",
+      "values": "match",
+      "schema": "unverified"
+    },
+    {
+      "case": "list-length",
+      "family": "namespaces",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "list-contains",
+      "family": "namespaces",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "list-join",
+      "family": "namespaces",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "list-first",
+      "family": "namespaces",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "datetime-parse-year",
+      "family": "namespaces",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "datetime-format",
+      "family": "namespaces",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "datetime-timezone",
+      "family": "namespaces",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "cast-float",
+      "family": "types-and-shapes",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "cast-nonstrict",
+      "family": "types-and-shapes",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "fill-nan",
+      "family": "types-and-shapes",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "TypeError"
+    },
+    {
+      "case": "window-sum",
+      "family": "types-and-shapes",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "rolling-mean",
+      "family": "types-and-shapes",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "shift",
+      "family": "types-and-shapes",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "pivot",
+      "family": "types-and-shapes",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "unpivot",
+      "family": "types-and-shapes",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "read-csv",
+      "family": "io",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "scan-csv",
+      "family": "io",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "scan-csv-strings",
+      "family": "io",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "write-read-csv",
+      "family": "io",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "read-parquet",
+      "family": "io",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "scan-parquet",
+      "family": "io",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "scan-parquet-strings",
+      "family": "io",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "write-read-parquet",
+      "family": "io",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "read-csv-options",
+      "family": "io",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "read-parquet-projection",
+      "family": "io",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "AttributeError"
+    },
+    {
+      "case": "collect-0",
+      "family": "batch-boundaries",
+      "expected_error": false,
+      "status": "failed",
+      "kind": "match",
+      "values": "match",
+      "schema": "unverified"
+    },
+    {
+      "case": "batches-0",
+      "family": "batch-boundaries",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "PyAlopexError"
+    },
+    {
+      "case": "collect-1023",
+      "family": "batch-boundaries",
+      "expected_error": false,
+      "status": "failed",
+      "kind": "match",
+      "values": "match",
+      "schema": "unverified"
+    },
+    {
+      "case": "batches-1023",
+      "family": "batch-boundaries",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "PyAlopexError"
+    },
+    {
+      "case": "collect-1024",
+      "family": "batch-boundaries",
+      "expected_error": false,
+      "status": "failed",
+      "kind": "match",
+      "values": "match",
+      "schema": "unverified"
+    },
+    {
+      "case": "batches-1024",
+      "family": "batch-boundaries",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "PyAlopexError"
+    },
+    {
+      "case": "collect-1025",
+      "family": "batch-boundaries",
+      "expected_error": false,
+      "status": "failed",
+      "kind": "match",
+      "values": "match",
+      "schema": "unverified"
+    },
+    {
+      "case": "batches-1025",
+      "family": "batch-boundaries",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "PyAlopexError"
+    },
+    {
+      "case": "batches-filter-empty-first",
+      "family": "batch-boundaries",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "PyAlopexError"
+    },
+    {
+      "case": "batches-expressions-null",
+      "family": "batch-boundaries",
+      "expected_error": false,
+      "status": "failed",
+      "reason": "execution_error",
+      "exception": "PyAlopexError"
+    },
+    {
+      "case": "error-missing-column",
+      "family": "errors",
+      "expected_error": true,
+      "status": "failed",
+      "reason": "exception_contract"
+    },
+    {
+      "case": "error-column-length",
+      "family": "errors",
+      "expected_error": true,
+      "status": "failed",
+      "reason": "exception_contract"
+    },
+    {
+      "case": "error-strict-cast",
+      "family": "errors",
+      "expected_error": true,
+      "status": "failed",
+      "reason": "exception_contract"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "schema": "alopex.polars-common-audit/v1",
+  "python": "3.11.11",
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "versions": {
+    "alopex": "0.8.16",
+    "polars": "1.43.2",
+    "polars-runtime-32": "1.43.2"
+  },
+  "required_subject_version": "0.8.16",
+  "source_commit": "02bb9f9ef5007408f9001bb9c8e8a4ef6d8f28d1",
+  "source_sha256": {
+    "polars_common_v0816.py": "0447403f88e96b7f8730aa45d9335617d11782b57769d3e3d8f946ecb06036b1"
+  },
+  "fixture_sha256": {
+    "rows.parquet": "a2082a9060f8498bbac1b3b901a85101770365330f14b1a1a78856bbb4507918",
+    "rows.csv": "a73fd9baf616d1b1c98f39d0e0e3198c3d42d4f1e6124b0f90f64323e06c6e32",
+    "options.csv": "91109dc42bbb5842607fde6ef40afc9e5b063ae9a1834f8259600b1c88dca199"
+  },
+  "scope": "functional audit, not performance or full Polars coverage"
+}

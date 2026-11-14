@@ -1,0 +1,149 @@
+{
+  "case": "construct-dict",
+  "family": "construction",
+  "expected_error": false,
+  "status": "failed",
+  "kind": "match",
+  "values": "match",
+  "schema": "unverified",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": [
+        [
+          "id",
+          "Int64"
+        ],
+        [
+          "group",
+          "String"
+        ],
+        [
+          "value",
+          "Int64"
+        ],
+        [
+          "label",
+          "String"
+        ],
+        [
+          "items",
+          "List(String)"
+        ]
+      ],
+      "values": [
+        [
+          "id",
+          [
+            1,
+            2,
+            3,
+            4
+          ]
+        ],
+        [
+          "group",
+          [
+            "a",
+            "a",
+            "b",
+            "b"
+          ]
+        ],
+        [
+          "value",
+          [
+            10,
+            20,
+            null,
+            40
+          ]
+        ],
+        [
+          "label",
+          [
+            "One",
+            null,
+            "三",
+            "Four"
+          ]
+        ],
+        [
+          "items",
+          [
+            [
+              "a",
+              "b"
+            ],
+            [],
+            null,
+            [
+              "c"
+            ]
+          ]
+        ]
+      ]
+    }
+  },
+  "subject": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": null,
+      "values": [
+        [
+          "id",
+          [
+            1,
+            2,
+            3,
+            4
+          ]
+        ],
+        [
+          "group",
+          [
+            "a",
+            "a",
+            "b",
+            "b"
+          ]
+        ],
+        [
+          "value",
+          [
+            10,
+            20,
+            null,
+            40
+          ]
+        ],
+        [
+          "label",
+          [
+            "One",
+            null,
+            "三",
+            "Four"
+          ]
+        ],
+        [
+          "items",
+          [
+            [
+              "a",
+              "b"
+            ],
+            [],
+            null,
+            [
+              "c"
+            ]
+          ]
+        ]
+      ],
+      "schema_error": "AttributeError"
+    }
+  }
+}

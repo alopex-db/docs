@@ -1,0 +1,1 @@
+{"execution": "error", "exception": "InvalidOperationError", "message": "conversion from `str` to `i64` failed in column 'x' for 1 out of 1 values: [\"bad\"]\n\nThis error occurred in the following expression:\n\tcol(\"x\").strict_cast(Int64)\n"}

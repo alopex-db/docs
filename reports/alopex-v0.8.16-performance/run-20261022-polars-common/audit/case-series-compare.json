@@ -1,0 +1,30 @@
+{
+  "case": "series-compare",
+  "family": "series",
+  "expected_error": false,
+  "status": "failed",
+  "reason": "execution_error",
+  "exception": "TypeError",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "Series",
+      "schema": [
+        [
+          "x",
+          "Boolean"
+        ]
+      ],
+      "values": [
+        false,
+        null,
+        true
+      ]
+    }
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "TypeError",
+    "message": "cannot create 'builtins.Series' instances"
+  }
+}

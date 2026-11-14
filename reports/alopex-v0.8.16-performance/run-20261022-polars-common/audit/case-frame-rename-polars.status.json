@@ -1,0 +1,5 @@
+{
+  "case": "frame-rename",
+  "engine": "polars",
+  "exit_code": 0
+}

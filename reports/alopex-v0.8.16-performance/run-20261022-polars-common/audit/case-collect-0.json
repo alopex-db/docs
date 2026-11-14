@@ -1,0 +1,53 @@
+{
+  "case": "collect-0",
+  "family": "batch-boundaries",
+  "expected_error": false,
+  "status": "failed",
+  "kind": "match",
+  "values": "match",
+  "schema": "unverified",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": [
+        [
+          "label",
+          "Null"
+        ],
+        [
+          "id",
+          "Null"
+        ]
+      ],
+      "values": [
+        [
+          "label",
+          []
+        ],
+        [
+          "id",
+          []
+        ]
+      ]
+    }
+  },
+  "subject": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": null,
+      "values": [
+        [
+          "label",
+          []
+        ],
+        [
+          "id",
+          []
+        ]
+      ],
+      "schema_error": "AttributeError"
+    }
+  }
+}

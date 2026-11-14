@@ -1,0 +1,49 @@
+{
+  "case": "boolean-null-logic",
+  "family": "expression",
+  "expected_error": false,
+  "status": "failed",
+  "reason": "execution_error",
+  "exception": "PyAlopexError",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": [
+        [
+          "and",
+          "Boolean"
+        ],
+        [
+          "or",
+          "Boolean"
+        ]
+      ],
+      "values": [
+        [
+          "and",
+          [
+            null,
+            false,
+            null,
+            false
+          ]
+        ],
+        [
+          "or",
+          [
+            true,
+            null,
+            true,
+            null
+          ]
+        ]
+      ]
+    }
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "PyAlopexError",
+    "message": "type mismatch: expected Boolean, got Int64"
+  }
+}

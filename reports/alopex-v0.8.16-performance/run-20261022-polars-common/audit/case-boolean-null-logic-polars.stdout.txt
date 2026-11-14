@@ -1,0 +1,1 @@
+{"execution": "ok", "observation": {"kind": "DataFrame", "schema": [["and", "Boolean"], ["or", "Boolean"]], "values": [["and", [null, false, null, false]], ["or", [true, null, true, null]]]}}

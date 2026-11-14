@@ -78,7 +78,13 @@ Codexは初期10,000件の専用データを使い、writeは明示beginから�
 
 今回のrandomアクセスはwarm cacheでのAPI応答性能であり、cold disk I/O、並行負荷、メモリを超える規模の評価ではない。SQLとKVはそれぞれ同じ責務の製品と比較し、両API境界の倍率を混ぜない。既知のDROP SEQUENCEは実行していない。SQL random DELETEとKV point read/rangeの差は[性能改善Issue #712](https://github.com/alopex-db/alopex/issues/712)の調査対象とする。
 
-## Polars互換：DataFrameを明示構築しない入口
+## Polars互換：通常操作と入口の不足
+
+Codexは初回6ケースだけでは互換性の検証に不足するため、通常の操作を13分類・149ケースへ広げ、公開Alopex 0.8.16と実Polars 1.43.2へ同じコードを流した。Alopexは20ケースを実行でき、19ケースで全値・Python型・NULL・順序が一致したが、20ケースすべてで公開schemaを取得できず完全契約を確認できなかった。bool構築ではTrue/Falseが1/0になる差もあった。残る129ケースの例外には期待した異常系3件も含み、129個のAPIが未実装という意味ではない。
+
+今回の完全契約を満たしたケースは0であり、CodexはPolars互換を達成済みと扱わない。[通常操作の全行列・分類別結果・再実行方法](alopex-v0.8.16-performance/run-20261022-polars-common/report.md)は、機能の未達を性能比と分けて記録する。[Issue #722](https://github.com/alopex-db/alopex/issues/722)は通常操作の差分テストと不足修正を所有し、初回6件だけの修正では閉じない。
+
+### 先行した6入口とファイル走査の比較
 
 Codexはトップレベル関数・Series演算と、CSV／ParquetからのLazy実行も評価対象に追加した。**公開Alopex v0.8.16は、今回確認した6つの入口・操作でPolars互換を満たしていない。** moduleのselect／scan_csv／scan_parquet、Series直接構築・加算、LazyFrame直接構築が未対応だった。先行のDataFrame構築経由の測定だけを根拠に、これらの互換APIも比較済みとは扱わない。
 

@@ -1,0 +1,39 @@
+{
+  "case": "batches-0",
+  "family": "batch-boundaries",
+  "expected_error": false,
+  "status": "failed",
+  "reason": "execution_error",
+  "exception": "PyAlopexError",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": [
+        [
+          "label",
+          "Null"
+        ],
+        [
+          "id",
+          "Null"
+        ]
+      ],
+      "values": [
+        [
+          "label",
+          []
+        ],
+        [
+          "id",
+          []
+        ]
+      ]
+    }
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "PyAlopexError",
+    "message": "streaming unsupported for dataframe_scan: legacy_materialized_source"
+  }
+}

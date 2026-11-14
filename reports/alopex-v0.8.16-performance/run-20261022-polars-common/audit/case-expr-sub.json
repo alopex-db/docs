@@ -1,0 +1,36 @@
+{
+  "case": "expr-sub",
+  "family": "expression",
+  "expected_error": false,
+  "status": "failed",
+  "reason": "execution_error",
+  "exception": "TypeError",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": [
+        [
+          "result",
+          "Int64"
+        ]
+      ],
+      "values": [
+        [
+          "result",
+          [
+            9,
+            19,
+            null,
+            39
+          ]
+        ]
+      ]
+    }
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "TypeError",
+    "message": "unsupported operand type(s) for -: 'builtins.Expr' and 'int'"
+  }
+}

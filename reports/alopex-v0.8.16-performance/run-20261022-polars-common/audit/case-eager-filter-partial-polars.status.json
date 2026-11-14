@@ -1,0 +1,5 @@
+{
+  "case": "eager-filter-partial",
+  "engine": "polars",
+  "exit_code": 0
+}

@@ -1,0 +1,5 @@
+{
+  "case": "series-compare",
+  "engine": "polars",
+  "exit_code": 0
+}

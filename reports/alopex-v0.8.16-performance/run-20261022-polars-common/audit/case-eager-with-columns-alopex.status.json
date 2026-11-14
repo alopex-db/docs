@@ -1,0 +1,5 @@
+{
+  "case": "eager-with-columns",
+  "engine": "alopex",
+  "exit_code": 0
+}

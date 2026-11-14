@@ -1,0 +1,5 @@
+{
+  "case": "expr-null-count",
+  "engine": "polars",
+  "exit_code": 0
+}

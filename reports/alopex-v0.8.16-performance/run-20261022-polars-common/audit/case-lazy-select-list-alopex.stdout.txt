@@ -1,0 +1,1 @@
+{"execution": "ok", "observation": {"kind": "DataFrame", "schema": null, "values": [["label", ["One", null, "三", "Four"]], ["id", [1, 2, 3, 4]]], "schema_error": "AttributeError"}}

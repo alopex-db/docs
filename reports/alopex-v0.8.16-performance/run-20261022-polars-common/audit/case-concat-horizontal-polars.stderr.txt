@@ -1,0 +1,3 @@
+<audit-worktree>/scripts/reference_tests/polars_common_v0816.py:172: DeprecationWarning: the default behavior of `how='horizontal'` for `concat` is deprecated and will require equal heights in the next breaking release. Use `how='horizontal_extend'` to keep the current behavior.
+(Deprecated in version 1.42.1)
+  add("concat-horizontal", "join-concat", lambda p, c: p.concat(

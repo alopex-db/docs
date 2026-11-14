@@ -1,0 +1,21 @@
+{
+  "case": "series-sum",
+  "family": "series",
+  "expected_error": false,
+  "status": "failed",
+  "reason": "execution_error",
+  "exception": "TypeError",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "int",
+      "schema": null,
+      "values": 4
+    }
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "TypeError",
+    "message": "cannot create 'builtins.Series' instances"
+  }
+}

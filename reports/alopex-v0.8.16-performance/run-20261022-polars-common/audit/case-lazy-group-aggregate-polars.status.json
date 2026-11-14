@@ -1,0 +1,5 @@
+{
+  "case": "lazy-group-aggregate",
+  "engine": "polars",
+  "exit_code": 0
+}

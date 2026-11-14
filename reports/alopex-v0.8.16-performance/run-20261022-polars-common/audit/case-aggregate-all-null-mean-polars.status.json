@@ -1,0 +1,5 @@
+{
+  "case": "aggregate-all-null-mean",
+  "engine": "polars",
+  "exit_code": 0
+}

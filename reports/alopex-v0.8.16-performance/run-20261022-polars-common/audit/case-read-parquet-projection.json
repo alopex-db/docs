@@ -1,0 +1,49 @@
+{
+  "case": "read-parquet-projection",
+  "family": "io",
+  "expected_error": false,
+  "status": "failed",
+  "reason": "execution_error",
+  "exception": "AttributeError",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": [
+        [
+          "label",
+          "String"
+        ],
+        [
+          "id",
+          "Int64"
+        ]
+      ],
+      "values": [
+        [
+          "label",
+          [
+            "One",
+            null,
+            "三",
+            "Four"
+          ]
+        ],
+        [
+          "id",
+          [
+            1,
+            2,
+            3,
+            4
+          ]
+        ]
+      ]
+    }
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "AttributeError",
+    "message": "module 'alopex' has no attribute 'read_parquet'"
+  }
+}

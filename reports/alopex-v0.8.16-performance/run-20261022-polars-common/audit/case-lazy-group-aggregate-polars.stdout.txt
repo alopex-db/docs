@@ -1,0 +1,1 @@
+{"execution": "ok", "observation": {"kind": "DataFrame", "schema": [["group", "String"], ["sum", "Int64"], ["mean", "Float64"], ["count", "UInt32"]], "values": [["group", ["a", "b"]], ["sum", [30, 40]], ["mean", [15.0, 40.0]], ["count", [2, 1]]]}}

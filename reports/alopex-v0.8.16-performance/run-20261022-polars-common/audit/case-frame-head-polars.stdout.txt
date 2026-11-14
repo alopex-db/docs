@@ -1,0 +1,1 @@
+{"execution": "ok", "observation": {"kind": "DataFrame", "schema": [["id", "Int64"], ["group", "String"], ["value", "Int64"], ["label", "String"], ["items", "List(String)"]], "values": [["id", [1, 2]], ["group", ["a", "a"]], ["value", [10, 20]], ["label", ["One", null]], ["items", [["a", "b"], []]]]}}

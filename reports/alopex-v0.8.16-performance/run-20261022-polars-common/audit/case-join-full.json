@@ -1,0 +1,87 @@
+{
+  "case": "join-full",
+  "family": "join-concat",
+  "expected_error": false,
+  "status": "failed",
+  "reason": "execution_error",
+  "exception": "AttributeError",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": [
+        [
+          "key",
+          "Int64"
+        ],
+        [
+          "left",
+          "Int64"
+        ],
+        [
+          "key_right",
+          "Int64"
+        ],
+        [
+          "right",
+          "Int64"
+        ]
+      ],
+      "values": [
+        [
+          "key",
+          [
+            1,
+            2,
+            2,
+            2,
+            2,
+            null,
+            null
+          ]
+        ],
+        [
+          "left",
+          [
+            10,
+            20,
+            20,
+            30,
+            30,
+            40,
+            null
+          ]
+        ],
+        [
+          "key_right",
+          [
+            null,
+            2,
+            2,
+            2,
+            2,
+            null,
+            3
+          ]
+        ],
+        [
+          "right",
+          [
+            null,
+            50,
+            60,
+            50,
+            60,
+            80,
+            70
+          ]
+        ]
+      ]
+    }
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "AttributeError",
+    "message": "'builtins.DataFrame' object has no attribute 'join'"
+  }
+}

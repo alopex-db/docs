@@ -1,0 +1,67 @@
+{
+  "case": "lazy-group-aggregate",
+  "family": "aggregation",
+  "expected_error": false,
+  "status": "failed",
+  "reason": "execution_error",
+  "exception": "AttributeError",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": [
+        [
+          "group",
+          "String"
+        ],
+        [
+          "sum",
+          "Int64"
+        ],
+        [
+          "mean",
+          "Float64"
+        ],
+        [
+          "count",
+          "UInt32"
+        ]
+      ],
+      "values": [
+        [
+          "group",
+          [
+            "a",
+            "b"
+          ]
+        ],
+        [
+          "sum",
+          [
+            30,
+            40
+          ]
+        ],
+        [
+          "mean",
+          [
+            15.0,
+            40.0
+          ]
+        ],
+        [
+          "count",
+          [
+            2,
+            1
+          ]
+        ]
+      ]
+    }
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "AttributeError",
+    "message": "'builtins.LazyFrame' object has no attribute 'group_by'"
+  }
+}

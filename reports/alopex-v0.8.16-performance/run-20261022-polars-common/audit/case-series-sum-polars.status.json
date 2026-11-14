@@ -1,0 +1,5 @@
+{
+  "case": "series-sum",
+  "engine": "polars",
+  "exit_code": 0
+}

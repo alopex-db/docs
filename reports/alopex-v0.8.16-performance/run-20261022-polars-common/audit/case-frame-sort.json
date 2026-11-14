@@ -1,0 +1,93 @@
+{
+  "case": "frame-sort",
+  "family": "table-and-nulls",
+  "expected_error": false,
+  "status": "failed",
+  "reason": "execution_error",
+  "exception": "AttributeError",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": [
+        [
+          "id",
+          "Int64"
+        ],
+        [
+          "group",
+          "String"
+        ],
+        [
+          "value",
+          "Int64"
+        ],
+        [
+          "label",
+          "String"
+        ],
+        [
+          "items",
+          "List(String)"
+        ]
+      ],
+      "values": [
+        [
+          "id",
+          [
+            4,
+            2,
+            1,
+            3
+          ]
+        ],
+        [
+          "group",
+          [
+            "b",
+            "a",
+            "a",
+            "b"
+          ]
+        ],
+        [
+          "value",
+          [
+            40,
+            20,
+            10,
+            null
+          ]
+        ],
+        [
+          "label",
+          [
+            "Four",
+            null,
+            "One",
+            "三"
+          ]
+        ],
+        [
+          "items",
+          [
+            [
+              "c"
+            ],
+            [],
+            [
+              "a",
+              "b"
+            ],
+            null
+          ]
+        ]
+      ]
+    }
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "AttributeError",
+    "message": "'builtins.DataFrame' object has no attribute 'sort'"
+  }
+}

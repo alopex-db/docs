@@ -1,0 +1,5 @@
+{
+  "case": "collect-1023",
+  "engine": "polars",
+  "exit_code": 0
+}

@@ -1,0 +1,5 @@
+{
+  "case": "read-parquet-projection",
+  "engine": "alopex",
+  "exit_code": 0
+}

@@ -1,0 +1,45 @@
+{
+  "case": "concat-horizontal",
+  "family": "join-concat",
+  "expected_error": false,
+  "status": "failed",
+  "reason": "execution_error",
+  "exception": "NotImplementedError",
+  "reference": {
+    "execution": "ok",
+    "observation": {
+      "kind": "DataFrame",
+      "schema": [
+        [
+          "a",
+          "Int64"
+        ],
+        [
+          "b",
+          "Int64"
+        ]
+      ],
+      "values": [
+        [
+          "a",
+          [
+            1,
+            2
+          ]
+        ],
+        [
+          "b",
+          [
+            3,
+            4
+          ]
+        ]
+      ]
+    }
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "NotImplementedError",
+    "message": "Alopex does not yet implement Polars option non-vertical concat"
+  }
+}

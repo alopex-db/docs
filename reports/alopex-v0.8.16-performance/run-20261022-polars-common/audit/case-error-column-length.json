@@ -1,0 +1,17 @@
+{
+  "case": "error-column-length",
+  "family": "errors",
+  "expected_error": true,
+  "status": "failed",
+  "reason": "exception_contract",
+  "reference": {
+    "execution": "error",
+    "exception": "ShapeError",
+    "message": "could not create a new DataFrame: height of column 'b' (2) does not match height of column 'a' (1)"
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "PyAlopexError",
+    "message": "schema mismatch: column length mismatch: 'b' has length 2, expected 1"
+  }
+}

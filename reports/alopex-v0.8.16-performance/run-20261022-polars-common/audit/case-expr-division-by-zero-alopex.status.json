@@ -1,0 +1,5 @@
+{
+  "case": "expr-division-by-zero",
+  "engine": "alopex",
+  "exit_code": 0
+}

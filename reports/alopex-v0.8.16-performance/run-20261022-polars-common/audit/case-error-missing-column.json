@@ -1,0 +1,17 @@
+{
+  "case": "error-missing-column",
+  "family": "errors",
+  "expected_error": true,
+  "status": "failed",
+  "reason": "exception_contract",
+  "reference": {
+    "execution": "error",
+    "exception": "ColumnNotFoundError",
+    "message": "unable to find column \"missing\"; valid columns: [\"id\", \"group\", \"value\", \"label\", \"items\"]\n\nResolved plan until failure:\n\n\t---> FAILED HERE RESOLVING 'select' <---\nDF [\"id\", \"group\", \"value\", \"label\", ...]; PROJECT */5 COLUMNS\n\nThis error occurred with the following context stack:\n\t[1] 'select'\n"
+  },
+  "subject": {
+    "execution": "error",
+    "exception": "PyAlopexError",
+    "message": "column not found: missing"
+  }
+}
